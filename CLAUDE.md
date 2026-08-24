@@ -11,9 +11,28 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 1 (The sequence spine) **complete**. Phase 2 (ML core) is next
-- **Last completed:** Phase 1 on 2026-08-24 (see `Docs/CHANGELOG.md`)
-- **Blocked on:** nothing for Phase 2. Open question 6 (35M vs 150M backbone) is worth settling early in Phase 2 but does not block starting it. Q1 gates Phase 3, Q2 and Q3 gate Phase 5
+- **Phase:** 2 (ML core) **complete**. Phase 3 (Order tab) is next
+- **Last completed:** Phase 2 on 2026-08-24 (see `Docs/CHANGELOG.md`)
+- **Blocked on:** **open question 1 gates Phase 3** and must be answered before it starts: which datasets for the disorder, SS and TM heads (DisProt, CB513, TOPCONS, DeepTMHMM), and are they trained here or are published heads fine-tuned? Q2 and Q3 gate Phase 5
+
+### Decisions and findings from Phase 2
+
+- **The premise is proven: 98.8% ANE residency** for esm2_t12_35M_UR50D. The
+  risk register's fatal risk is retired.
+- **fair-esm's `RotaryEmbedding` caches cos/sin tables keyed on sequence length
+  in Python.** A naive `torch.jit.trace` freezes them at the traced length, so
+  with `EnumeratedShapes` every other bucket is silently wrong. `convert_backbone.py`
+  swaps in a traceable version and asserts that it replaced a non-zero count.
+- **The ANE is fp16 hardware.** fp32 achieves 0% residency (all 682 ops on CPU).
+  The plan's `max absolute error < 1e-2` parity gate was therefore unachievable
+  and has been revised to relative error < 1% plus cosine > 0.999 (Marc's call).
+- **Exclude `const` from the residency denominator.** They execute nowhere and
+  are 58% of this program: including them reports 41.5% instead of 98.8%.
+- **The model is a build artefact and is NOT committed** (67 MB). The tokeniser
+  JSON IS committed: it is the Python-to-Swift contract and is 1 KB. Tests that
+  need the model skip with an explicit reason when it is absent.
+- **Python 3.12 and torch 2.7.0 specifically.** coremltools 9.0 ships no wheel
+  for this machine's default 3.14, and warns on any torch newer than 2.7.0.
 
 ### Decisions taken in Phase 1
 

@@ -79,3 +79,35 @@ struct SequenceTests {
         #expect(residue.authorNumber == -3)
     }
 }
+
+@Suite("Residue identity, hostile input")
+struct ResidueIdentityHostileInputTests {
+
+    @Test("A character whose uppercase form is multi-character does not crash")
+    func multiCharacterUppercaseIsSafe() {
+        // Found by the Phase 2 tokeniser tests. `Character(code.uppercased())`
+        // traps whenever uppercasing is not one-to-one, and the German sharp s
+        // is the everyday example: "\u{00DF}".uppercased() == "SS". A single one
+        // of these pasted into the sequence field crashed the app.
+        let identity = ResidueIdentity(code: "\u{00DF}")
+        #expect(identity == .nonCanonical("\u{00DF}"))
+        #expect(!identity.isScorable)
+    }
+
+    @Test("Ligatures and other awkward characters survive as non-canonical")
+    func awkwardCharactersSurvive() {
+        for character in ["\u{FB01}", "\u{0130}", "\u{01F0}", "\u{1E9E}"] {
+            guard let scalar = character.first else { continue }
+            let identity = ResidueIdentity(code: scalar)
+            #expect(!identity.isScorable)
+        }
+    }
+
+    @Test("A whole sequence of awkward characters parses without crashing")
+    func awkwardSequenceParses() {
+        let sequence = ProteinSequence(
+            name: "hostile", letters: "M\u{00DF}K\u{FB01}V", source: .pasted)
+        #expect(sequence.count == 5)
+        #expect(sequence.residues[1].identity == .nonCanonical("\u{00DF}"))
+    }
+}

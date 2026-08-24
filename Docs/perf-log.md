@@ -54,3 +54,65 @@ by a test rather than by eye.
 
 The ruler's frame timing on real hardware is a Phase 3 measurement, once there
 are model-derived tracks stacked on it and the row count is realistic.
+
+
+## Phase 2 (2026-08-24)
+
+### Neural Engine residency: 98.8% (gate: >90%) PASS
+
+The number the whole premise rests on. Measured with `MLComputePlan`, which
+reports the device Core ML plans for each operation, rather than read off an
+Instruments trace.
+
+| | esm2_t12_35M_UR50D |
+|---|---|
+| Executable operations | 755 |
+| Planned for the ANE | 746 (**98.8%**) |
+| Planned for the CPU | 9 (1.2%) |
+| `const` operations excluded | 1043 |
+
+The 9 CPU operations are the padding-mask logic (`equal`, `greater_equal`,
+`select`, `cast`, one `add`, one `gather`): trivial elementwise work that is
+expected to stay on the CPU.
+
+**Counting `const` in the denominator would have reported 41.5% and a false
+FAIL.** Constants are weights and literals that execute nowhere and are assigned
+no device; here they are 58% of the program. Residency is a claim about the
+operations that actually run.
+
+### Precision is not a free choice
+
+| | fp16 | fp32 |
+|---|---|---|
+| ANE residency | **98.8%** | **0.0%** (all 682 ops on CPU) |
+| Package size | 67.4 MB | 134.4 MB |
+| Max absolute error vs PyTorch | 0.031 | 0.0017 |
+| Relative error (of signal scale) | 0.61% | 0.03% |
+| Cosine similarity | 0.99997 | 0.99999 |
+| delta-LLR Spearman rho | 0.999975 | 0.999999 |
+
+The Neural Engine is fp16 hardware. fp32 is more accurate and **cannot run on
+the ANE at all**, which makes it unshippable for this app regardless of its
+accuracy. This is why the plan's original `max absolute error < 1e-2` gate was
+replaced with a relative one: as written it selected for a model that defeats
+the premise.
+
+### Latency: development Mac only, NOT the budget
+
+Measured on an M1 Max. The build plan's budgets are for iPhone 15 Pro class
+hardware and an M-series ANE is not an A-series ANE, so **these are not the
+budget numbers and must not be recorded as though they were.**
+
+| Bucket | Median ms |
+|---|---|
+| 128 | 4.0 |
+| 256 | 10.0 |
+| 384 | 31.3 |
+| 512 | 47.7 |
+| 768 | 92.2 |
+| 1024 | 147.3 |
+
+A 300-residue sequence needs 302 tokens and so lands in the 384 bucket: 31 ms
+here. The budget is < 250 ms on an iPhone. That leaves a large apparent margin,
+but the honest statement is that **the < 250 ms budget is still unmeasured**: it
+needs an on-device XCTest measure block, which is outstanding.

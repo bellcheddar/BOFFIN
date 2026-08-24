@@ -78,3 +78,40 @@ domain, so a poly-acidic peptide reads 3.49 rather than exactly 4.05. Both
 behaviours are pinned by tests.
 
 111 package tests plus 3 UI tests, all passing.
+
+
+## Phase 2: ML core (2026-08-24)
+
+The phase the risk register calls fatal if it fails. **It passes.**
+
+- **Conversion pipeline** in `Tools/coreml/`, pinned to Python 3.12 and torch
+  2.7.0 (the newest coremltools 9.0 has been tested against). Produces the
+  `.mlpackage`, the tokeniser JSON and PyTorch reference tensors.
+- **ANE residency 98.8%** for esm2_t12_35M_UR50D, 746 of 755 executable
+  operations, measured with `MLComputePlan` rather than eyeballed in
+  Instruments. The 9 CPU operations are padding-mask elementwise work.
+- **Parity gate passes** on all six shape buckets: relative error 0.48% to
+  0.61%, cosine similarity 0.99997, delta-LLR Spearman rho 0.999975.
+- **`EmbeddingEngine` actor** with shape bucketing, overlap tiling for
+  sequences beyond 1024 tokens, warm-up, and a size-bounded cache.
+- **Cross-language parity test**: the Swift engine is checked against a golden
+  file exported from PyTorch, so a Swift-side tokenising or slicing error
+  cannot hide behind self-consistency.
+
+Three findings worth carrying forward:
+
+1. **fair-esm's rotary embeddings cache by sequence length in Python.** A naive
+   trace bakes the cos/sin tables in at whichever length was traced, so with
+   `EnumeratedShapes` every other bucket is silently wrong. Replaced with a
+   traceable version that precomputes at the maximum length and slices.
+2. **The ANE is fp16 hardware.** fp32 converts, is more accurate, and achieves
+   0% residency. The plan's absolute parity gate selected for exactly that
+   model, and was revised to a relative one.
+3. **`const` operations must be excluded from the residency denominator.** They
+   are 58% of this program and execute nowhere; including them reports 41.5%
+   and a false failure.
+
+Also fixed: `ResidueIdentity(code:)` crashed on any character whose uppercase
+form is more than one character ("\u{00DF}" uppercases to "SS"), which trapped
+`Character.init`. Found by a Phase 2 tokeniser test, fixed in Phase 1 code, with
+regression tests.

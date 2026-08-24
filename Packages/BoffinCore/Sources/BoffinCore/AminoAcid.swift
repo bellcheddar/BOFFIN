@@ -63,7 +63,15 @@ public enum ResidueIdentity: Sendable, Hashable {
     }
 
     public init(code: Character) {
-        let upper = Character(code.uppercased())
+        // `Character.uppercased()` returns a String because uppercasing is not
+        // always one-to-one: "\u{00DF}" uppercases to "SS", and the German
+        // sharp s is not the only one. Feeding that back into `Character(_:)`
+        // traps at runtime, so a single stray character pasted into the
+        // sequence field would crash the app rather than being kept as a
+        // non-canonical residue.
+        let uppercased = code.uppercased()
+        let upper = uppercased.count == 1 ? Character(uppercased) : code
+
         if let acid = AminoAcid(rawValue: upper) {
             self = .canonical(acid)
         } else {

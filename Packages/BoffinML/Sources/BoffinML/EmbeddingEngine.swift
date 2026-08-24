@@ -5,14 +5,18 @@
 //
 //  Every analytical feature in BOFFIN reads from a single ESM-2 pass on the
 //  Neural Engine. Per-residue hidden states drive order and boundaries,
-//  masked-token logits drive fitness, and the pooled embedding drives family
-//  and homolog search. Do not build independent pipelines per feature.
+//  masked-token logits drive fitness, and the mean-pooled embedding drives
+//  family and homolog search. Do not build independent pipelines per feature:
+//  the expensive step is amortised across the whole app, and that amortisation
+//  is the reason the app is viable on a phone at all.
 //
-//  Phase 0 establishes the module boundary and the actor's public surface.
-//  Phase 2 supplies the Core ML backing, shape bucketing, tiling, warm-up and
-//  the parity and residency gates.
+//  Measured for esm2_t12_35M_UR50D on 2026-08-24: 98.8% of executable
+//  operations planned for the Neural Engine, 746 of 755. See Docs/perf-log.md.
 
 import BoffinCore
+import CoreML
+import Foundation
+import OSLog
 
 /// Sequence-length buckets for the Neural Engine.
 ///
@@ -21,7 +25,7 @@ import BoffinCore
 /// padded up to the smallest fitting bucket, the padding is masked, and the
 /// output is sliced back. Sequences longer than the largest bucket are tiled
 /// with overlap and stitched.
-public enum ShapeBucket: Int, CaseIterable, Sendable, Comparable {
+public enum ShapeBucket: Int, CaseIterable, Sendable, Comparable, Codable {
     case tokens128 = 128
     case tokens256 = 256
     case tokens384 = 384
@@ -37,21 +41,270 @@ public enum ShapeBucket: Int, CaseIterable, Sendable, Comparable {
         lhs.rawValue < rhs.rawValue
     }
 
-    /// The smallest bucket that fits `tokenCount`, or `nil` if the sequence
-    /// must be tiled.
+    /// The smallest bucket that fits `tokenCount`, or `nil` if tiling is needed.
     public static func smallestFitting(tokenCount: Int) -> ShapeBucket? {
         allCases.first { $0.rawValue >= tokenCount }
     }
 }
 
-/// The single point of access to the backbone. Core ML models are not
-/// thread-safe under concurrent prediction, so all traffic is serialised here.
-public actor EmbeddingEngine {
-    public init() {}
+/// The output of one pass, and the three tensors the app fans out from.
+public struct EmbeddingResult: Sendable {
+    /// Per-residue hidden states, aligned one-to-one with the sequence.
+    public let hiddenStates: [[Float]]
 
-    /// Pay the ANE compilation cost at launch with a dummy input, so a user
-    /// never sees it on their first real analysis.
+    /// Mean-pooled embedding over real residues (special tokens and padding
+    /// excluded, since pooling over pad tokens dilutes the vector towards
+    /// whatever the model does with nothing).
+    public let pooled: [Float]
+
+    /// Hidden dimension.
+    public var width: Int { pooled.count }
+
+    /// How many inference passes this took. More than one means the sequence
+    /// was tiled.
+    public let passes: Int
+
+    public init(hiddenStates: [[Float]], pooled: [Float], passes: Int) {
+        self.hiddenStates = hiddenStates
+        self.pooled = pooled
+        self.passes = passes
+    }
+}
+
+public enum EmbeddingError: Error, Sendable {
+    case modelUnavailable(String)
+    case tokeniserUnavailable(String)
+    case emptySequence
+    case unexpectedOutputShape(String)
+    case tilingFailed
+}
+
+/// The single point of access to the backbone.
+///
+/// Core ML models are not thread-safe under concurrent prediction, so all
+/// traffic is serialised through this actor.
+public actor EmbeddingEngine {
+
+    private let modelURL: URL
+    private let tokeniser: Tokeniser
+    private var model: MLModel?
+    private var compiledURL: URL?
+    private var cache: [String: EmbeddingResult] = [:]
+    private let cacheLimit: Int
+    private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "EmbeddingEngine")
+
+    /// - Parameters:
+    ///   - modelURL: a compiled `.mlmodelc` or an `.mlpackage`.
+    ///   - tokeniserURL: the JSON exported alongside the model.
+    ///   - cacheLimit: how many results to retain, keyed by sequence.
+    /// - Throws: ``EmbeddingError/tokeniserUnavailable(_:)`` when the alphabet
+    ///   cannot be read. The model itself is loaded lazily on first use, so a
+    ///   missing model surfaces at ``embed(_:)`` rather than here.
+    public init(modelURL: URL, tokeniserURL: URL, cacheLimit: Int = 16) throws {
+        self.modelURL = modelURL
+        self.cacheLimit = cacheLimit
+        do {
+            self.tokeniser = try Tokeniser(contentsOf: tokeniserURL)
+        } catch {
+            throw EmbeddingError.tokeniserUnavailable(
+                "\(tokeniserURL.lastPathComponent): \(error.localizedDescription)")
+        }
+    }
+
+    private func loadedModel() async throws -> MLModel {
+        if let model { return model }
+
+        // `MLModel(contentsOf:)` takes a COMPILED model. Handed an .mlpackage it
+        // fails with "Unable to load model ... Compile the model with Xcode",
+        // which is accurate but easy to read as "the model is broken". In the
+        // shipping app the package is compiled at build time; in development and
+        // in tests it is the raw conversion output, so compile it here and keep
+        // the result for the life of the actor.
+        let loadURL: URL
+        if modelURL.pathExtension == "mlpackage" {
+            if let compiled = compiledURL {
+                loadURL = compiled
+            } else {
+                do {
+                    let compiled = try await MLModel.compileModel(at: modelURL)
+                    compiledURL = compiled
+                    loadURL = compiled
+                } catch {
+                    throw EmbeddingError.modelUnavailable(
+                        "could not compile \(modelURL.lastPathComponent): "
+                            + error.localizedDescription)
+                }
+            }
+        } else {
+            loadURL = modelURL
+        }
+
+        let configuration = MLModelConfiguration()
+        // Excluding the GPU deliberately. If an operation cannot run on the
+        // Neural Engine it falls back to the CPU and shows up in a benchmark,
+        // rather than quietly landing on the GPU and looking acceptable while
+        // defeating the premise of the app.
+        configuration.computeUnits = .cpuAndNeuralEngine
+        do {
+            let loaded = try MLModel(contentsOf: loadURL, configuration: configuration)
+            model = loaded
+            return loaded
+        } catch {
+            throw EmbeddingError.modelUnavailable(error.localizedDescription)
+        }
+    }
+
+    /// Pay the Neural Engine compilation cost with a dummy input.
+    ///
+    /// The first prediction after load is markedly slower than every subsequent
+    /// one. Calling this at launch means the user never sees that cost attached
+    /// to their own first sequence, where it would look like the app being slow
+    /// at the thing it exists to do.
     public func warmUp() async {
-        // Phase 2.
+        do {
+            let model = try await loadedModel()
+            let (tokens, _) = tokeniser.encode([], paddedTo: ShapeBucket.tokens128.rawValue)
+            _ = try predict(model: model, tokens: tokens)
+            logger.info("warm-up complete")
+        } catch {
+            logger.error("warm-up failed: \(String(describing: error))")
+        }
+    }
+
+    /// Embed a sequence, tiling if it exceeds the largest bucket.
+    public func embed(_ sequence: ProteinSequence) async throws -> EmbeddingResult {
+        guard sequence.count > 0 else { throw EmbeddingError.emptySequence }
+
+        let key = cacheKey(for: sequence)
+        if let cached = cache[key] { return cached }
+
+        let model = try await loadedModel()
+        let plan = SequenceTiler.plan(
+            residueCount: sequence.count, specialTokens: tokeniser.specialTokenCount)
+
+        var outputs: [(range: Range<Int>, vectors: [[Float]])] = []
+        for tile in plan.tiles {
+            let residues = Array(sequence.residues[tile.residues])
+            let (tokens, residueRange) = tokeniser.encode(
+                residues, paddedTo: tile.bucket.rawValue)
+            let hidden = try predict(model: model, tokens: tokens)
+            let sliced = try slice(hidden, residueRange: residueRange, width: hidden.width)
+            outputs.append((tile.residues, sliced))
+        }
+
+        guard
+            let stitched = SequenceTiler.stitch(outputs, residueCount: sequence.count)
+        else { throw EmbeddingError.tilingFailed }
+
+        let result = EmbeddingResult(
+            hiddenStates: stitched,
+            pooled: meanPool(stitched),
+            passes: plan.tiles.count)
+
+        store(result, forKey: key)
+        return result
+    }
+
+    // MARK: - Internals
+
+    private struct HiddenTensor {
+        let values: MLMultiArray
+        let width: Int
+    }
+
+    private func predict(model: MLModel, tokens: [Int32]) throws -> HiddenTensor {
+        let input = try MLMultiArray(shape: [1, NSNumber(value: tokens.count)], dataType: .int32)
+        for (index, token) in tokens.enumerated() {
+            input[index] = NSNumber(value: token)
+        }
+
+        let features = try MLDictionaryFeatureProvider(dictionary: ["tokens": input])
+        let output = try model.prediction(from: features)
+
+        guard let hidden = output.featureValue(for: "hidden_states")?.multiArrayValue else {
+            throw EmbeddingError.unexpectedOutputShape("hidden_states missing from model output")
+        }
+        guard hidden.shape.count == 3 else {
+            throw EmbeddingError.unexpectedOutputShape(
+                "expected rank 3 hidden states, got shape \(hidden.shape)")
+        }
+        return HiddenTensor(values: hidden, width: hidden.shape[2].intValue)
+    }
+
+    private func slice(
+        _ tensor: HiddenTensor,
+        residueRange: Range<Int>,
+        width: Int
+    ) throws -> [[Float]] {
+        let sequenceLength = tensor.values.shape[1].intValue
+        guard residueRange.upperBound <= sequenceLength else {
+            throw EmbeddingError.unexpectedOutputShape(
+                "residue range \(residueRange) exceeds model output length \(sequenceLength)")
+        }
+
+        var rows: [[Float]] = []
+        rows.reserveCapacity(residueRange.count)
+
+        // Read through raw bytes rather than `withUnsafeBufferPointer(ofType:)`:
+        // Float16's MLShapedArrayScalar conformance is macOS 15+, and these
+        // packages build for macOS 14 so their tests run on the host.
+        //
+        // Both float16 and float32 are handled rather than assuming the model's
+        // declared output type. A model reconverted at a different precision
+        // would otherwise be reinterpreted at the wrong element size, which does
+        // not throw: it produces plausible-looking garbage embeddings.
+        let dataType = tensor.values.dataType
+        tensor.values.withUnsafeBytes { raw in
+            switch dataType {
+            case .float16:
+                let base = raw.bindMemory(to: Float16.self)
+                for position in residueRange {
+                    let start = position * width
+                    var row = [Float](repeating: 0, count: width)
+                    for component in 0..<width {
+                        row[component] = Float(base[start + component])
+                    }
+                    rows.append(row)
+                }
+            case .float32:
+                let base = raw.bindMemory(to: Float.self)
+                for position in residueRange {
+                    let start = position * width
+                    rows.append(Array(base[start..<(start + width)]))
+                }
+            default:
+                rows = []
+            }
+        }
+
+        guard rows.count == residueRange.count else {
+            throw EmbeddingError.unexpectedOutputShape(
+                "unsupported hidden state element type \(dataType.rawValue)")
+        }
+        return rows
+    }
+
+    private func meanPool(_ vectors: [[Float]]) -> [Float] {
+        guard let width = vectors.first?.count, !vectors.isEmpty else { return [] }
+        var total = [Float](repeating: 0, count: width)
+        for vector in vectors {
+            for component in 0..<width { total[component] += vector[component] }
+        }
+        let divisor = Float(vectors.count)
+        for component in 0..<width { total[component] /= divisor }
+        return total
+    }
+
+    private func cacheKey(for sequence: ProteinSequence) -> String {
+        // The letters are the input the model actually sees, so two sequences
+        // with different names but identical residues share a result.
+        sequence.letters
+    }
+
+    private func store(_ result: EmbeddingResult, forKey key: String) {
+        if cache.count >= cacheLimit, let victim = cache.keys.first {
+            cache.removeValue(forKey: victim)
+        }
+        cache[key] = result
     }
 }

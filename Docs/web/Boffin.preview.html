@@ -58,7 +58,7 @@
 <blockquote>
 <p><strong>Turn an iPhone or iPad into a self-contained protein workstation: paste a sequence, get boundaries, disorder, fitness and family, then present the structure from the same device.</strong></p>
 </blockquote>
-<p><img alt="swift" src="https://img.shields.io/badge/swift-6.2-F05138?logo=swift&amp;logoColor=white"> <img alt="swiftui" src="https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&amp;logoColor=white"> <img alt="xcode" src="https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&amp;logoColor=white"> <img alt="tuist" src="https://img.shields.io/badge/Tuist-4.x-6236FF"> <img alt="coreml" src="https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&amp;logoColor=white"> <img alt="esm2" src="https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7"> <img alt="molstar" src="https://img.shields.io/badge/Mol*-MIT-00897B"> <img alt="swift-testing" src="https://img.shields.io/badge/swift--testing-27%20passing-9b51e0"> <img alt="data" src="https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4"> <img alt="offline" src="https://img.shields.io/badge/offline-no%20cloud%20inference-00d084"> <img alt="phase" src="https://img.shields.io/badge/phase-0%20of%2012%20%28foundations%29-fcb900"> <img alt="licence" src="https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey"> <img alt="author" src="https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B"></p>
+<p><img alt="swift" src="https://img.shields.io/badge/swift-6.2-F05138?logo=swift&amp;logoColor=white"> <img alt="swiftui" src="https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&amp;logoColor=white"> <img alt="xcode" src="https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&amp;logoColor=white"> <img alt="project" src="https://img.shields.io/badge/project-native%20Xcode-1575F9"> <img alt="coreml" src="https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&amp;logoColor=white"> <img alt="esm2" src="https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7"> <img alt="molstar" src="https://img.shields.io/badge/Mol*-MIT-00897B"> <img alt="swift-testing" src="https://img.shields.io/badge/swift--testing-27%20passing-9b51e0"> <img alt="data" src="https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4"> <img alt="offline" src="https://img.shields.io/badge/offline-no%20cloud%20inference-00d084"> <img alt="phase" src="https://img.shields.io/badge/phase-0%20of%2012%20%28foundations%29-fcb900"> <img alt="licence" src="https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey"> <img alt="author" src="https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B"></p>
 <table class="emd-info-table">
 <tr>
 <td>🌐 <b>Website</b></td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
@@ -146,7 +146,7 @@ BoffinViewer        → BoffinCore, BoffinStructure
 App                 → everything (wiring only)
 </code></pre>
 <p>This is not a convention: <code>Tools/check-module-graph.sh</code> fails the build on any violation, checking both source imports and package manifest declarations. If a feature seems to need an upward dependency, the abstraction is in the wrong module.</p>
-<p>Project configuration lives in <code>Project.swift</code> (Tuist). The generated <code>.xcodeproj</code> is gitignored, and CI fails if one is ever committed, which makes hand-editing it pointless rather than merely forbidden.</p>
+<p><code>BOFFIN.xcodeproj</code> is a plain native Xcode project, committed to the repository and the source of truth for project configuration. Clone and open it: there is no generation step and no extra toolchain to install. Project changes are made in Xcode and land as a <code>project.pbxproj</code> diff. Per-user state (<code>xcuserdata</code>) is gitignored, and CI fails if any is ever committed.</p>
 <h2>📋 Requirements</h2>
 <div class="emd-table-wrap"><table class="emd-data-table">
 <thead>
@@ -165,17 +165,12 @@ App                 → everything (wiring only)
 <tr>
 <td data-label="Requirement">Xcode</td>
 <td data-label="Version">26.x</td>
-<td data-label="Notes">Command Line Tools alone are not enough: <code>swift test</code> needs <code>lib_TestingInterop.dylib</code>, which ships only with Xcode</td>
+<td data-label="Notes">Command Line Tools alone are not enough: <code>swift test</code> needs <code>lib_TestingInterop.dylib</code>, which ships only with Xcode. Xcode 26 does not bundle simulator runtimes, so run <code>xcodebuild -downloadPlatform iOS</code> once</td>
 </tr>
 <tr>
 <td data-label="Requirement">Swift</td>
 <td data-label="Version">6.2 language mode</td>
 <td data-label="Notes">Strict concurrency enabled</td>
-</tr>
-<tr>
-<td data-label="Requirement">Tuist</td>
-<td data-label="Version">4.x</td>
-<td data-label="Notes"><code>brew install tuist</code></td>
 </tr>
 <tr>
 <td data-label="Requirement">Target OS</td>
@@ -188,12 +183,15 @@ App                 → everything (wiring only)
 <pre><code class="language-bash">git clone https://github.com/bellcheddar/Boffin.git
 cd Boffin
 
-tuist generate            # regenerate the Xcode project (never edit the .pbxproj)
-tuist build
-tuist test
+open BOFFIN.xcodeproj     # no generation step: the project is committed
+
+xcodebuild build -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+xcodebuild test  -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 ./Tools/check-module-graph.sh                 # enforce the module dependency rule
-swift format lint --recursive --strict App Packages Project.swift Tuist.swift
+swift format lint --recursive --strict App Packages
 </code></pre>
 <p>Package-level tests run without a simulator, because every package declares macOS alongside iOS:</p>
 <pre><code class="language-bash">cd Packages/BoffinCore &amp;&amp; swift test
@@ -318,8 +316,9 @@ swift format lint --recursive --strict App Packages Project.swift Tuist.swift
 <h2>✅ To Do</h2>
 <p>Roadmap for BOFFIN, in dependency order. Each phase ends with tests green, performance logged and a demoable build. A phase does not begin until the previous one's acceptance criteria are met. Suggestions welcome.</p>
 <ul class="emd-tasklist">
-<li><span class="emd-check">&#9989;</span> <strong>Phase 0: repository foundations.</strong> Git, seven local SPM packages, Tuist manifest, app shell, CI, swift-format, brand and scientific palette tokens, <code>ResidueTrack</code> with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker</li>
-<li><span class="emd-check">&#11036;</span> <strong>Close the Phase 0 acceptance gaps.</strong> All 27 package tests now pass under Xcode 26.6. Still unproven: <code>tuist generate</code>, the iPhone and iPad simulator builds, and CI, which has never executed. Treat CI's first run as debugging rather than as a gate</li>
+<li><span class="emd-check">&#9989;</span> <strong>Phase 0: repository foundations.</strong> Git, seven local SPM packages, Xcode project, app shell, CI, swift-format, brand and scientific palette tokens, <code>ResidueTrack</code> with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker</li>
+<li><span class="emd-check">&#9989;</span> <strong>Dropped Tuist for a native Xcode project.</strong> Tuist was trialled in Phase 0 and removed on 2026-08-24. The seven local SPM packages were kept, since they are what makes the module dependency rule mechanically enforceable: this changed how the <em>project</em> is managed, not how the <em>modules</em> are structured. The accepted cost is that project changes now land as generated <code>.pbxproj</code> diffs, which merge badly</li>
+<li><span class="emd-check">&#11036;</span> <strong>Close the Phase 0 acceptance gaps.</strong> All 27 package tests pass under Xcode 26.6 and the project opens and lists cleanly. Still unproven: the iPhone and iPad simulator builds, and CI, which has never executed. Treat CI's first run as debugging rather than as a gate</li>
 <li><span class="emd-check">&#11036;</span> <strong>Answer the seven open questions.</strong> Listed in <code>Docs/BOFFIN_BUILD_PLAN.md</code> §15. Q1 (head training data) gates Phase 3, Q2 (index scope) and Q3 (family coverage) gate Phase 5. None of them gate Phases 1, 2 or 4, so sequence and ML work is not blocked</li>
 <li><span class="emd-check">&#11036;</span> <strong>Phase 1: the sequence spine.</strong> FASTA and UniProt parsing, analytical properties (MW, pI, ε₂₈₀, GRAVY), and the scrollable track ruler with pinch-zoom and residue selection at 120 Hz</li>
 <li><span class="emd-check">&#11036;</span> <strong>Phase 2: ML core.</strong> The <code>Tools/coreml/</code> conversion pipeline, the backbone <code>.mlpackage</code>, the <code>EmbeddingEngine</code> actor, shape bucketing and overlap tiling, warm-up and caching. Gated on parity (max abs error &lt; 1e-2, Spearman ρ &gt; 0.99) and ANE residency &gt; 90 %. This is the phase that proves or kills the premise, so it comes before anything is built on top of it</li>

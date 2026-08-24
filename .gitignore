@@ -1,19 +1,13 @@
-# Xcode / Tuist generated: never committed, always regenerated
-*.xcodeproj
-*.xcworkspace
-!*.xcworkspace/contents.xcworkspacedata
-Derived/
-.build/
-DerivedData/
-*.xcuserstate
+# BOFFIN is a native Xcode project: BOFFIN.xcodeproj IS committed and is the
+# source of truth for project configuration. Only per-user state is ignored.
 xcuserdata/
-
-# Tuist
-.tuist-version
-Tuist/.build/
-Tuist/Dependencies/
+*.xcuserstate
+*.xcscmblueprint
+DerivedData/
+build/
 
 # Swift Package Manager
+.build/
 .swiftpm/
 Package.resolved
 

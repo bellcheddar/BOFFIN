@@ -61,13 +61,13 @@ Any new feature that cannot be expressed as a `ResidueTrack` or as a structure o
 | UI | SwiftUI, no UIKit except where wrapping is unavoidable | Single codebase for iPhone, iPad and future visionOS |
 | Minimum OS | iOS 26.0 / iPadOS 26.0 | Verify current SDK at project start and raise if a newer major has shipped |
 | IDE | Latest Xcode | |
-| Project generation | **Tuist 4.x** | `.pbxproj` is not agent-editable in practice: Tuist keeps project config as reviewable Swift |
+| Project | **Native Xcode project, committed** | `BOFFIN.xcodeproj` is the source of truth. Tuist was trialled in Phase 0 and dropped on 2026-08-24: the cost is that project changes land as generated `.pbxproj` diffs and merge badly, which is accepted in exchange for a standard Xcode workflow with no extra toolchain |
 | Dependency management | Swift Package Manager only | |
 | Testing | swift-testing (`@Test`), XCUITest for flows | |
-| CI | GitHub Actions, macOS runner, `tuist generate && xcodebuild test` | |
+| CI | GitHub Actions, macOS runner, `xcodebuild test` | No generation step: the project is committed |
 | Formatting | swift-format, enforced in CI | |
 
-**Rule for the agent:** never hand-edit `.pbxproj`. All target, capability and resource changes go through `Project.swift`.
+**Rule for the agent:** target, capability and resource changes are made in Xcode and committed as a `project.pbxproj` diff. Never commit `xcuserdata`. `Tools/bootstrap-xcodeproj.rb` records how the project was first created and must not be re-run: it overwrites the project.
 
 ---
 
@@ -77,7 +77,7 @@ Local SPM packages under `Packages/`, each independently testable. The app targe
 
 ```
 BOFFIN/
-├── Project.swift                 # Tuist manifest
+├── BOFFIN.xcodeproj              # committed: the source of truth for project config
 ├── CLAUDE.md                     # agent working agreement
 ├── App/                          # BoffinApp target: entry point, routing, DI only
 ├── Packages/
@@ -478,8 +478,8 @@ Where scientific correctness is at stake (numbering schemes, interaction geometr
 Each phase ends with: tests green, performance logged, a demoable build, and a short entry in `Docs/CHANGELOG.md`. **Do not begin a phase until the previous phase's acceptance criteria are met.**
 
 ### Phase 0: Foundations
-Repo, Tuist manifest, module skeleton with the dependency rule enforced, CI, swift-format, design system tokens, fixture set committed, `CLAUDE.md` in place.
-**Accept:** empty app builds and runs on iPhone and iPad simulators; CI green; `tuist generate` reproducible from clean checkout.
+Repo, Xcode project, module skeleton with the dependency rule enforced, CI, swift-format, design system tokens, fixture set committed, `CLAUDE.md` in place.
+**Accept:** empty app builds and runs on iPhone and iPad simulators; CI green; the project opens and builds from a clean checkout with no generation step.
 
 ### Phase 1: The sequence spine
 `Sequence`, `Residue`, `ResidueTrack`, FASTA and UniProt parsing, analytical properties (MW, pI, ε₂₈₀, GRAVY), the scrollable track ruler with pinch-zoom and residue selection.
@@ -550,7 +550,7 @@ Metal impostor renderer spike, benchmark against Mol*, RealityKit AR presentatio
 
 1. **Read `CLAUDE.md` before every work session.** It holds the current phase, the invariants and the open questions.
 2. **One phase at a time.** Do not begin Phase N+1 while Phase N acceptance criteria are unmet.
-3. **Never edit `.pbxproj`.** Project changes go through `Project.swift` and `tuist generate`.
+3. **`BOFFIN.xcodeproj` is committed.** Make project changes in Xcode and commit the `project.pbxproj` diff. Never commit `xcuserdata`.
 4. **Never introduce a network dependency into a core path.** The app must work fully offline. Network features are additive and must degrade cleanly.
 5. **Never string-interpolate into JavaScript.** All bridge traffic goes through the typed command envelope.
 6. **Where science is at stake, write the test first** from the published definition.

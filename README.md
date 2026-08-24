@@ -2,7 +2,7 @@
 
 > **Turn an iPhone or iPad into a self-contained protein workstation: paste a sequence, get boundaries, disorder, fitness and family, then present the structure from the same device.**
 
-![swift](https://img.shields.io/badge/swift-6.2-F05138?logo=swift&logoColor=white) ![swiftui](https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&logoColor=white) ![xcode](https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&logoColor=white) ![tuist](https://img.shields.io/badge/Tuist-4.x-6236FF) ![coreml](https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&logoColor=white) ![esm2](https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7) ![molstar](https://img.shields.io/badge/Mol*-MIT-00897B) ![swift-testing](https://img.shields.io/badge/swift--testing-27%20passing-9b51e0) ![data](https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4) ![offline](https://img.shields.io/badge/offline-no%20cloud%20inference-00d084) ![phase](https://img.shields.io/badge/phase-0%20of%2012%20%28foundations%29-fcb900) ![licence](https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B)
+![swift](https://img.shields.io/badge/swift-6.2-F05138?logo=swift&logoColor=white) ![swiftui](https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&logoColor=white) ![xcode](https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&logoColor=white) ![project](https://img.shields.io/badge/project-native%20Xcode-1575F9) ![coreml](https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&logoColor=white) ![esm2](https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7) ![molstar](https://img.shields.io/badge/Mol*-MIT-00897B) ![swift-testing](https://img.shields.io/badge/swift--testing-27%20passing-9b51e0) ![data](https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4) ![offline](https://img.shields.io/badge/offline-no%20cloud%20inference-00d084) ![phase](https://img.shields.io/badge/phase-0%20of%2012%20%28foundations%29-fcb900) ![licence](https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B)
 
 <table>
 <tr>
@@ -65,16 +65,15 @@ App                 → everything (wiring only)
 
 This is not a convention: `Tools/check-module-graph.sh` fails the build on any violation, checking both source imports and package manifest declarations. If a feature seems to need an upward dependency, the abstraction is in the wrong module.
 
-Project configuration lives in `Project.swift` (Tuist). The generated `.xcodeproj` is gitignored, and CI fails if one is ever committed, which makes hand-editing it pointless rather than merely forbidden.
+`BOFFIN.xcodeproj` is a plain native Xcode project, committed to the repository and the source of truth for project configuration. Clone and open it: there is no generation step and no extra toolchain to install. Project changes are made in Xcode and land as a `project.pbxproj` diff. Per-user state (`xcuserdata`) is gitignored, and CI fails if any is ever committed.
 
 ## 📋 Requirements
 
 | Requirement | Version | Notes |
 |---|---|---|
 | macOS | 26 (Tahoe) | Development machine |
-| Xcode | 26.x | Command Line Tools alone are not enough: `swift test` needs `lib_TestingInterop.dylib`, which ships only with Xcode |
+| Xcode | 26.x | Command Line Tools alone are not enough: `swift test` needs `lib_TestingInterop.dylib`, which ships only with Xcode. Xcode 26 does not bundle simulator runtimes, so run `xcodebuild -downloadPlatform iOS` once |
 | Swift | 6.2 language mode | Strict concurrency enabled |
-| Tuist | 4.x | `brew install tuist` |
 | Target OS | iOS 26.0 / iPadOS 26.0 | |
 
 ## 🔧 Getting started
@@ -83,12 +82,15 @@ Project configuration lives in `Project.swift` (Tuist). The generated `.xcodepro
 git clone https://github.com/bellcheddar/Boffin.git
 cd Boffin
 
-tuist generate            # regenerate the Xcode project (never edit the .pbxproj)
-tuist build
-tuist test
+open BOFFIN.xcodeproj     # no generation step: the project is committed
+
+xcodebuild build -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+xcodebuild test  -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 ./Tools/check-module-graph.sh                 # enforce the module dependency rule
-swift format lint --recursive --strict App Packages Project.swift Tuist.swift
+swift format lint --recursive --strict App Packages
 ```
 
 Package-level tests run without a simulator, because every package declares macOS alongside iOS:
@@ -150,8 +152,9 @@ KLIFS is the one term still to confirm, since redistribution of derived numberin
 
 Roadmap for BOFFIN, in dependency order. Each phase ends with tests green, performance logged and a demoable build. A phase does not begin until the previous one's acceptance criteria are met. Suggestions welcome.
 
-- [x] **Phase 0: repository foundations.** Git, seven local SPM packages, Tuist manifest, app shell, CI, swift-format, brand and scientific palette tokens, `ResidueTrack` with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker
-- [ ] **Close the Phase 0 acceptance gaps.** All 27 package tests now pass under Xcode 26.6. Still unproven: `tuist generate`, the iPhone and iPad simulator builds, and CI, which has never executed. Treat CI's first run as debugging rather than as a gate
+- [x] **Phase 0: repository foundations.** Git, seven local SPM packages, Xcode project, app shell, CI, swift-format, brand and scientific palette tokens, `ResidueTrack` with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker
+- [x] **Dropped Tuist for a native Xcode project.** Tuist was trialled in Phase 0 and removed on 2026-08-24. The seven local SPM packages were kept, since they are what makes the module dependency rule mechanically enforceable: this changed how the *project* is managed, not how the *modules* are structured. The accepted cost is that project changes now land as generated `.pbxproj` diffs, which merge badly
+- [ ] **Close the Phase 0 acceptance gaps.** All 27 package tests pass under Xcode 26.6 and the project opens and lists cleanly. Still unproven: the iPhone and iPad simulator builds, and CI, which has never executed. Treat CI's first run as debugging rather than as a gate
 - [ ] **Answer the seven open questions.** Listed in `Docs/BOFFIN_BUILD_PLAN.md` §15. Q1 (head training data) gates Phase 3, Q2 (index scope) and Q3 (family coverage) gate Phase 5. None of them gate Phases 1, 2 or 4, so sequence and ML work is not blocked
 - [ ] **Phase 1: the sequence spine.** FASTA and UniProt parsing, analytical properties (MW, pI, ε₂₈₀, GRAVY), and the scrollable track ruler with pinch-zoom and residue selection at 120 Hz
 - [ ] **Phase 2: ML core.** The `Tools/coreml/` conversion pipeline, the backbone `.mlpackage`, the `EmbeddingEngine` actor, shape bucketing and overlap tiling, warm-up and caching. Gated on parity (max abs error < 1e-2, Spearman ρ > 0.99) and ANE residency > 90 %. This is the phase that proves or kills the premise, so it comes before anything is built on top of it

@@ -17,7 +17,7 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ### What Phase 0 delivered
 
-Repo, seven SPM packages, Tuist manifest, app shell, CI, swift-format, design
+Repo, seven SPM packages, Xcode project, app shell, CI, swift-format, design
 tokens, `ResidueTrack` with alignment validation, fixture set with provenance,
 and the start of the licence audit. All seven packages build and the whole tree
 is lint-clean.
@@ -28,7 +28,7 @@ is lint-clean.
 |---|---|
 | Module skeleton with the dependency rule enforced | Met: `Tools/check-module-graph.sh` passes and is canary-tested both ways |
 | Package tests pass | Met: 27 tests across seven packages, all green under Xcode 26.6 |
-| `tuist generate` reproducible from a clean checkout | Met: Tuist 4.205.0, generates in ~10 s, all seven packages resolve |
+| Project opens from a clean checkout | Met: `BOFFIN.xcodeproj` is committed, three targets, seven local packages resolve |
 | CI defined | Met as configuration; **never executed**, so "CI green" is unproven |
 | Empty app builds and runs on iPhone and iPad simulators | **In progress**: iOS simulator runtime downloading |
 | Fixture set committed | Met, with three caveats flagged in `Fixtures/MANIFEST.md` |
@@ -51,9 +51,10 @@ device names in the matrix are guesses until one run confirms them.
 - Xcode 26 does **not** bundle simulator runtimes: `xcodebuild -downloadPlatform iOS`
   is a separate download of several GB. A fresh machine is not ready for a
   simulator build just because Xcode is installed.
-- Tuist needs its own Homebrew tap and, since Homebrew added tap trust, an
-  explicit `brew trust tuist/tuist` before `brew install --formula tuist/tuist/tuist`.
-  Reversible with `brew untrust`.
+- Tuist was trialled and dropped on 2026-08-24 at Marc's request, in favour of
+  a native Xcode project. The seven local SPM packages were kept: they are what
+  make the dependency rule mechanically enforceable, and dropping Tuist changed
+  how the *project* is managed, not how the *modules* are structured.
 
 ### Decisions taken in Phase 0 that were not in the build plan
 
@@ -84,7 +85,7 @@ Disorder, secondary structure, TM spans, ΔLLR, motifs and structure-derived int
 
 ## Hard rules
 
-1. **Never edit `.pbxproj`.** All project changes go through `Project.swift` and `tuist generate`.
+1. **`BOFFIN.xcodeproj` is committed and is the source of truth.** Make project changes (targets, capabilities, resources, build settings) in Xcode and commit the resulting `project.pbxproj` diff. Never commit `xcuserdata`. Tuist was dropped on 2026-08-24 in favour of a plain native Xcode project.
 2. **Never break offline operation.** No CDN references, no network in any core path. Network features are additive and degrade cleanly.
 3. **Never string-interpolate into JavaScript.** All Mol* traffic goes through the typed command envelope in `BoffinViewer`.
 4. **Never link or port PLIP.** It is GPL v2. The interaction profiler is a clean-room Swift implementation of published geometric criteria.
@@ -151,13 +152,24 @@ Regressions are bugs, not trade-offs.
 ## Commands
 
 ```bash
-tuist generate            # regenerate the Xcode project
-tuist build
-tuist test
-swift-format lint -r .
+open BOFFIN.xcodeproj     # the project is committed: no generation step
+
+xcodebuild build -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+xcodebuild test  -project BOFFIN.xcodeproj -scheme BOFFIN \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+
+./Tools/check-module-graph.sh                       # enforce the dependency rule
+swift format lint --recursive --strict App Packages
+(cd Packages/BoffinCore && swift test)               # per-package, no simulator
+
 ./Tools/coreml/convert.sh # rebuild Core ML models (requires Python env)
 ./Tools/coreml/validate_parity.py
 ```
+
+`Tools/bootstrap-xcodeproj.rb` created the project once and is kept for
+provenance only. **Running it again overwrites the project and discards every
+change made in Xcode since.**
 
 ---
 

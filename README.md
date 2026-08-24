@@ -1,0 +1,192 @@
+# 🧬 BOFFIN
+
+> **Turn an iPhone or iPad into a self-contained protein workstation: paste a sequence, get boundaries, disorder, fitness and family, then present the structure from the same device.**
+
+![swift](https://img.shields.io/badge/swift-6.2-F05138?logo=swift&logoColor=white) ![swiftui](https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&logoColor=white) ![xcode](https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&logoColor=white) ![tuist](https://img.shields.io/badge/Tuist-4.x-6236FF) ![coreml](https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&logoColor=white) ![esm2](https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7) ![molstar](https://img.shields.io/badge/Mol*-MIT-00897B) ![swift-testing](https://img.shields.io/badge/swift--testing-27%20passing-9b51e0) ![data](https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4) ![offline](https://img.shields.io/badge/offline-no%20cloud%20inference-00d084) ![phase](https://img.shields.io/badge/phase-0%20of%2012%20%28foundations%29-fcb900) ![licence](https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B)
+
+<table>
+<tr>
+<td>🌐 <b>Website</b></td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
+<td>✉️ <b>Contact</b></td><td><a href="mailto:marc@marcdeller.com">marc@marcdeller.com</a></td>
+<td>🐙 <b>GitHub</b></td><td><a href="https://github.com/bellcheddar/Boffin" target="_blank" rel="noopener noreferrer">bellcheddar/Boffin</a></td>
+</tr>
+</table>
+
+---
+
+**BOFFIN** (**B**oundary, **O**rder, **F**itness and **F**amily **IN**ference) is a native SwiftUI application for iOS and iPadOS. It runs protein language model inference on the Apple Neural Engine, entirely on device, and pairs it with a full interactive structure viewer intended as a mobile equivalent of PyMOL.
+
+Why it matters: the analyses a structural biologist actually reaches for (where does the ordered domain start, which mutations will be tolerated, what family is this, has anyone crystallised something like it) normally mean a laptop, a cluster queue or a web service that wants your sequence. BOFFIN does all of them from a single forward pass on a phone, in aeroplane mode, with no sequence ever leaving the device. It is useful for: designing a construct at the bench before you order the gene, sanity-checking a variant on the train, triaging a homolog set between meetings, and presenting a structure from an iPad without carrying a laptop to the room.
+
+Research use only. No clinical, diagnostic or therapeutic claims.
+
+## 🧭 The two invariants
+
+Everything in BOFFIN follows from two design commitments. They are load-bearing, not stylistic, and they are why the app can be fast on a phone.
+
+**1. One forward pass, four fan-outs.** Every analytical feature is a read-out from a *single* ESM-2 pass on the Neural Engine, not an independent pipeline:
+
+| Fan-out | Source tensor | Feature |
+|---|---|---|
+| Per-residue hidden states | `last_hidden_state` | Disorder, secondary structure, TM spans, domain boundaries |
+| Masked-token logits | `logits` at masked positions | ΔLLR substitution matrix (variant fitness) |
+| Mean-pooled embedding | `mean(last_hidden_state)` | Family classification, homolog cosine search |
+
+The expensive step is amortised across the whole app rather than repeated per feature.
+
+**2. Everything is a `ResidueTrack`.** Disorder, secondary structure, TM spans, ΔLLR, motifs and structure-derived interactions are all arrays aligned one-to-one with the sequence, stacked on one scrollable ruler. Tabs are filters over that ruler, not separate features. Any feature that cannot be expressed as a `ResidueTrack` or a structure overlay needs an explicit design decision first.
+
+A misaligned track does not crash: it draws a convincing picture of the wrong thing. Every track is therefore validated against its sequence at the point of production.
+
+## ✨ What it will do
+
+| Tab | Purpose |
+|---|---|
+| **Order** | Disorder probability, SS3/SS8, TM helices and signal peptide, low complexity, plus MW, pI, ε₂₈₀ and GRAVY over any selection |
+| **Fitness** | ΔLLR heatmap (20 amino acids × N positions), sequence logo in bits, mutation basket, disorder masking, CSV and PNG export |
+| **Family** | Pfam-level classification with calibrated confidence, KLIFS pocket numbering for kinases, GPCRdb generic numbering for class A GPCRs, motif tracks, SIFTS mapping, embedding homolog search |
+| **Boundary** | Ranked construct truncations that never cut through a motif, TM span or disulfide, with crystallisation precedent from the homolog set and tag/linker planning |
+| **Structure** | Mol\*-based viewer: representations, colour themes (including painting any `ResidueTrack` onto the structure), a PyMOL-like selection language, measurements, scenes, presentation mode, Pencil annotation, and `.pml` import/export |
+
+## 🧱 Architecture
+
+Local SPM packages under `Packages/`, each independently testable. The app target is a thin shell that wires them together.
+
+```
+BoffinCore          → nothing
+BoffinML            → BoffinCore
+BoffinData          → BoffinCore
+BoffinStructure     → BoffinCore
+BoffinCharts        → BoffinCore
+BoffinUI            → BoffinCore
+BoffinViewer        → BoffinCore, BoffinStructure
+App                 → everything (wiring only)
+```
+
+This is not a convention: `Tools/check-module-graph.sh` fails the build on any violation, checking both source imports and package manifest declarations. If a feature seems to need an upward dependency, the abstraction is in the wrong module.
+
+Project configuration lives in `Project.swift` (Tuist). The generated `.xcodeproj` is gitignored, and CI fails if one is ever committed, which makes hand-editing it pointless rather than merely forbidden.
+
+## 📋 Requirements
+
+| Requirement | Version | Notes |
+|---|---|---|
+| macOS | 26 (Tahoe) | Development machine |
+| Xcode | 26.x | Command Line Tools alone are not enough: `swift test` needs `lib_TestingInterop.dylib`, which ships only with Xcode |
+| Swift | 6.2 language mode | Strict concurrency enabled |
+| Tuist | 4.x | `brew install tuist` |
+| Target OS | iOS 26.0 / iPadOS 26.0 | |
+
+## 🔧 Getting started
+
+```bash
+git clone https://github.com/bellcheddar/Boffin.git
+cd Boffin
+
+tuist generate            # regenerate the Xcode project (never edit the .pbxproj)
+tuist build
+tuist test
+
+./Tools/check-module-graph.sh                 # enforce the module dependency rule
+swift format lint --recursive --strict App Packages Project.swift Tuist.swift
+```
+
+Package-level tests run without a simulator, because every package declares macOS alongside iOS:
+
+```bash
+cd Packages/BoffinCore && swift test
+```
+
+## 🧪 Fixtures and testing
+
+`Fixtures/` holds the golden set, committed with provenance and SHA-256 checksums in `Fixtures/MANIFEST.md`. It is committed rather than fetched so the test suite runs with no network, matching the app's own offline rule.
+
+| Fixture | Exercises |
+|---|---|
+| 1UBQ (ubiquitin) | Baseline and fast path |
+| 1HCK (CDK2 with ATP and Mg) | KLIFS numbering, motifs, interaction profiling |
+| 2RH1 (β2-adrenergic receptor) | GPCRdb numbering, TM prediction |
+| 6EQE (*Piscinibacter sakaiensis* PETase) | Catalytic triad annotation |
+| 1XQ8 (α-synuclein, NMR) | Disorder track, boundary solver refusal, multi-model ensemble |
+| 7K00 (*E. coli* 70S ribosome) | Viewer performance guardrail |
+| 1E8A (selenomethionine) | Non-standard residues, alternate locations |
+| 8 malformed inputs | Truncated FASTA, empty records, non-canonical codes, CRLF, bare sequence |
+
+Three fixture choices are judgement calls rather than facts, and are flagged in the manifest rather than assumed: 2RH1 is a T4 lysozyme fusion rather than wild-type ADRB2 (which is why its entry sequence is 500 residues), 1HCK carries ATP rather than a drug-like inhibitor, and 7K00 is 7.3 MB.
+
+Where scientific correctness is at stake (numbering schemes, interaction geometry, biochemical constants), the test is written first from the published definition. A plausible-looking implementation of GPCRdb numbering that is silently wrong is worse than no feature, because it will be believed.
+
+## 📊 Performance budgets
+
+Measured on iPhone 15 Pro class hardware and re-measured at the end of every phase, logged to `Docs/perf-log.md`. Regressions are bugs, not trade-offs.
+
+| Operation | Budget |
+|---|---|
+| Cold launch to interactive | < 1.2 s |
+| Embed, 300 residues | < 250 ms |
+| Full 300-residue ΔLLR scan | < 6 s |
+| Family classification | < 50 ms |
+| Homolog search, 100 k index | < 100 ms |
+| Structure load, 5 k atoms | < 1.5 s |
+| ANE residency | > 90 % of ops |
+
+The residency figure is the one the whole premise rests on: a naive trace of HuggingFace ESM falls back to the GPU and defeats the point of the app, so the conversion follows Apple's `ml-ane-transformers` tensor layout from the start rather than as a later optimisation.
+
+## ⚖️ Licensing and attribution
+
+Every dependency, data source and model is recorded in `Docs/ATTRIBUTIONS.md` before it is used, with the licence as read at source and the date it was read.
+
+Verified so far:
+
+| Source | Licence | Consequence |
+|---|---|---|
+| PLIP | **GNU GPL v2** (verified 2026-08-24) | **Never linked, vendored or ported.** The interaction profiler is a clean-room Swift implementation of the published geometric criteria, which are standard structural chemistry and not themselves proprietary |
+| Mol\* | MIT (verified 2026-08-24) | Vendored offline with pinned commit hash. No CDN reference anywhere: CI fails the build if one appears |
+| ESM-2 | MIT (verified 2026-08-24) | Weights bundled. Note the ESM Metagenomic Atlas *data* is separately CC BY 4.0 and is not used |
+
+KLIFS is the one term still to confirm, since redistribution of derived numbering tables inside a shipped app is genuinely in question, and it gates the Family tab.
+
+## ✅ To Do
+
+Roadmap for BOFFIN, in dependency order. Each phase ends with tests green, performance logged and a demoable build. A phase does not begin until the previous one's acceptance criteria are met. Suggestions welcome.
+
+- [x] **Phase 0: repository foundations.** Git, seven local SPM packages, Tuist manifest, app shell, CI, swift-format, brand and scientific palette tokens, `ResidueTrack` with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker
+- [ ] **Close the Phase 0 acceptance gaps.** All 27 package tests now pass under Xcode 26.6. Still unproven: `tuist generate`, the iPhone and iPad simulator builds, and CI, which has never executed. Treat CI's first run as debugging rather than as a gate
+- [ ] **Answer the seven open questions.** Listed in `Docs/BOFFIN_BUILD_PLAN.md` §15. Q1 (head training data) gates Phase 3, Q2 (index scope) and Q3 (family coverage) gate Phase 5. None of them gate Phases 1, 2 or 4, so sequence and ML work is not blocked
+- [ ] **Phase 1: the sequence spine.** FASTA and UniProt parsing, analytical properties (MW, pI, ε₂₈₀, GRAVY), and the scrollable track ruler with pinch-zoom and residue selection at 120 Hz
+- [ ] **Phase 2: ML core.** The `Tools/coreml/` conversion pipeline, the backbone `.mlpackage`, the `EmbeddingEngine` actor, shape bucketing and overlap tiling, warm-up and caching. Gated on parity (max abs error < 1e-2, Spearman ρ > 0.99) and ANE residency > 90 %. This is the phase that proves or kills the premise, so it comes before anything is built on top of it
+- [ ] **Phase 3: Order tab.** Disorder, SS3/SS8, TM and signal peptide heads, low complexity, and the analytical panel. Accepts when α-synuclein reads as disordered and the GPCR shows seven TM spans
+- [ ] **Phase 4: Fitness tab.** Batched masked-marginal scoring (never one prediction per residue), the ΔLLR heatmap, the sequence logo, the mutation basket and disorder masking
+- [ ] **Phase 5: Family tab.** Classifier head with calibrated confidence, Pfam metadata, KLIFS and GPCRdb numbering, motif tracks, SIFTS mapping and homolog search. Accepts when CDK2's DFG, HRD, gatekeeper and hinge annotate at the correct KLIFS positions
+- [ ] **Phase 6: Boundary tab.** Construct solver with motif and TM hard constraints, crystallisation precedent from the homolog set, tag and linker planning. Must decline to propose for a fully disordered input and say why
+- [ ] **Phase 7: Structure viewer.** Mol\* vendored offline, the typed `ViewerBridge` command envelope on both sides, representations and colour themes including painting a `ResidueTrack` onto the structure (the single most compelling demo in the app: build it early)
+- [ ] **Phase 8: PyMOL mode.** Selection language parser and compiler, visual selection builder, measurements, scenes, presentation mode with external display, Pencil annotation, and `.pml` round-tripping to desktop PyMOL
+- [ ] **Phase 9: Interaction profiling.** Clean-room `InteractionProfiler`, 3D overlay, 2D diagram and table. Protonation assumptions surfaced in the UI: a profile that silently guesses protonation states is worse than one that says what it assumed
+- [ ] **Phase 10: Platform integration.** App Intents, share extension, Quick Look preview, document types, CloudKit sync, Handoff, widget and Live Activity
+- [ ] **Phase 11: Polish and release.** Accessibility audit, onboarding, empty and error states, privacy manifest, attributions screen, TestFlight
+- [ ] **Phase 12 (stretch): native renderer and AR.** Metal impostor renderer spike benchmarked against Mol\*, RealityKit AR presentation, visionOS evaluation. Gated on measured performance rather than preference
+- [ ] **Choose a licence.** Not yet decided. The choice is constrained: PLIP's GPL v2 is why the interaction profiler is clean-room, and a closed-source App Store release rules out copyleft dependencies generally
+- [ ] **Confirm the three fixture caveats.** Whether GPCRdb tests assert against the 2RH1 fusion or canonical P07550, whether the profiler wants a drug-like CDK2 inhibitor rather than ATP, and whether 7K00 should move to on-demand fetch to lighten the repo
+
+## 🚫 Out of scope for v1
+
+Structure prediction (no AlphaFold or Boltz on device), MSA generation, molecular dynamics, docking, and any cloud inference. Prediction requests are routed to [BoltzMaker](https://github.com/bellcheddar/BoltzMaker) on the desktop instead.
+
+## 📄 Licence
+
+Not yet chosen: see the To Do list above. Until a licence is added, no permissions are granted beyond viewing.
+
+---
+
+## 👤 Author
+
+**Marc C. Deller, D.Phil.**  
+Structural biologist & drug discovery scientist  
+
+<table>
+<tr>
+<td>🌐</td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
+<td>✉️</td><td><a href="mailto:marc@marcdeller.com">marc@marcdeller.com</a></td>
+<td>🐙</td><td><a href="https://github.com/bellcheddar/Boffin" target="_blank" rel="noopener noreferrer">github.com/bellcheddar/Boffin</a></td>
+</tr>
+</table>

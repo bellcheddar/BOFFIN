@@ -2,8 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- With GENERATE_INFOPLIST_FILE=NO, Xcode injects nothing: every standard
+	     key must be present here. Omitting CFBundleIdentifier still builds a
+	     .app successfully, then fails at install time with "The bundle
+	     identifier for BOFFIN.app couldn't be read", which reads like a
+	     simulator fault rather than a missing key. -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en_GB</string>
 	<key>CFBundleDisplayName</key>
 	<string>BOFFIN</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.1.0</string>
 	<key>CFBundleVersion</key>

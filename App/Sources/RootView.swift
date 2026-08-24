@@ -18,9 +18,7 @@ struct RootView: View {
                 OrderTabView(store: store)
             }
             Tab("Fitness", systemImage: "square.grid.3x3") {
-                PlaceholderTab(
-                    name: "Fitness", phase: "Phase 4",
-                    detail: "Delta-LLR heatmap, sequence logo and mutation basket.")
+                FitnessTabView(store: store)
             }
             Tab("Family", systemImage: "point.3.connected.trianglepath.dotted") {
                 PlaceholderTab(

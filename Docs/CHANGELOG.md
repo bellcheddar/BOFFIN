@@ -147,3 +147,36 @@ Findings recorded because each failed silently:
    zero padding was measured harmless rather than assumed.
 5. **A head window that disagrees with the converted bucket** builds, converts
    and passes parity, then fails only on device. Caught by running the app.
+
+
+## Phase 4: Fitness tab (2026-08-25)
+
+Per-position substitution scoring, the delta-LLR heatmap, the sequence logo and
+a mutation basket. 158 package tests and 5 UI tests passing.
+
+- **Two scoring modes**, both producing the same matrix type and both stating
+  which produced them: masked marginal (one pass per position, the model does
+  not see the residue it scores) and a fast preview by wild-type marginal (one
+  pass in total, 300 times cheaper, and the model can see what it is scoring).
+- **Heatmap** with a locked amino acid axis, wild-type cells outlined rather
+  than filled, and tap-to-collect into a mutation basket.
+- **Sequence logo** in two modes: information content in bits, and signed
+  delta-LLR so tolerated and deleterious substitutions separate above and below
+  the axis.
+- **Disorder masking** reuses the Phase 3 head to skip positions where scoring
+  is rarely actionable.
+- CSV export of the matrix and a shareable mutation list.
+
+The bug worth recording: **`MLMultiArray` is not densely packed.** Core ML pads
+each row for alignment, so a (1, S, 33) logits array has a stride between tokens
+larger than 33. Computing offsets as `token * vocabulary` read part of the
+previous token's padding and part of the real row. Token 0 came out correct (its
+offset is zero) and every other token was silently shifted, producing a complete
+heatmap of real-looking logits in which 29% of substitutions beat the wild type
+of one of the most conserved proteins known. Both the logits and hidden-state
+readers are now stride-aware.
+
+Three "fixes" preceded the real one (data type, batch size, input fill) and all
+three produced byte-for-byte identical output. That identity was the actual
+diagnostic and should have been read sooner: unchanged results after a real code
+change mean the wrong code path is being examined.

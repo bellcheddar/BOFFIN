@@ -176,3 +176,42 @@ design rather than the reverse.
 
 What the convolutional shape is still buying is unchanged and real: a biLSTM
 head would not be ANE-capable at all and would be far more than 2% of the pass.
+
+
+## Phase 4 (2026-08-25)
+
+### Substitution scanning, 300 residues, on this Mac
+
+| Mode | Cost | Passes |
+|---|---|---|
+| Fast preview (wild-type marginal) | **31 ms** | 1 |
+| Masked marginal | **9.35 s** | 300 |
+| Budget (iPhone 15 Pro class) | < 6 s | |
+
+**Masked marginal misses the 6 s budget on this hardware, and that is stated
+rather than rounded away.** The budget is specified for an iPhone 15 Pro, and an
+A-series Neural Engine is not an M-series one, so the figure on device is
+unknown and could land either side. It has not been measured there.
+
+Batching would have closed most of the gap and is not available. Measured at
+bucket 384: 31.2 ms per variant at batch 1, 21.6 at batch 8 (a 31% saving,
+saturating there), 22.6 at batch 16. Core ML would not accept a batch dimension
+alongside enumerated sequence shapes in any configuration tried:
+
+* enumerated batch: converts, saves, predicts at the default shape, then
+  crashes the process with SIGTRAP on any other batch;
+* fixed batch 8 with enumerated sequence lengths: converts and saves, then
+  hangs indefinitely on first predict at 0% CPU;
+* fixed batch and fixed length: works, but needs one model per bucket or a
+  second 67 MB model against a 200 MB bundle target.
+
+What makes the miss tolerable is the fast mode: a single forward pass for the
+whole matrix, 300 times cheaper, so the interactive answer is immediate and the
+accurate scan runs behind it.
+
+### Model
+
+The backbone was reconverted to add a `logits` output, which Phase 2 did not
+need. Residency and parity were re-measured rather than assumed to carry over:
+**98.8% ANE residency**, parity passing on all six buckets, delta-LLR Spearman
+rho 0.999975 against PyTorch.

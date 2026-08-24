@@ -253,27 +253,36 @@ public actor EmbeddingEngine {
         // declared output type. A model reconverted at a different precision
         // would otherwise be reinterpreted at the wrong element size, which does
         // not throw: it produces plausible-looking garbage embeddings.
+        // Stride-aware, for the same reason as the logits reader: Core ML pads
+        // rows and a dense `position * width` offset silently reads the wrong
+        // values for every position after the first.
         let dataType = tensor.values.dataType
+        let strides = tensor.values.strides.map(\.intValue)
+        let positionStride = strides.count > 1 ? strides[1] : width
+        let componentStride = strides.count > 2 ? strides[2] : 1
+
         tensor.values.withUnsafeBytes { raw in
+            let read: (Int) -> Float
             switch dataType {
             case .float16:
-                let base = raw.bindMemory(to: Float16.self)
-                for position in residueRange {
-                    let start = position * width
-                    var row = [Float](repeating: 0, count: width)
-                    for component in 0..<width {
-                        row[component] = Float(base[start + component])
-                    }
-                    rows.append(row)
-                }
+                let typed = raw.bindMemory(to: Float16.self)
+                read = { Float(typed[$0]) }
             case .float32:
-                let base = raw.bindMemory(to: Float.self)
-                for position in residueRange {
-                    let start = position * width
-                    rows.append(Array(base[start..<(start + width)]))
-                }
+                let typed = raw.bindMemory(to: Float.self)
+                read = { typed[$0] }
+            case .double:
+                let typed = raw.bindMemory(to: Double.self)
+                read = { Float(typed[$0]) }
             default:
-                rows = []
+                read = { _ in Float.nan }
+            }
+            for position in residueRange {
+                let start = position * positionStride
+                var row = [Float](repeating: 0, count: width)
+                for component in 0..<width {
+                    row[component] = read(start + component * componentStride)
+                }
+                rows.append(row)
             }
         }
 
@@ -293,6 +302,141 @@ public actor EmbeddingEngine {
         let divisor = Float(vectors.count)
         for component in 0..<width { total[component] /= divisor }
         return total
+    }
+
+    // MARK: - Scoring support
+
+    /// Special tokens the tokeniser wraps around the residues.
+    var tokeniserSpecialTokenCount: Int { tokeniser.specialTokenCount }
+
+    /// Token index for a residue identity.
+    func tokeniserIndex(for identity: ResidueIdentity) -> Int32 {
+        tokeniser.index(for: identity)
+    }
+
+    /// Where a residue sits in the token buffer, past any prepended `<cls>`.
+    func tokenOffset(for residue: Int) -> Int {
+        residue + (tokeniser.prependBOS ? 1 : 0)
+    }
+
+    func loadedModelForScoring() async throws -> MLModel {
+        try await loadedModel()
+    }
+
+    /// Run the model with each named position masked, one batch row per
+    /// position, and return the logit row at each masked position.
+    ///
+    /// An empty `positions` array means: run once over the unmasked sequence
+    /// and return the logits for EVERY token. That is the wild-type marginal
+    /// path, and it shares this code so the two modes cannot drift apart in
+    /// how they tokenise or slice.
+    func predictMasked(
+        model: MLModel,
+        sequence: ProteinSequence,
+        positions: [Int],
+        bucket: ShapeBucket
+    ) throws -> [[Float]] {
+        let width = bucket.rawValue
+        let (baseTokens, _) = tokeniser.encode(sequence.residues, paddedTo: width)
+
+        let rowCount = max(positions.count, 1)
+        let input = try MLMultiArray(
+            shape: [NSNumber(value: rowCount), NSNumber(value: width)], dataType: .int32)
+
+        // Filled by subscript, matching the embedding path. The
+        // `withUnsafeMutableBufferPointer(ofType:)` form compiles and does NOT
+        // populate the array here, so every token stayed 0 (`<cls>`): the model
+        // then saw a buffer of start-tokens, returned near-identical logits at
+        // every position, and the delta-LLR matrix came out as a plausible-
+        // looking field in which 29% of substitutions beat the wild type of one
+        // of the most conserved proteins known. Nothing errored.
+        for row in 0..<rowCount {
+            for column in 0..<width {
+                input[row * width + column] = NSNumber(value: baseTokens[column])
+            }
+            // Mask exactly the position this row is asking about. The rest of
+            // the sequence stays intact: that context is the whole point.
+            if row < positions.count {
+                input[row * width + tokenOffset(for: positions[row])] =
+                    NSNumber(value: tokeniser.maskIndex)
+            }
+        }
+
+        let features = try MLDictionaryFeatureProvider(dictionary: ["tokens": input])
+        let output = try model.prediction(from: features)
+        guard let logits = output.featureValue(for: "logits")?.multiArrayValue else {
+            throw ScoringError.unexpectedOutputShape(
+                "logits missing from model output: the backbone must be converted with "
+                    + "a logits output for scoring to work")
+        }
+        guard logits.shape.count == 3 else {
+            throw ScoringError.unexpectedOutputShape(
+                "expected rank 3 logits, got shape \(logits.shape)")
+        }
+        let vocabulary = logits.shape[2].intValue
+
+        // Read according to the ACTUAL element type, not the declared one.
+        // Reading float32 storage as Float16 does not fail: it returns numbers,
+        // and they look like plausible logits. The first version assumed
+        // Float16 here and produced a delta-LLR matrix in which 29% of
+        // substitutions beat the wild type, for one of the most conserved
+        // proteins known, and it rendered perfectly.
+        let dataType = logits.dataType
+        var rows: [[Float]] = []
+
+        // Index through the array's OWN strides. Core ML pads rows for
+        // alignment, so a (1, S, 33) logits array is not densely packed: the
+        // stride between tokens is larger than 33. Computing offsets as
+        // `token * vocabulary` reads part of the previous token's padding and
+        // part of the real row, which returns a shifted vector of real-looking
+        // logits. Token 0 comes out correct (its offset is zero) and every
+        // other token is quietly wrong, which is exactly the kind of error that
+        // renders as a convincing heatmap.
+        let strides = logits.strides.map(\.intValue)
+        let batchStride = strides.count > 0 ? strides[0] : width * vocabulary
+        let tokenStride = strides.count > 1 ? strides[1] : vocabulary
+        let valueStride = strides.count > 2 ? strides[2] : 1
+
+        func readRow(_ token: Int, _ batchRow: Int, _ base: (Int) -> Float) -> [Float] {
+            var row = [Float](repeating: 0, count: vocabulary)
+            let offset = batchRow * batchStride + token * tokenStride
+            for index in 0..<vocabulary { row[index] = base(offset + index * valueStride) }
+            return row
+        }
+
+        logits.withUnsafeBytes { raw in
+            let read: (Int) -> Float
+            switch dataType {
+            case .float16:
+                let typed = raw.bindMemory(to: Float16.self)
+                read = { Float(typed[$0]) }
+            case .float32:
+                let typed = raw.bindMemory(to: Float.self)
+                read = { typed[$0] }
+            case .double:
+                let typed = raw.bindMemory(to: Double.self)
+                read = { Float(typed[$0]) }
+            default:
+                read = { _ in Float.nan }
+            }
+
+            if positions.isEmpty {
+                // Wild-type marginal: every token's row from the single pass.
+                rows.reserveCapacity(width)
+                for token in 0..<width { rows.append(readRow(token, 0, read)) }
+            } else {
+                rows.reserveCapacity(positions.count)
+                for (rowIndex, position) in positions.enumerated() {
+                    rows.append(readRow(tokenOffset(for: position), rowIndex, read))
+                }
+            }
+        }
+
+        if rows.first?.contains(where: { $0.isNaN }) == true {
+            throw ScoringError.unexpectedOutputShape(
+                "unsupported logits element type \(dataType.rawValue)")
+        }
+        return rows
     }
 
     private func cacheKey(for sequence: ProteinSequence) -> String {

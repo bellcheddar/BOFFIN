@@ -24,6 +24,24 @@ final class SequenceStore {
     /// arithmetic and disorder is a prediction.
     private(set) var modelTracks: [AnyResidueTrack] = []
     private(set) var predictions: HeadPredictions?
+
+    // MARK: - Fitness
+
+    private(set) var llr: LLRMatrix?
+    private(set) var llrMode: ScoringMode?
+    private(set) var scanState: ScanState = .idle
+    var mutations: [Mutation] = []
+    var maskDisordered = false
+
+    private var scanTask: Task<Void, Never>?
+
+    enum ScanState: Equatable {
+        case idle
+        case running(fraction: Double)
+        case ready
+        case failed(String)
+        case cancelled
+    }
     private(set) var modelState: ModelState = .idle
 
     enum ModelState: Equatable {
@@ -70,6 +88,11 @@ final class SequenceStore {
             modelTracks = []
             predictions = nil
             modelState = .idle
+            llr = nil
+            llrMode = nil
+            mutations = []
+            scanTask?.cancel()
+            scanState = .idle
             recompute()
             Task { await runModel() }
         } catch FASTAParseError.empty {
@@ -147,6 +170,73 @@ final class SequenceStore {
         if FileManager.default.fileExists(atPath: development.path) { return development }
         #endif
         return nil
+    }
+
+    /// Score substitutions across the sequence.
+    ///
+    /// The fast mode is one forward pass and returns almost immediately; the
+    /// masked-marginal mode is one pass per position and is cancellable.
+    func scan(mode: ScoringMode) {
+        guard let sequence, let bundle = Self.modelDirectory else { return }
+        scanTask?.cancel()
+        scanState = .running(fraction: 0)
+
+        // Disorder masking narrows the scan to ordered positions. Scoring a
+        // disordered region is rarely actionable, and in the slow mode it is
+        // most of the wait. Computed here, on the main actor, so the task body
+        // captures plain values rather than reaching back into the store.
+        var positions: [Int]?
+        if maskDisordered, let called = predictions?.isDisordered {
+            positions = called.indices.filter { !called[$0] }
+        }
+        let scanPositions = positions
+
+        // Strong capture, not weak. The progress callback is @Sendable and
+        // cannot reach back through a weak optional binding; the store is
+        // @MainActor (and so implicitly Sendable) and the task is cancelled
+        // whenever the sequence changes, so holding it for the scan is safe.
+        scanTask = Task { @MainActor in
+            do {
+                let engine = try EmbeddingEngine(
+                    modelURL: bundle.appending(path: "esm2_t12_35M_UR50D.mlpackage"),
+                    tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
+
+                let matrix = try await engine.maskedMarginals(
+                    sequence, positions: scanPositions, mode: mode
+                ) { progress in
+                    Task { @MainActor in self.report(progress) }
+                }
+                self.llr = matrix
+                self.llrMode = mode
+                self.scanState = .ready
+            } catch is CancellationError {
+                self.scanState = .cancelled
+            } catch {
+                self.scanState = .failed(String(describing: error))
+            }
+        }
+    }
+
+    /// Relay scan progress. Separate method so the @Sendable callback has a
+    /// single main-actor entry point rather than mutating state inline.
+    private func report(_ progress: ScanProgress) {
+        if case .running = scanState {
+            scanState = .running(fraction: progress.fraction)
+        }
+    }
+
+    func cancelScan() {
+        scanTask?.cancel()
+        scanTask = nil
+        scanState = .cancelled
+    }
+
+    func toggle(_ mutation: Mutation) {
+        if let index = mutations.firstIndex(of: mutation) {
+            mutations.remove(at: index)
+        } else {
+            mutations.append(mutation)
+        }
     }
 
     private func recompute() {

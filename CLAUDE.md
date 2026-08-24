@@ -11,9 +11,30 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3 (Order tab) **complete** for secondary structure and disorder. TM spans and signal peptide remain
-- **Last completed:** Phase 3 heads on 2026-08-24 (see `Docs/CHANGELOG.md`)
+- **Phase:** 4 (Fitness tab) **complete**. Phase 5 (Family tab) is next, gated on open questions 2 and 3
+- **Last completed:** Phase 4 on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
+
+### Phase 4 findings
+
+- **`MLMultiArray` IS NOT DENSELY PACKED.** Core ML pads rows for alignment.
+  Always index through `array.strides`, never `index * width`. Getting this
+  wrong reads a shifted-but-real-looking vector: token 0 is correct because its
+  offset is zero, and everything after it is quietly wrong. It produced a
+  perfect-looking delta-LLR heatmap that was garbage.
+- **Identical output after a real code change means the wrong code path is
+  being examined.** Three successive "fixes" here returned byte-for-byte
+  identical numbers before the real bug was found. Read that as a signal.
+- **Core ML will not combine a batch dimension with enumerated sequence
+  shapes.** Enumerated batch crashes predict with SIGTRAP; fixed batch with
+  enumerated lengths hangs at 0% CPU. Batch 1 with enumerated lengths is the
+  only configuration that works, so masked-marginal scoring is unbatched.
+- **`ANECompilerService` can wedge at 100% CPU** and starve every subsequent
+  conversion (they sit at 0% CPU for tens of minutes). It is root-owned, so
+  clearing it needs `sudo pkill -9 -f ANECompilerService`. Symptoms look exactly
+  like a hung conversion.
+- **`AnalysisHeads.headWindow` and `EmbeddingEngine.scoringBatchSize` must match
+  the converter by hand.** Both fail only at runtime.
 
 ### Phase 3 findings, each of which failed silently
 

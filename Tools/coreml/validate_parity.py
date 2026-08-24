@@ -52,6 +52,7 @@ ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = ROOT / "Models"
 
 BUCKETS = [128, 256, 384, 512, 768, 1024]
+sys.path.insert(0, str(Path(__file__).parent))
 
 RELATIVE_TOLERANCE = 0.01
 COSINE_FLOOR = 0.999
@@ -62,11 +63,19 @@ CANONICAL = "ACDEFGHIKLMNPQRSTVWY"
 
 
 def build_tokens(alphabet, sequence: str, bucket: int) -> torch.Tensor:
-    tokens = torch.full((1, bucket), alphabet.padding_idx, dtype=torch.int64)
-    tokens[0, 0] = alphabet.cls_idx
+    """Build a padded token buffer at the model's batch size.
+
+    Kept in step with `convert_backbone.SCORING_BATCH`, which is 1: Core ML
+    would not accept a batch dimension alongside enumerated sequence shapes.
+    """
+    from convert_backbone import SCORING_BATCH
+
+    batch = SCORING_BATCH
+    tokens = torch.full((batch, bucket), alphabet.padding_idx, dtype=torch.int64)
+    tokens[:, 0] = alphabet.cls_idx
     residues = [alphabet.get_idx(c) for c in sequence]
-    tokens[0, 1 : 1 + len(residues)] = torch.tensor(residues)
-    tokens[0, 1 + len(residues)] = alphabet.eos_idx
+    tokens[:, 1 : 1 + len(residues)] = torch.tensor(residues)
+    tokens[:, 1 + len(residues)] = alphabet.eos_idx
     return tokens
 
 
@@ -102,10 +111,10 @@ def main() -> int:
 
         with torch.no_grad():
             torch_hidden, _ = reference(tokens)
-        torch_hidden = torch_hidden.numpy().astype(np.float32)
+        torch_hidden = torch_hidden.numpy().astype(np.float32)[:1]
 
         prediction = mlmodel.predict({"tokens": tokens.numpy().astype(np.int32)})
-        coreml_hidden = np.asarray(prediction["hidden_states"], dtype=np.float32)
+        coreml_hidden = np.asarray(prediction["hidden_states"], dtype=np.float32)[:1]
 
         # Compare only the real positions: padding is masked, so whatever the
         # model emits there is not a claim about anything.
@@ -171,10 +180,10 @@ def main() -> int:
     long = build_tokens(alphabet, UBIQUITIN[:60], 512)
     short_hidden = np.asarray(
         mlmodel.predict({"tokens": short.numpy().astype(np.int32)})["hidden_states"],
-        dtype=np.float32)
+        dtype=np.float32)[:1]
     long_hidden = np.asarray(
         mlmodel.predict({"tokens": long.numpy().astype(np.int32)})["hidden_states"],
-        dtype=np.float32)
+        dtype=np.float32)[:1]
     real = 62
     padding_difference = float(
         np.abs(short_hidden[:, :real, :] - long_hidden[:, :real, :]).max())

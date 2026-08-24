@@ -52,6 +52,38 @@ MODELS_DIR = ROOT / "Models"
 BUCKETS = [128, 256, 384, 512, 768, 1024]
 DEFAULT_BUCKET = 384
 
+# Batch of 1. Masked-marginal scoring therefore runs one prediction per
+# position rather than batching them, which is a documented departure from hard
+# rule 5 and was arrived at by measurement, not by preference.
+#
+# What batching would buy, measured on an M1 Max at bucket 384:
+#
+#     batch 1   31.2 ms/variant   9.37 s for a 300-residue scan
+#     batch 8   21.6 ms/variant   6.48 s
+#     batch 16  22.6 ms/variant   6.78 s
+#
+# So batching is worth 31% and SATURATES at 8: a compute-bound workload, not a
+# memory-bound one. Worth having, and not available here, because Core ML will
+# not combine a batch dimension with enumerated sequence shapes:
+#
+# * `EnumeratedShapes` over the BATCH axis converts and saves, predicts at the
+#   default shape, then **crashes the process with SIGTRAP** on any other batch.
+# * A FIXED batch of 8 with enumerated SEQUENCE shapes converts and saves, and
+#   then **hangs on first predict**: 0% CPU, no memory growth, indefinitely.
+# * A fixed batch of 8 with a fixed sequence length works fine (173 ms), but
+#   would need one model per bucket, or a second model beside the batch-1 one at
+#   134 MB against a 200 MB bundle target.
+#
+# The configuration that works is batch 1 with enumerated sequence shapes, which
+# is what Phase 2 proved at 98.8% ANE residency. The cost is a 9.37 s
+# masked-marginal scan on this Mac against a 6 s budget specified for iPhone
+# hardware, which remains unmeasured on device.
+#
+# What makes that acceptable is the wild-type marginal mode: ONE forward pass
+# for the whole matrix, about 31 ms, so the user gets an immediate answer and
+# the accurate scan runs behind it.
+SCORING_BATCH = 1
+
 
 class TraceableRotaryEmbedding(nn.Module):
     """A rotary position embedding that survives tracing.
@@ -198,11 +230,11 @@ def main() -> int:
     # A DELIBERATELY PADDED example. See the module docstring: tracing without
     # padding bakes in the no-mask branch and silently breaks every real input.
     padding_index = alphabet.padding_idx
-    example = torch.full((1, DEFAULT_BUCKET), padding_index, dtype=torch.int64)
-    example[0, 0] = alphabet.cls_idx
+    example = torch.full((SCORING_BATCH, DEFAULT_BUCKET), padding_index, dtype=torch.int64)
+    example[:, 0] = alphabet.cls_idx
     real_residues = [alphabet.get_idx(c) for c in "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDK"]
-    example[0, 1 : 1 + len(real_residues)] = torch.tensor(real_residues)
-    example[0, 1 + len(real_residues)] = alphabet.eos_idx
+    example[:, 1 : 1 + len(real_residues)] = torch.tensor(real_residues)
+    example[:, 1 + len(real_residues)] = alphabet.eos_idx
 
     assert example.eq(padding_index).any(), "example must contain padding"
 
@@ -211,8 +243,11 @@ def main() -> int:
         traced = torch.jit.trace(wrapper, example, strict=False)
 
     print("converting ...")
+    # Enumerated over sequence length only, with the batch FIXED. Enumerating
+    # the batch too crashes predict: see the note on SCORING_BATCH.
     enumerated = ct.EnumeratedShapes(
-        shapes=[[1, bucket] for bucket in BUCKETS], default=[1, DEFAULT_BUCKET])
+        shapes=[[SCORING_BATCH, bucket] for bucket in BUCKETS],
+        default=[SCORING_BATCH, DEFAULT_BUCKET])
 
     mlmodel = ct.convert(
         traced,
@@ -237,7 +272,9 @@ def main() -> int:
         f"ESM-2 {args.model} backbone. Outputs per-residue hidden states and "
         f"masked-token logits from one forward pass.")
     mlmodel.input_description["tokens"] = (
-        f"Padded token ids, one of {BUCKETS} in length, padding id {padding_index}.")
+        f"Padded token ids, ({SCORING_BATCH}, S) where S is one of {BUCKETS}, "
+        f"padding id {padding_index}. Embedding uses row 0; masked-marginal "
+        f"scoring uses all {SCORING_BATCH} rows.")
     mlmodel.output_description["hidden_states"] = (
         f"Per-residue hidden states, ({{1}}, S, {model.embed_dim}).")
     mlmodel.output_description["logits"] = "Per-position vocabulary logits."
@@ -253,7 +290,7 @@ def main() -> int:
     references = {}
     with torch.no_grad():
         for bucket in (128, DEFAULT_BUCKET):
-            tokens = torch.full((1, bucket), padding_index, dtype=torch.int64)
+            tokens = torch.full((SCORING_BATCH, bucket), padding_index, dtype=torch.int64)
             tokens[0, 0] = alphabet.cls_idx
             residues = [alphabet.get_idx(c) for c in UBIQUITIN[: bucket - 2]]
             tokens[0, 1 : 1 + len(residues)] = torch.tensor(residues)

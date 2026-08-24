@@ -6,7 +6,12 @@ import PackageDescription
 
 let package = Package(
     name: "BoffinViewer",
-    platforms: [.iOS(.v26), .macOS(.v26)],
+    // iOS 26 is the real deployment target. The macOS platform exists only so
+    // that `swift test` can run these suites on the host without booting a
+    // simulator, so keep it as LOW as the sources compile against: pinning it
+    // to the newest macOS makes the test binaries unloadable on any older
+    // machine or CI runner ("built for macOS X which is newer than running OS").
+    platforms: [.iOS(.v26), .macOS(.v14)],
     products: [
         .library(name: "BoffinViewer", targets: ["BoffinViewer"])
     ],

@@ -30,7 +30,7 @@ is lint-clean.
 | Package tests pass | Met: 27 tests across seven packages, all green under Xcode 26.6 |
 | Project opens from a clean checkout | Met: `BOFFIN.xcodeproj` is committed, three targets, seven local packages resolve |
 | CI defined | Met as configuration; **never executed**, so "CI green" is unproven |
-| Empty app builds and runs on iPhone and iPad simulators | **In progress**: iOS simulator runtime downloading |
+| Empty app builds and runs on iPhone and iPad simulators | **Blocked on a reboot**: the iOS 26.5 runtime is installed and Ready but its cryptex volume is unmounted, so every device reads `unavailable`. See the toolchain notes |
 | Fixture set committed | Met, with three caveats flagged in `Fixtures/MANIFEST.md` |
 | `CLAUDE.md` in place | Met |
 | README with To Do roadmap | Met: house standard, 13 badges verified, Elementor assets in `Docs/web/` |
@@ -49,8 +49,18 @@ device names in the matrix are guesses until one run confirms them.
   `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` achieves the same
   thing without sudo, and is how the package tests were run.
 - Xcode 26 does **not** bundle simulator runtimes: `xcodebuild -downloadPlatform iOS`
-  is a separate download of several GB. A fresh machine is not ready for a
-  simulator build just because Xcode is installed.
+  is a separate ~8.5 GB download. A fresh machine is not ready for a simulator
+  build just because Xcode is installed. Running it while Xcode is already
+  fetching the same asset creates a duplicate registration, one marked
+  `Unusable - Other Failure: Duplicate of <uuid>`; clear it with
+  `xcrun simctl runtime delete <uuid> --keep-asset`.
+- **Never `killall com.apple.CoreSimulator.CoreSimulatorService`.** It is the
+  commonly suggested fix for Xcode not enumerating simulators, and on macOS 26
+  it unmounts the runtime cryptex volume, which does not re-establish without a
+  reboot. `simctl runtime list` still reports `Ready` while every device reads
+  `unavailable, runtime profile not found`, so the diagnostics actively mislead.
+  This happened here on 2026-08-24 and cost the simulator acceptance row.
+  Diagnose with `mount | grep iOS_` before reaching for anything.
 - Tuist was trialled and dropped on 2026-08-24 at Marc's request, in favour of
   a native Xcode project. The seven local SPM packages were kept: they are what
   make the dependency rule mechanically enforceable, and dropping Tuist changed

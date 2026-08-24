@@ -91,19 +91,37 @@ jobs:
   # Phase 0 acceptance: the app builds and runs on both iPhone and iPad
   # simulators, straight from a clean checkout with no generation step.
   app:
-    name: App (${{ matrix.simulator }})
+    name: App (${{ matrix.family }})
     runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
-        simulator:
-          - "iPhone 17 Pro"
-          - "iPad Pro 13-inch (M4)"
+        # Device *families*, not exact model names. Apple renames these every
+        # cycle (this repo's own machine has "iPad Pro 13-inch (M5)" where the
+        # first draft guessed M4), and a renamed device fails the build with an
+        # unhelpful "unable to find a device matching the destination".
+        # The resolve step below picks a real device of each family.
+        family: ["iPhone", "iPad"]
     steps:
       - uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_${XCODE_VERSION}.app
+
+      - name: Resolve a simulator for this family
+        id: sim
+        run: |
+          set -euo pipefail
+          # Print everything available first: when this job fails on a runner
+          # image bump, the log should say what WAS available rather than only
+          # what was asked for.
+          echo "::group::Available simulators"
+          xcrun simctl list devices available
+          echo "::endgroup::"
+
+          name="$(./Tools/pick-simulator.py "${{ matrix.family }}")"
+          echo "Using: $name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
 
       - name: Build and test
         run: |
@@ -111,8 +129,8 @@ jobs:
           xcodebuild test \
             -project BOFFIN.xcodeproj \
             -scheme BOFFIN \
-            -destination "platform=iOS Simulator,name=${{ matrix.simulator }}" \
-            -resultBundlePath "TestResults-${{ matrix.simulator }}.xcresult" \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -resultBundlePath "TestResults-${{ matrix.family }}.xcresult" \
             CODE_SIGNING_ALLOWED=NO \
           | xcbeautify
 
@@ -120,6 +138,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: xcresult-${{ matrix.simulator }}
+          name: xcresult-${{ matrix.family }}
           path: "TestResults-*.xcresult"
           if-no-files-found: ignore

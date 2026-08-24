@@ -1,0 +1,7 @@
+# Fixture structures are binary and must never be line-ending converted.
+*.bcif binary
+*.cif  text eol=lf
+*.pdb  text eol=lf
+
+# The CRLF fixture exists precisely to test CRLF handling: leave it alone.
+Fixtures/malformed/crlf.fasta -text

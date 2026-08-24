@@ -37,3 +37,20 @@ simulated device, **not** cold launch to interactive on real hardware, and it
 must not be compared against the 1.2 s budget. Simulator timings are not device
 timings and are recorded here only so nobody later mistakes their absence for an
 oversight.
+
+
+## Phase 1 (2026-08-24)
+
+No device measurements yet: everything below the model layer is composition
+arithmetic over a few hundred residues, and the 120 Hz ruler budget is a
+*device* number that a simulator cannot honestly report.
+
+What is established instead is the structural property the budget depends on:
+the ruler draws only the residues in the viewport plus overscan, pinned by
+`TrackRulerGeometryTests`. A 10,000-residue sequence in a 400-point viewport
+draws fewer than 100 residues, not 10,000. That is the difference between
+meeting the budget and missing it by two orders of magnitude, and it is checked
+by a test rather than by eye.
+
+The ruler's frame timing on real hardware is a Phase 3 measurement, once there
+are model-derived tracks stacked on it and the row count is realistic.

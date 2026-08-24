@@ -79,6 +79,36 @@ Provenance, download date and SHA-256 checksums are in `Fixtures/MANIFEST.md`.
 
 ---
 
+## Constant tables (Phase 1, 2026-08-24)
+
+`BoffinCore`'s amino acid tables are **generated**, not transcribed, by
+`Tools/data/generate_amino_acid_tables.py`. Source URLs, download date and
+SHA-256 of every input are recorded in `Tools/data/MANIFEST.md`.
+
+These are published scientific constants (facts from the papers below), used
+here via convenient machine-readable transcriptions rather than as code. No
+third-party code is linked or shipped.
+
+| Table | Paper | Transcription source | Licence of that source |
+|---|---|---|---|
+| Kyte-Doolittle hydropathy | Kyte J, Doolittle RF. J Mol Biol 157:105-132 (1982) | Biopython `Bio/SeqUtils/ProtParamData.py` | Biopython License Agreement or BSD 3-Clause |
+| DIWV dipeptide instability (400 entries) | Guruprasad K, Reddy BVB, Pandit MW. Protein Eng 4:155-161 (1990) | Biopython `Bio/SeqUtils/ProtParamData.py` | as above |
+| Bjellqvist pKa scale | Bjellqvist B et al. Electrophoresis 14:1023-1031 (1993) | Biopython `Bio/SeqUtils/IsoelectricPoint.py` | as above |
+| Average residue masses | IUPAC-IUB standard atomic weights | Biopython `Bio/Data/IUPACData.py` | as above |
+| EMBOSS pKa scale | EMBOSS `iep` | EMBOSS `emboss/data/Epk.dat` | GPL (data file only, no code taken) |
+| Extinction coefficients at 280 nm | Pace CN et al. Protein Sci 4:2411-2423 (1995) | written directly into the generator | n/a |
+
+Biopython 1.88 is additionally used **outside the app**, as an independent
+reference implementation for generating expected values in the Phase 1 test
+suite. It is not a dependency of BOFFIN and is not shipped.
+
+Note on the EMBOSS entry: EMBOSS itself is GPL. Only the numeric pKa values
+from a data file are used, which are the published constants of the `iep`
+method rather than expressive code, and no EMBOSS code is linked or ported.
+The same discipline applied to PLIP applies here.
+
+---
+
 ## Adding a dependency
 
 Rule 9 of `CLAUDE.md`: every new dependency needs a licence check recorded

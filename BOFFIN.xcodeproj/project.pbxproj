@@ -8,9 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		020C6F596C66196959ADA1D1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B748EDB595BF571562A511B3 /* RootView.swift */; };
+		03A7287E083C43CD82FCE57C /* SequenceInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C2A4FDA914BF77952ECCDF /* SequenceInputView.swift */; };
+		093D59258C5D2CE1395D0464 /* BrandRulerStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */; };
+		0C2136391539F611D4635981 /* OrderTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6AF9CD98519D9AF99ED534B /* OrderTabView.swift */; };
 		0C7EB7B7CD9B9C5B19180327 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		309392C24349D867930D263C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
+		471354F21120830E72D5FA9C /* PropertiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A469349A97963F1293E91F91 /* PropertiesView.swift */; };
+		5316C03BC7B85C402CAE1366 /* OrderTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4A66A11CFF23594DC1D41D /* OrderTabUITests.swift */; };
 		7E5E08AE35F4236102CD6A72 /* LaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3211A8BC77205F57822AC0 /* LaunchUITests.swift */; };
+		822D6797A1FDD50249938A1C /* SequenceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */; };
 		B31D5E9CD2C7D310B2762DBD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		B4FAFC3F2B5E2685E3DF98FA /* AppSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */; };
 		F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F519F5A35151A9069277CE /* BoffinApp.swift */; };
@@ -37,20 +43,26 @@
 /* Begin PBXFileReference section */
 		025405E6BD0A79F1E200A6D5 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
 		1C4B37771FD3FEA80B21D072 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = App/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		2C4A66A11CFF23594DC1D41D /* OrderTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrderTabUITests.swift; path = App/UITests/OrderTabUITests.swift; sourceTree = "<group>"; };
 		2C86B4F6F2133F1EC2D10115 /* BOFFIN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BOFFIN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppSmokeTests.swift; path = App/Tests/AppSmokeTests.swift; sourceTree = "<group>"; };
 		360DFC49528DA13E4D37399D /* CLAUDE.md */ = {isa = PBXFileReference; includeInIndex = 1; path = CLAUDE.md; sourceTree = "<group>"; };
 		3A1BCB9FEDFDE88FF4D1D2C9 /* perf-log.md */ = {isa = PBXFileReference; includeInIndex = 1; name = "perf-log.md"; path = "Docs/perf-log.md"; sourceTree = "<group>"; };
 		3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BOFFINUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		59C2A4FDA914BF77952ECCDF /* SequenceInputView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SequenceInputView.swift; path = App/Sources/SequenceInputView.swift; sourceTree = "<group>"; };
 		5A3211A8BC77205F57822AC0 /* LaunchUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LaunchUITests.swift; path = App/UITests/LaunchUITests.swift; sourceTree = "<group>"; };
 		A25E506DF3A473C4D4925FA1 /* MANIFEST.md */ = {isa = PBXFileReference; includeInIndex = 1; name = MANIFEST.md; path = Fixtures/MANIFEST.md; sourceTree = "<group>"; };
+		A469349A97963F1293E91F91 /* PropertiesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PropertiesView.swift; path = App/Sources/PropertiesView.swift; sourceTree = "<group>"; };
 		B2BB7456A68778FEF6291BD2 /* ATTRIBUTIONS.md */ = {isa = PBXFileReference; includeInIndex = 1; name = ATTRIBUTIONS.md; path = Docs/ATTRIBUTIONS.md; sourceTree = "<group>"; };
 		B748EDB595BF571562A511B3 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = App/Sources/RootView.swift; sourceTree = "<group>"; };
 		BEA6F1540BB95EAD1919CF82 /* BOFFIN_BUILD_PLAN.md */ = {isa = PBXFileReference; includeInIndex = 1; name = BOFFIN_BUILD_PLAN.md; path = Docs/BOFFIN_BUILD_PLAN.md; sourceTree = "<group>"; };
 		CFD3EA957D205A3C45470A9F /* CHANGELOG.md */ = {isa = PBXFileReference; includeInIndex = 1; name = CHANGELOG.md; path = Docs/CHANGELOG.md; sourceTree = "<group>"; };
 		D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D65824DDFA9E4DC7375236C4 /* BOFFINTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BOFFINTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BrandRulerStyle.swift; path = App/Sources/BrandRulerStyle.swift; sourceTree = "<group>"; };
+		E6AF9CD98519D9AF99ED534B /* OrderTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrderTabView.swift; path = App/Sources/OrderTabView.swift; sourceTree = "<group>"; };
 		F1F519F5A35151A9069277CE /* BoffinApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinApp.swift; path = App/Sources/BoffinApp.swift; sourceTree = "<group>"; };
+		F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SequenceStore.swift; path = App/Sources/SequenceStore.swift; sourceTree = "<group>"; };
 		F92CF2D37BBBC032A7551686 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = App/Resources/Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				5A3211A8BC77205F57822AC0 /* LaunchUITests.swift */,
+				2C4A66A11CFF23594DC1D41D /* OrderTabUITests.swift */,
 			);
 			name = UITests;
 			sourceTree = SOURCE_ROOT;
@@ -144,6 +157,11 @@
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
 				B748EDB595BF571562A511B3 /* RootView.swift */,
+				D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */,
+				E6AF9CD98519D9AF99ED534B /* OrderTabView.swift */,
+				A469349A97963F1293E91F91 /* PropertiesView.swift */,
+				59C2A4FDA914BF77952ECCDF /* SequenceInputView.swift */,
+				F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */,
 			);
 			name = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -313,6 +331,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E5E08AE35F4236102CD6A72 /* LaunchUITests.swift in Sources */,
+				5316C03BC7B85C402CAE1366 /* OrderTabUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +341,11 @@
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
 				020C6F596C66196959ADA1D1 /* RootView.swift in Sources */,
+				093D59258C5D2CE1395D0464 /* BrandRulerStyle.swift in Sources */,
+				0C2136391539F611D4635981 /* OrderTabView.swift in Sources */,
+				471354F21120830E72D5FA9C /* PropertiesView.swift in Sources */,
+				03A7287E083C43CD82FCE57C /* SequenceInputView.swift in Sources */,
+				822D6797A1FDD50249938A1C /* SequenceStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

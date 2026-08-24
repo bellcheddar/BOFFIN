@@ -11,9 +11,31 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 0 (Foundations) **complete**. Phase 1 (the sequence spine) is next
-- **Last completed:** Phase 0 scaffolding on 2026-08-24 (see `Docs/CHANGELOG.md`)
-- **Blocked on:** nothing for Phase 1. Open questions 1 and 2 gate Phase 3 and Phase 5, not Phase 1
+- **Phase:** 1 (The sequence spine) **complete**. Phase 2 (ML core) is next
+- **Last completed:** Phase 1 on 2026-08-24 (see `Docs/CHANGELOG.md`)
+- **Blocked on:** nothing for Phase 2. Open question 6 (35M vs 150M backbone) is worth settling early in Phase 2 but does not block starting it. Q1 gates Phase 3, Q2 and Q3 gate Phase 5
+
+### Decisions taken in Phase 1
+
+- **Both pKa scales, user-selectable** (Marc's call). Bjellqvist matches ExPASy
+  ProtParam; EMBOSS matches command-line pipelines. Every result carries the
+  scale that produced it, because they disagree by 0.2 to 0.5 pH units.
+- **Constant tables are generated, never transcribed.** The DIWV table is 400
+  values; hand typing it is exactly the silently-wrong-but-believed failure
+  hard rule 6 exists to prevent. `Tools/data/generate_amino_acid_tables.py`
+  emits the Swift from checksummed sources.
+- **The isoelectric point brackets 0 to 14, not 4.05 to 12.** Biopython
+  brackets the narrow range and returns the *bound* for sequences outside it,
+  so poly-aspartate reads exactly 4.05. Tests pin both the agreement (ubiquitin
+  6.5616, identical) and the deliberate divergence (DDDEEE 3.49, not 4.05).
+- **Non-canonical residues are excluded from properties and counted**, never
+  coerced or silently dropped. `nonCanonicalCount` drives a UI warning.
+- **Hydropathy leaves the termini blank** rather than averaging a truncated
+  window. A half-window average is a different statistic wearing the same
+  colour, and the termini are where construct boundaries get chosen.
+- **`TrackRulerStyle` is injected by the app.** BoffinCharts and BoffinUI
+  cannot see each other under the dependency rule, so the app wires the brand
+  palette into the renderer. That is the rule working, not a workaround.
 
 ### What Phase 0 delivered
 

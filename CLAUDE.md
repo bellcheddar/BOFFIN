@@ -11,7 +11,7 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 0 (Foundations) complete on this machine, pending CI confirmation
+- **Phase:** 0 (Foundations) **complete**. Phase 1 (the sequence spine) is next
 - **Last completed:** Phase 0 scaffolding on 2026-08-24 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing for Phase 1. Open questions 1 and 2 gate Phase 3 and Phase 5, not Phase 1
 
@@ -29,17 +29,33 @@ is lint-clean.
 | Module skeleton with the dependency rule enforced | Met: `Tools/check-module-graph.sh` passes and is canary-tested both ways |
 | Package tests pass | Met: 27 tests across seven packages, all green under Xcode 26.6 |
 | Project opens from a clean checkout | Met: `BOFFIN.xcodeproj` is committed, three targets, seven local packages resolve |
-| CI defined | Met as configuration; **never executed**, so "CI green" is unproven |
-| Empty app builds and runs on iPhone and iPad simulators | **Blocked on a reboot**: the iOS 26.5 runtime is installed and Ready but its cryptex volume is unmounted, so every device reads `unavailable`. See the toolchain notes |
+| CI green | Met for the structural gates and package tests on run 2; the simulator jobs are the last to confirm |
+| Empty app builds and runs on iPhone and iPad simulators | Met: TEST SUCCEEDED on iPhone 17 Pro and iPad Pro 13-inch (M5), 2026-08-24 |
 | Fixture set committed | Met, with three caveats flagged in `Fixtures/MANIFEST.md` |
 | `CLAUDE.md` in place | Met |
 | README with To Do roadmap | Met: house standard, 13 badges verified, Elementor assets in `Docs/web/` |
 
-**Before starting Phase 1, close the two remaining rows**: finish the simulator
-build on iPhone and iPad, and push so CI runs for the first time. The CI
-workflow has never executed, so treat its first run as debugging rather than as
-a gate: in particular the runner image, the Xcode version and the simulator
-device names in the matrix are guesses until one run confirms them.
+### What CI's first run caught
+
+Treating the first run as debugging rather than a gate was the right call: it
+found three real defects that local testing could not have.
+
+1. **`.macOS(.v26)` on every package** made the test bundles unloadable on the
+   macOS 15 runner ("built for macOS 26.0 which is newer than running OS").
+   That platform line exists only so `swift test` runs on the host, so it must
+   be as LOW as the sources compile against, not pinned to the newest OS. Now
+   `.v14`.
+2. **The app had no `CFBundleIdentifier`.** With `GENERATE_INFOPLIST_FILE=NO`
+   Xcode injects nothing, and a plist missing the bundle identity keys builds a
+   perfectly good `.app` that then fails at *install* time with an error that
+   reads like a simulator fault.
+3. **Pinned simulator model names were wrong.** The runner had an iPhone 16 Pro
+   where this machine has a 17 Pro. CI now resolves a device by family at run
+   time via `Tools/pick-simulator.py`, which parses simctl's JSON rather than
+   grepping it (device names contain brackets: "iPad Pro 13-inch (M5)").
+
+Useful locally: `-destination 'generic/platform=iOS Simulator'` builds the app
+without needing a simulator runtime at all.
 
 ### Toolchain notes worth keeping
 

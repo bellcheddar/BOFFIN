@@ -33,4 +33,17 @@ Repository initialised and scaffolded.
 - Licence audit begun: PLIP (GPL v2), Mol* (MIT) and ESM-2 (MIT) verified at
   source.
 
+**Phase 0 acceptance met on 2026-08-24.** The app builds and runs on both the
+iPhone 17 Pro and iPad Pro 13-inch (M5) simulators (TEST SUCCEEDED), 27 package
+tests pass, the project opens from a clean checkout with no generation step, and
+CI's structural gates and package tests are green.
+
+Two changes to the plan landed during the phase:
+
+- **Tuist was dropped** in favour of a native, committed `BOFFIN.xcodeproj`. The
+  seven local SPM packages were kept, so the module dependency rule stays
+  mechanically enforceable.
+- **The packages' macOS platform is 14, not 26.** It exists only for host-side
+  testing and pinning it high made the binaries unloadable on CI.
+
 Known gaps carried into Phase 1 are listed in `CLAUDE.md`.

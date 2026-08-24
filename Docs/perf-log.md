@@ -29,3 +29,11 @@ looks like a regression the moment real work is wired in.
 First real entries land in Phase 1 (ruler interaction at 120 Hz) and Phase 2
 (embedding latency and ANE residency), the latter being the number the whole
 premise of the app rests on.
+
+For the record, the only timing worth noting from Phase 0 is the UI launch test
+on the simulator: 5.05 s on iPhone 17 Pro and 4.94 s on iPad Pro 13-inch (M5).
+That figure is `XCUIApplication().launch()` plus test harness overhead on a
+simulated device, **not** cold launch to interactive on real hardware, and it
+must not be compared against the 1.2 s budget. Simulator timings are not device
+timings and are recorded here only so nobody later mistakes their absence for an
+oversight.

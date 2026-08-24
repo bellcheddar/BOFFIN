@@ -27,21 +27,33 @@ is lint-clean.
 | Criterion | Status |
 |---|---|
 | Module skeleton with the dependency rule enforced | Met: `Tools/check-module-graph.sh` passes and is canary-tested both ways |
+| Package tests pass | Met: 27 tests across seven packages, all green under Xcode 26.6 |
+| `tuist generate` reproducible from a clean checkout | Met: Tuist 4.205.0, generates in ~10 s, all seven packages resolve |
 | CI defined | Met as configuration; **never executed**, so "CI green" is unproven |
-| `tuist generate` reproducible from a clean checkout | **Unproven**: Tuist is not installed and needs Xcode |
-| Empty app builds and runs on iPhone and iPad simulators | **Unproven**: no Xcode on this machine at the time of writing |
+| Empty app builds and runs on iPhone and iPad simulators | **In progress**: iOS simulator runtime downloading |
 | Fixture set committed | Met, with three caveats flagged in `Fixtures/MANIFEST.md` |
 | `CLAUDE.md` in place | Met |
+| README with To Do roadmap | Met: house standard, 13 badges verified, Elementor assets in `Docs/web/` |
 
-Xcode was installing when Phase 0 was scaffolded. **Before starting Phase 1,
-close the three unproven rows**: install Tuist, run `tuist generate`, build and
-test on both simulators, and push so CI runs for the first time. The CI
+**Before starting Phase 1, close the two remaining rows**: finish the simulator
+build on iPhone and iPad, and push so CI runs for the first time. The CI
 workflow has never executed, so treat its first run as debugging rather than as
-a gate.
+a gate: in particular the runner image, the Xcode version and the simulator
+device names in the matrix are guesses until one run confirms them.
 
-Also unproven locally: `swift test` cannot run under Command Line Tools alone,
-because `lib_TestingInterop.dylib` ships only with Xcode. The suites compile
-and link; they have not been executed.
+### Toolchain notes worth keeping
+
+- `swift test` cannot run under Command Line Tools alone: `lib_TestingInterop.dylib`
+  ships only with Xcode. The suites compile and link but will not execute.
+- `sudo xcode-select -s` has no TTY in an agent session. Setting
+  `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` achieves the same
+  thing without sudo, and is how the package tests were run.
+- Xcode 26 does **not** bundle simulator runtimes: `xcodebuild -downloadPlatform iOS`
+  is a separate download of several GB. A fresh machine is not ready for a
+  simulator build just because Xcode is installed.
+- Tuist needs its own Homebrew tap and, since Homebrew added tap trust, an
+  explicit `brew trust tuist/tuist` before `brew install --formula tuist/tuist/tuist`.
+  Reversible with `brew untrust`.
 
 ### Decisions taken in Phase 0 that were not in the build plan
 

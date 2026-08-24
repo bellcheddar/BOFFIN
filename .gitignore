@@ -41,3 +41,8 @@ scratch/
 # converter and the Swift tokeniser, it is two kilobytes, and a repository that
 # cannot tokenise without first running a 4 GB toolchain is not much use.
 Models/*.reference.npz
+
+# Head training datasets. Hundreds of megabytes, reproducible from
+# Tools/data/fetch_head_datasets.py; provenance in Datasets/MANIFEST.md.
+Datasets/*.npz
+Datasets/*.json

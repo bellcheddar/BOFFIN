@@ -116,3 +116,63 @@ A 300-residue sequence needs 302 tokens and so lands in the 384 bucket: 31 ms
 here. The budget is < 250 ms on an iPhone. That leaves a large apparent margin,
 but the honest statement is that **the < 250 ms budget is still unmeasured**: it
 needs an on-device XCTest measure block, which is outstanding.
+
+
+## Phase 3 (2026-08-24)
+
+### Head accuracy, against the NetSurfP-3.0 paper's own baselines
+
+Benchmarks are the published ones (Table 1, Nucleic Acids Research 50:W510).
+"one-hot" uses no language model at all and is the floor: below it, the
+embeddings are contributing nothing.
+
+| | CB513 | TS115 | CASP12 |
+|---|---|---|---|
+| **BOFFIN Q3** | **0.808** | **0.824** | **0.743** |
+| one-hot floor | 0.719 | 0.746 | 0.704 |
+| NetSurfP-3.0 | 0.846 | 0.856 | 0.791 |
+| **BOFFIN Q8** | **0.676** | **0.718** | **0.630** |
+| one-hot floor | 0.573 | 0.628 | 0.576 |
+| NetSurfP-3.0 | 0.711 | 0.749 | 0.669 |
+| **BOFFIN disorder MCC** | **0.431** | **0.628** | **0.500** |
+| one-hot floor | n/a | 0.561 | 0.573 |
+| NetSurfP-2.0 | n/a | 0.624 | 0.653 |
+| NetSurfP-3.0 | n/a | 0.662 | 0.621 |
+
+Secondary structure sits 3 to 5 points below NetSurfP-3.0, which runs a
+650M-parameter backbone and a ResNet+biLSTM head on a server, against BOFFIN's
+35M backbone and 0.63 MB head on a phone. Comfortably clear of the floor
+everywhere.
+
+Disorder **beats NetSurfP-2.0 on TS115** and is **below the one-hot floor on
+CASP12** (0.500 against 0.573). CASP12 is free-modelling targets with no close
+homologues, which is exactly where a small model without MSA profiles should be
+weakest, so the shape of the failure is coherent. It is surfaced in the UI
+rather than averaged into a single reassuring number.
+
+The disorder decision threshold is **0.900, tuned on validation and applied
+blind**. An earlier sweep on the test sets themselves suggested 0.631 on TS115;
+that was an upper bound, not a result, and is not what is reported here.
+
+### Head cost
+
+| | secondary structure | disorder |
+|---|---|---|
+| Size | 0.63 MB | 0.63 MB |
+| Latency (bucket 1024) | 0.64 ms | 0.58 ms |
+| Core ML vs PyTorch argmax | 100% | 100% |
+
+Against the backbone's 31 ms, each head is roughly 2% of a pass. Both are
+gated on **latency, not residency**: see the note below.
+
+### Why the heads report 0% ANE residency, and why that is correct
+
+Every operation in both heads lists the Neural Engine among its **supported**
+devices. Core ML *prefers* the CPU, because a 12-operation, 0.63 MB model is
+not worth dispatching. The build plan's ">90% of operations on the ANE" is a
+**backbone** gate; applied to a head this small it would push towards making
+the head bigger purely to satisfy a threshold, which is the metric driving the
+design rather than the reverse.
+
+What the convolutional shape is still buying is unchanged and real: a biLSTM
+head would not be ANE-capable at all and would be far more than 2% of the pass.

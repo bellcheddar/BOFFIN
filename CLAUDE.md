@@ -11,9 +11,62 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 2 (ML core) **complete**. Phase 3 (Order tab) is next
-- **Last completed:** Phase 2 on 2026-08-24 (see `Docs/CHANGELOG.md`)
-- **Blocked on:** **open question 1 gates Phase 3** and must be answered before it starts: which datasets for the disorder, SS and TM heads (DisProt, CB513, TOPCONS, DeepTMHMM), and are they trained here or are published heads fine-tuned? Q2 and Q3 gate Phase 5
+- **Phase:** 3 (Order tab) **complete** for secondary structure and disorder. TM spans and signal peptide remain
+- **Last completed:** Phase 3 heads on 2026-08-24 (see `Docs/CHANGELOG.md`)
+- **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
+
+### Phase 3 findings, each of which failed silently
+
+- **`np.load` on a compressed `.npz` is LAZY.** Every `bundle["key"][lo:hi]`
+  re-decompresses the whole array: 6.8 s per access here, roughly 20 hours per
+  epoch, with no error and the process at 99% CPU looking busy. Materialise
+  once. Relatedly, **piping a long run through `grep` block-buffers its log**,
+  which left a monitor watching a permanently empty file.
+- **DisProt cannot train a disorder classifier.** It curates only
+  positively-observed disorder: 17.5% residue coverage, and the "structured"
+  region type appears **five times in the whole database**. There are no
+  negatives. Useful as an independent recall check, not as training labels.
+- **The heads' 0% ANE residency is correct.** Every operation is ANE-*capable*;
+  Core ML prefers CPU for a 12-op, 0.63 MB model, at 2% of the backbone pass.
+  The >90% gate is a **backbone** gate: applied to a head it would push towards
+  a bigger head purely to clear a threshold. Heads are gated on latency.
+- **`EnumeratedShapes` crashes `predict` with SIGTRAP for these heads**, after
+  converting and saving cleanly. One fixed 1024 window instead, whose zero
+  padding was *measured* harmless (100% argmax agreement against a 128 window).
+- **`AnalysisHeads.headWindow` must match `--bucket` in `convert_heads.py`.**
+  A mismatch builds, converts, passes parity and fails only at runtime. It was
+  caught by running the app, not by the test suite.
+
+### Open question 1, answered: heads are TRAINED, not adapted
+
+Marc's first answer was "use published heads, fine-tune them". Investigation
+showed that is not possible, for three independent reasons, and he then chose to
+train small heads on the published datasets instead (which is what the build
+plan specified in section 4.1 all along).
+
+**Do not revisit this without re-reading the three reasons**, because "just
+fine-tune DeepTMHMM" is a very reasonable-sounding suggestion:
+
+1. **Dimension.** DeepTMHMM and NetSurfP-3.0 are both built on **ESM-1b, which
+   is 1280-wide**. BOFFIN's backbone is ESM-2 t12 35M at **480**. Their weights
+   cannot be loaded at all, at any learning rate.
+2. **Architecture.** They are biLSTM+CRF and ResNet+biLSTM. Recurrent layers and
+   CRF decoding do not achieve Neural Engine residency, so adopting them would
+   forfeit the 98.8% Phase 2 established, which is the app's entire premise.
+3. **Licence.** DeepTMHMM needs a paid commercial licence outside academia.
+   NetSurfP-3.0 **declares no licence at all**, which defaults to all rights
+   reserved. Neither can ship inside BOFFIN.
+
+Dimension-compatible ESM-2 35M heads *do* exist on HuggingFace, but they are
+2022 HuggingFace-tutorial outputs with roughly a dozen downloads, mostly
+unlicensed and with no published evaluation. Using one as the basis of a
+scientific tool is exactly the "plausible but silently wrong, and believed"
+failure hard rule 6 exists to prevent.
+
+**Dataset licences are all UNVERIFIED and that blocks release, not development.**
+The DTU download pages state no terms. `Datasets/MANIFEST.md` records this
+honestly rather than assuming. Confirm at source before shipping any head
+trained on them.
 
 ### Decisions and findings from Phase 2
 

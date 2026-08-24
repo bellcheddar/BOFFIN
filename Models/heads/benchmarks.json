@@ -1,0 +1,23 @@
+{
+  "cb513": {
+    "q8_accuracy": 0.6756026600166251,
+    "q3_accuracy": 0.8082986977001939,
+    "disorder_mcc": 0.4310121061121316,
+    "disorder_positives": 3529,
+    "residues": 144360
+  },
+  "ts115": {
+    "q8_accuracy": 0.7181861028817668,
+    "q3_accuracy": 0.8235591166172906,
+    "disorder_mcc": 0.6284092180507863,
+    "disorder_positives": 2203,
+    "residues": 29704
+  },
+  "casp12": {
+    "q8_accuracy": 0.6295479603087101,
+    "q3_accuracy": 0.7426957001102535,
+    "disorder_mcc": 0.5003668449773678,
+    "disorder_positives": 836,
+    "residues": 7256
+  }
+}

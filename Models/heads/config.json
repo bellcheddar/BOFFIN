@@ -1,0 +1,10 @@
+{
+  "embed_width": 480,
+  "head_width": 128,
+  "q8_names": "GHIBESTC",
+  "q3_names": "HEC",
+  "backbone": "esm2_t12_35M_UR50D",
+  "best_q3": 0.8243748740041663,
+  "best_disorder_mcc": 0.5258393004128151,
+  "disorder_threshold": 0.9000000000000002
+}

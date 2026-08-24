@@ -1,0 +1,22 @@
+{
+  "source": "NetSurfP-3.0, Nucleic Acids Research 50:W510 (2022), Table 1",
+  "pmcid": "PMC9252760",
+  "note": "NSP One-Hot uses no language model at all: it is the floor. If BOFFIN's head does not beat it, the ESM-2 embeddings are contributing nothing and the whole architecture is unjustified. NetSurfP-2.0 and 3.0 are the published state of the art, built on a 650M-parameter backbone against BOFFIN's 35M, so they are a ceiling to approach rather than a target to match.",
+  "benchmarks": {
+    "cb513": {
+      "NSP One-Hot":   {"q8": 0.573, "q3": 0.719, "disorder_mcc": null},
+      "NetSurfP-2.0":  {"q8": 0.713, "q3": 0.845, "disorder_mcc": null},
+      "NetSurfP-3.0":  {"q8": 0.711, "q3": 0.846, "disorder_mcc": null}
+    },
+    "ts115": {
+      "NSP One-Hot":   {"q8": 0.628, "q3": 0.746, "disorder_mcc": 0.561},
+      "NetSurfP-2.0":  {"q8": 0.740, "q3": 0.849, "disorder_mcc": 0.624},
+      "NetSurfP-3.0":  {"q8": 0.749, "q3": 0.856, "disorder_mcc": 0.662}
+    },
+    "casp12": {
+      "NSP One-Hot":   {"q8": 0.576, "q3": 0.704, "disorder_mcc": 0.573},
+      "NetSurfP-2.0":  {"q8": 0.699, "q3": 0.810, "disorder_mcc": 0.653},
+      "NetSurfP-3.0":  {"q8": 0.669, "q3": 0.791, "disorder_mcc": 0.621}
+    }
+  }
+}

@@ -115,3 +115,35 @@ Also fixed: `ResidueIdentity(code:)` crashed on any character whose uppercase
 form is more than one character ("\u{00DF}" uppercases to "SS"), which trapped
 `Character.init`. Found by a Phase 2 tokeniser test, fixed in Phase 1 code, with
 regression tests.
+
+
+## Phase 3: Order tab, model-derived tracks (2026-08-24)
+
+Secondary structure and disorder predicted on device from the single backbone
+pass, stacked on the same ruler as the analytical tracks.
+
+- **Heads are trained, not adapted.** Fine-tuning DeepTMHMM or NetSurfP-3.0 is
+  impossible three ways: they are built on ESM-1b at 1280 dimensions against
+  BOFFIN's 480, their biLSTM+CRF architectures forfeit ANE residency, and
+  neither can be redistributed (DeepTMHMM needs a paid commercial licence,
+  NetSurfP-3.0 declares none).
+- **Accuracy measured against the published baselines**, including the
+  no-language-model floor. Secondary structure is 3 to 5 points below a 19x
+  larger backbone. Disorder beats NetSurfP-2.0 on TS115 and is below the floor
+  on CASP12, and that asymmetry is stated in the UI.
+- **`Tools/data/` and `Tools/heads/`** pipelines: dataset fetch with checksums,
+  embedding extraction, training, and Core ML conversion with a latency gate.
+
+Findings recorded because each failed silently:
+
+1. **`np.load` on a compressed .npz is lazy**: every slice re-decompresses the
+   whole array. 6.8 s per access, about 20 hours per epoch, no error.
+2. **DisProt cannot train a disorder classifier**: 17.5% residue coverage and
+   five "structured" regions in the entire database, so it has no negatives.
+3. **The heads' 0% ANE residency is correct**, not a failure: every op is
+   ANE-capable and Core ML prefers CPU for a model this small. Gated on latency.
+4. **`EnumeratedShapes` crashes `predict` for these heads** with SIGTRAP after
+   converting and saving cleanly. One fixed 1024 window is used instead, and its
+   zero padding was measured harmless rather than assumed.
+5. **A head window that disagrees with the converted bucket** builds, converts
+   and passes parity, then fails only on device. Caught by running the app.

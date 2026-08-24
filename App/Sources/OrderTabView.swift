@@ -70,10 +70,11 @@ struct OrderTabView: View {
                         .foregroundStyle(.secondary)
                     TrackRulerView(
                         sequence: sequence,
-                        tracks: store.tracks,
+                        tracks: store.allTracks,
                         selection: $store.selection,
                         style: .boffin)
                     trackLegend
+                    modelStatus
                 }
 
                 if let selection = store.selection, let properties = store.selectionProperties {
@@ -115,11 +116,54 @@ struct OrderTabView: View {
 
     private var trackLegend: some View {
         HStack(spacing: Spacing.m) {
-            ForEach(store.tracks, id: \.id.rawValue) { track in
+            ForEach(store.allTracks, id: \.id.rawValue) { track in
                 Text(track.title)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    /// The model's state, stated plainly.
+    ///
+    /// The disorder head is materially better on proteins with relatives in
+    /// the PDB than on novel folds (MCC 0.63 on TS115, 0.50 on CASP12, against
+    /// a no-language-model floor of 0.57). Averaging those into one number
+    /// would hide exactly the case where the answer is least trustworthy, so
+    /// the caveat travels with the track.
+    @ViewBuilder
+    private var modelStatus: some View {
+        switch store.modelState {
+        case .idle:
+            EmptyView()
+        case .running:
+            HStack(spacing: Spacing.s) {
+                ProgressView().controlSize(.small)
+                Text("Running the model ...").font(.caption).foregroundStyle(.secondary)
+            }
+        case .ready(let passes):
+            VStack(alignment: .leading, spacing: 2) {
+                Label(
+                    passes == 1
+                        ? "Secondary structure and disorder predicted from one model pass."
+                        : "Predicted from \(passes) tiled model passes.",
+                    systemImage: "checkmark.seal"
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                Text(
+                    "Disorder is less reliable on sequences without close relatives "
+                        + "in the PDB. Research use only."
+                )
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        case .unavailable(let reason):
+            Label(reason, systemImage: "exclamationmark.triangle")
+                .font(.caption2)
+                .foregroundStyle(.orange)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

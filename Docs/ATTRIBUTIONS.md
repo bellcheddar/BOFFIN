@@ -96,6 +96,38 @@ analysis of large biomolecular structures*, Nucleic Acids Res 49:W431 (2021).
 | AlphaFold DB | CC BY 4.0 | Phase 7 | assumed, predicted models must be labelled as such |
 | DisProt, CB513, TOPCONS, DeepTMHMM | various | Phase 3 | **unverified, and gated on open question 1** |
 
+### SIFTS: the workaround that does not work, and the way out
+
+The obvious response to an unlicensed dataset is to obtain the same thing from
+somebody whose terms are clear. RCSB's data is CC0, verified, and its API
+publishes the UniProt correspondence for every entity.
+
+**It does not help.** RCSB labels that alignment `provenance_source: SIFTS`, and
+RCSB's own policy excludes data originating from an integrated external resource
+from its licence: "the licensing restrictions applied by the data provider must
+be followed". The mapping is EBI's work whoever hands it to you. Recorded here so
+the route is closed rather than tried again.
+
+**The way out is a different SOURCE, not a different supplier.** Three categories
+inside every mmCIF entry carry what BOFFIN actually needs, and the PDB archive is
+CC0:
+
+| Category | What it gives |
+|---|---|
+| `_pdbx_poly_seq_scheme` | SEQRES index to author number, insertion codes, and which residues were observed |
+| `_struct_ref_seq` | the depositor's own UniProt correspondence |
+| `_pdbx_struct_assembly` | the biological assemblies the entry declares |
+
+`BoffinStructure/EntryNumbering.swift` reads all three, and its tests pin the
+same anchors the SIFTS path is pinned to: CDK2's catalytic aspartate is author
+145 by the entry's own scheme, and the coordinates agree.
+
+**What is lost is real.** `_struct_ref_seq` is the DEPOSITOR'S alignment, and
+SIFTS is EBI's curated correction of exactly that. For a straightforward entry
+they agree; for a chimera, an engineered mutant or a badly annotated old entry,
+SIFTS is better. This is the licence-clear path, not the more accurate one, and
+the source file says so rather than implying they are equivalent.
+
 ### SIFTS, checked at source 2026-08-25
 
 `uniprot_segments_observed.tsv.gz` is the residue-level correspondence between

@@ -1134,3 +1134,42 @@ Finding no motifs returns a sentence rather than an empty string, because a
 Shortcut that returns "" reads as a failure.
 
 164 BoffinCore tests, 12 UI tests.
+
+
+## Licences: replacing SIFTS rather than waiting for permission (2026-08-25)
+
+SIFTS states no licence, which blocks release. The obvious response is to get the
+same mapping from somebody whose terms are clear, and RCSB is CC0.
+
+**That does not work.** RCSB labels its alignment `provenance_source: SIFTS`, and
+RCSB's policy excludes data originating from an integrated external resource from
+its own licence. The mapping is EBI's work whoever hands it to you. Recorded in
+`ATTRIBUTIONS.md` so the route is closed rather than tried again by the next
+person.
+
+**The way out is a different source, not a different supplier.** Three categories
+inside every mmCIF entry carry what BOFFIN needs, and the PDB archive is CC0:
+`_pdbx_poly_seq_scheme` for SEQRES-to-author numbering and which residues were
+observed, `_struct_ref_seq` for the depositor's UniProt correspondence, and
+`_pdbx_struct_assembly` for the assemblies. BOFFIN already parses these bytes.
+
+`EntryNumbering` reads all three and its tests pin the same anchors as the SIFTS
+path: CDK2's catalytic aspartate is author 145 by the entry's own scheme, and the
+coordinates independently agree.
+
+**What is lost is stated rather than glossed.** `_struct_ref_seq` is the
+DEPOSITOR'S alignment and SIFTS is EBI's curated correction of exactly that. For
+a straightforward entry they agree; for a chimera or an engineered mutant, SIFTS
+is better. This is the licence-clear path and not the more accurate one.
+
+### One bug, and it would have made a whole feature meaningless
+
+An unobserved residue does NOT have a missing author number.
+`_pdbx_poly_seq_scheme.pdb_seq_num` is populated for every residue of the
+construct whether it was seen or not; the marker is `pdb_mon_id` being absent.
+Reading the number reported all 298 residues of CDK2 as observed, which would
+have made the Boundary tab's crystallisation precedent worthless: every construct
+would have appeared to order completely, and the disordered count that is the
+whole point of the table would have been zero everywhere.
+
+65 BoffinStructure tests.

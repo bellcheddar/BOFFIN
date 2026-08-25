@@ -24,6 +24,7 @@ struct StructureTabView: View {
     @State private var identifier: String = ""
     @State private var profile: InteractionProfile?
     @State private var loadedStore: AtomStore?
+    @State private var deck = SceneDeckModel()
 
     var body: some View {
         NavigationStack {
@@ -126,6 +127,7 @@ struct StructureTabView: View {
 
             assemblyControls(model)
             interactionControls(model)
+            SceneDeckView(model: deck, viewer: model)
             trackPainting(model)
             if let selection = model.selection { inspector(selection) }
         }

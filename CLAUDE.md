@@ -15,6 +15,38 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 - **Last completed:** Phase 9's interaction profiler on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
+### Phase 8 and 9 UI findings
+
+- **An accessibility identifier on a STACK makes the whole stack one element**
+  and hides every control inside it. The scene controls vanished from the
+  accessibility tree and the failure read as "no next control" against a view
+  that visibly has one. Put identifiers on leaves.
+- **Never tap-to-advance over a structure viewer.** Mol* swallows the tap, and
+  more importantly a tap on a molecule belongs to the molecule: in front of a
+  room you rotate as often as you change slide.
+- **Do not type into a text field in a UI test if the test is not about
+  typing.** Keyboard focus in a field inside a scrolling stack differs between
+  iPhone and iPad; a name that typed on one and not the other produced a
+  one-scene deck and a failure that looked like the advance logic.
+- **`Application failed preflight checks` / `Busy`** on launch is a wedged
+  simulator, not a test failure. `simctl shutdown all`, `simctl erase <id>`,
+  `simctl bootstatus <id> -b`. Never `killall CoreSimulatorService`.
+- **The CDN check tripped on a COMMENT** in vendored Mol* citing a SIGGRAPH
+  paper on `cdn2.unrealengine.com`. Exclude the vendored files by name, and
+  check our own page and bridge for any remote host at all.
+
+### Phase 9 findings
+
+- **Package tests passing does not mean the app compiles.** A type named `Scene`
+  added to BoffinStructure broke the app target, which imports both it and
+  SwiftUI, and the error lands on the app's own `App` conformance several files
+  from the cause. CI caught it; two local package-test runs did not. Build the
+  app after adding a public type to a package.
+- **A `View`'s members are main-actor isolated**, so a test calling one off the
+  main actor takes the process down with signal 5: every test reports STARTING
+  and none finishing, which reads like a hang rather than a crash. Put testable
+  logic in `nonisolated static` helpers.
+
 ### Phase 7 findings
 
 - **SPM's `.copy` of a directory does not reliably invalidate on inner-file

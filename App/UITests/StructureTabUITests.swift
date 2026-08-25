@@ -136,4 +136,72 @@ final class StructureTabUITests: XCTestCase {
         shot.lifetime = .keepAlways
         add(shot)
     }
+
+    /// Phase 8's remaining acceptance in the interface: a deck of scenes that
+    /// presents, advances, and exports as `.pml`.
+    func testSceneDeckCapturesPresentsAndExports() throws {
+        let app = XCUIApplication()
+        app.launch()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30))
+        load.tap()
+        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: 60))
+
+        // Capture two scenes so advancing has somewhere to go.
+        //
+        // Deliberately WITHOUT typing a name. The first version typed one and
+        // passed on iPhone while failing on iPad, because keyboard focus in a
+        // text field inside a scrolling stack behaves differently between the
+        // idioms: only one scene was captured, the deck showed "1 of 1", and the
+        // failure looked like the advance logic. An untitled scene is named for
+        // its position, which is what this test is about.
+        let capture = app.buttons["boffin.capture-scene"]
+        XCTAssertTrue(capture.waitForExistence(timeout: 20), "no capture control")
+        capture.tap()
+        capture.tap()
+        XCTAssertTrue(
+            app.staticTexts["2. Scene 2"].waitForExistence(timeout: 10),
+            "two captures did not produce two scenes")
+
+        XCTAssertTrue(
+            app.buttons["boffin.export-pml"].waitForExistence(timeout: 10),
+            "a deck with scenes cannot be exported")
+
+        app.buttons["boffin.present-deck"].tap()
+
+        // The position counter is the assertion, not the notes container. A
+        // VStack carrying an accessibility identifier does not reliably surface
+        // as `otherElements`, and the scene NAME is a poor probe because an
+        // untitled scene is named for its position. The counter is text the
+        // presenter actually reads.
+        //
+        // Advancing must stop at the end rather than wrapping: reaching the last
+        // scene and finding the first again reads as having lost your place.
+        XCTAssertTrue(
+            app.staticTexts["1 of 2"].waitForExistence(timeout: 20),
+            "presentation mode did not start")
+        // Explicit controls, not a tap on the structure: in front of a room you
+        // turn the molecule as often as you change slide, and a viewer that
+        // advances when you try to rotate it is unusable exactly when it
+        // matters. The first version tapped to advance and this test caught it,
+        // because Mol* swallowed the tap and nothing happened.
+        XCTAssertTrue(
+            app.buttons["boffin.next-scene"].waitForExistence(timeout: 10),
+            "no next control")
+        app.buttons["boffin.next-scene"].firstMatch.tap()
+        XCTAssertTrue(
+            app.staticTexts["2 of 2"].waitForExistence(timeout: 10),
+            "advancing did nothing")
+        app.buttons["boffin.next-scene"].tap()
+        XCTAssertTrue(app.staticTexts["2 of 2"].exists, "the deck wrapped past the end")
+        app.buttons["boffin.previous-scene"].tap()
+        XCTAssertTrue(app.staticTexts["1 of 2"].waitForExistence(timeout: 10))
+
+        app.buttons["boffin.end-presentation"].tap()
+        XCTAssertTrue(
+            app.buttons["boffin.load-structure"].waitForExistence(timeout: 10),
+            "dismissing the presentation did not return to the tab")
+    }
 }

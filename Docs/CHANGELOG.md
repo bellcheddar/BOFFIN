@@ -962,3 +962,42 @@ to work and draws nothing. Shipping that would have been worse than not having
 it, so the overlay stays on the To Do and the 2D diagram is the figure for now.
 
 11 UI tests on iPhone and iPad, 58 BoffinStructure tests, 31 BoffinCharts tests.
+
+
+## Phase 8 (part 4): scene decks and presentation mode (2026-08-25)
+
+A deck of named scenes that captures, reorders, presents and exports as `.pml`.
+What makes it worth having on a phone rather than a laptop is that it goes into a
+pocket and comes out in front of a room, so the two things it must do well are
+advance reliably and travel.
+
+**Advancing stops at the end rather than wrapping.** Reaching the last slide and
+finding the first again reads as having lost your place.
+
+**Not tap-to-advance.** The first version advanced on a tap and the test caught
+it, because Mol\* swallowed the tap. The deeper reason is better: a tap on a
+molecule belongs to the molecule, and in front of a room you rotate as often as
+you change slide.
+
+### Four failures, none of them in the deck
+
+**An accessibility identifier on a stack makes the whole stack one element.**
+The scene controls vanished from the accessibility tree and the failure read as
+"no next control" against a view that visibly has one.
+
+**Typing a name passed on iPhone and failed on iPad.** Keyboard focus in a text
+field inside a scrolling stack differs between the idioms, so only one scene was
+captured, the deck showed "1 of 1", and the failure looked like the advance
+logic. The test no longer types: an untitled scene is named for its position,
+which is what the test is about.
+
+**`Application failed preflight checks` / `Busy`** turned out to be a wedged
+simulator rather than anything in the code. `shutdown all`, `erase`,
+`bootstatus -b`.
+
+**CI's no-CDN check tripped on a comment** in the vendored Mol\* build citing a
+SIGGRAPH paper hosted on `cdn2.unrealengine.com`. The vendored files are now
+excluded by name and our own page and bridge are checked for any remote host at
+all, which is narrower and stricter than excluding the directory.
+
+12 UI tests on iPhone and iPad.

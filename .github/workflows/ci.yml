@@ -59,10 +59,27 @@ jobs:
           # reference in the viewer resources breaks that premise silently: it
           # only fails when a user is offline, which is exactly when it
           # matters. Vendored assets only.
+          #
+          # The vendored Mol* build is excluded, and the exclusion is narrow on
+          # purpose. It tripped this check on a COMMENT citing a SIGGRAPH paper
+          # hosted on cdn2.unrealengine.com, which is not a reference to
+          # anything at runtime. Excluding the whole file would also excuse a
+          # real one, so the two files that are OURS are then checked for any
+          # remote URL at all, and BoffinViewer has a test asserting the same
+          # thing about the page it actually loads.
           if grep -rn -E 'https?://(cdn|unpkg|jsdelivr|cdnjs)' \
                --include='*.html' --include='*.js' --include='*.css' \
+               --exclude='molstar.js' --exclude='molstar.css' \
+               --exclude-dir='.build' \
                App Packages 2>/dev/null; then
             echo "CDN reference found. Vendor the asset instead (see build plan section 6.2)."
+            exit 1
+          fi
+          if grep -n -E 'https?://' \
+               Packages/BoffinViewer/Sources/BoffinViewer/Web/boffin-viewer.html \
+               Packages/BoffinViewer/Sources/BoffinViewer/Web/boffin-bridge.js; then
+            echo "The viewer page or bridge references a remote host. Everything it"
+            echo "needs is vendored beside it."
             exit 1
           fi
           echo "No CDN references."

@@ -34,6 +34,10 @@
 		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
 		B6A5CBEF672462525018F65D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */; };
 		F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */; };
+		EC0DD52C6D2BCDC9AC2A117B /* ExampleSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576B3A7177EA48A039B5C23E /* ExampleSequences.swift */; };
+		807E5CBA693529F97233770D /* NoSequenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263D5703A26771A32159B0E2 /* NoSequenceView.swift */; };
+		3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */; };
+		D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +95,10 @@
 		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
 		80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = App/Resources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AcknowledgementsView.swift; path = App/Sources/AcknowledgementsView.swift; sourceTree = "<group>"; };
+		576B3A7177EA48A039B5C23E /* ExampleSequences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExampleSequences.swift; path = App/Sources/ExampleSequences.swift; sourceTree = "<group>"; };
+		263D5703A26771A32159B0E2 /* NoSequenceView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoSequenceView.swift; path = App/Sources/NoSequenceView.swift; sourceTree = "<group>"; };
+		BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = App/Sources/OnboardingView.swift; sourceTree = "<group>"; };
+		2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingUITests.swift; path = App/UITests/OnboardingUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +178,7 @@
 				CF3222BCE24F65F84CA0580A /* ProbeTests.swift */,
 				95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */,
 				1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */,
+				2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */,
 				467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */,
 			);
 			name = UITests;
@@ -190,6 +199,9 @@
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
 				889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */,
+				BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */,
+				263D5703A26771A32159B0E2 /* NoSequenceView.swift */,
+				576B3A7177EA48A039B5C23E /* ExampleSequences.swift */,
 				07AB5915B686A16BF428E028 /* BoffinIntents.swift */,
 				DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */,
 				C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */,
@@ -377,6 +389,7 @@
 				86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */,
 				892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */,
 				123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */,
+				D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */,
 				40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,6 +400,9 @@
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
 				F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */,
+				3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */,
+				807E5CBA693529F97233770D /* NoSequenceView.swift in Sources */,
+				EC0DD52C6D2BCDC9AC2A117B /* ExampleSequences.swift in Sources */,
 				E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */,
 				F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */,
 				0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */,

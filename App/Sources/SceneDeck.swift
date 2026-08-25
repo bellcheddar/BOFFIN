@@ -131,7 +131,7 @@ struct SceneDeckView: View {
                     }
                     Spacer()
                     Text(scene.representation)
-                        .font(.system(size: 9, design: .monospaced))
+                        .font(.system(.caption2, design: .monospaced))
                         .foregroundStyle(.tertiary)
                 }
             }

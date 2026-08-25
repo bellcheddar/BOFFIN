@@ -8,7 +8,7 @@ final class FamilyTabUITests: XCTestCase {
 
     func testUbiquitinShowsNoFamilyRatherThanAWrongOne() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.buttons["Paste a sequence"].tap()
         app.buttons["Use the ubiquitin example"].tap()
         app.buttons["Analyse"].tap()
@@ -35,7 +35,7 @@ final class FamilyTabUITests: XCTestCase {
     /// was taken from KLIFS's own mapping for 1HCK rather than from memory.
     func testCDK2AnnotatesItsPocketLandmarksByName() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.buttons["Paste a sequence"].tap()
         let cdk2Button = app.buttons["Use the CDK2 example"]
         XCTAssertTrue(cdk2Button.waitForExistence(timeout: 10), "no CDK2 example button")

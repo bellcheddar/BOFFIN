@@ -15,7 +15,7 @@ final class StructureTabUITests: XCTestCase {
     /// this is where that shows up.
     func testUbiquitinLoadsOfflineAndReportsItsAtomCount() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.openTab("Structure")
 
         let viewer = app.descendants(matching: .any)
@@ -57,7 +57,7 @@ final class StructureTabUITests: XCTestCase {
     /// whose values happen to be flat.
     func testPaintingATrackOntoTheStructureReportsNoError() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         app.buttons["Paste a sequence"].tap()
         app.buttons["Use the ubiquitin example"].tap()
@@ -102,7 +102,7 @@ final class StructureTabUITests: XCTestCase {
     /// which is an argument about layout and not about wording.
     func testInteractionProfileShowsItsAssumptionsAndExports() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.openTab("Structure")
 
         let load = app.buttons["boffin.load-structure"]
@@ -141,7 +141,7 @@ final class StructureTabUITests: XCTestCase {
     /// presents, advances, and exports as `.pml`.
     func testSceneDeckCapturesPresentsAndExports() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.openTab("Structure")
 
         let load = app.buttons["boffin.load-structure"]
@@ -213,7 +213,7 @@ final class StructureTabUITests: XCTestCase {
     /// track on the ruler.
     func testPredictionIsComparedAgainstTheStructuresOwnGeometry() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         app.buttons["Paste a sequence"].tap()
         app.buttons["Use the ubiquitin example"].tap()

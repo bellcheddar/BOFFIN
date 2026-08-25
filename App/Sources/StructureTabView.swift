@@ -226,7 +226,7 @@ struct StructureTabView: View {
                         + "entry. Residues are matched by position, which holds for "
                         + "the bundled fixture and needs the alignment in general."
                 )
-                .font(.system(size: 9)).foregroundStyle(.tertiary)
+                .font(.caption2).foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
             }
             .padding(Spacing.s)

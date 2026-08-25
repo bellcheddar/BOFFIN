@@ -1,9 +1,7 @@
 //  RootView.swift
 //  BOFFIN
 //
-//  The five tabs of the build plan. Only Order is implemented: the rest are
-//  placeholders naming the phase that fills them, so the shape of the app is
-//  visible without pretending the features exist.
+//  The five tabs of the build plan, and the one-time welcome sheet.
 
 import BoffinCore
 import BoffinUI
@@ -12,6 +10,28 @@ import SwiftUI
 struct RootView: View {
     @State private var store = SequenceStore()
     @State private var openError: String?
+
+    /// Whether the welcome sheet has been seen.
+    ///
+    /// Stored rather than shown every launch, and stored as "has seen" rather
+    /// than "is first run" so that a future version can reset it by bumping the
+    /// key when there is something new worth saying.
+    @AppStorage("boffin.onboarding.seen.v1") private var hasSeenOnboarding = false
+    @State private var isShowingOnboarding = false
+
+    /// Launch as though the welcome sheet had already been seen.
+    ///
+    /// The UI tests each drive a specific screen and a sheet over the tabs on a
+    /// fresh install would fail all fourteen of them for a reason that has
+    /// nothing to do with what they test. This is the standard way out, and it
+    /// carries the standard risk: a switch that suppresses a feature can
+    /// suppress it everywhere and look like the feature was never built. So
+    /// `OnboardingUITests` deliberately launches WITHOUT the argument and
+    /// asserts the sheet appears, which is the test the flag cannot pass by
+    /// disabling anything.
+    private static var suppressOnboarding: Bool {
+        ProcessInfo.processInfo.arguments.contains("-boffin.skip-onboarding")
+    }
 
     var body: some View {
         TabView {
@@ -49,33 +69,24 @@ struct RootView: View {
         .alert(
             "Could not open that file", isPresented: openAlert,
             actions: { Button("OK") { openError = nil } },
-            message: { Text(openError ?? "") })
+            message: { Text(openError ?? "") }
+        )
+        // Shown once. Not blocking: it is a sheet over a working app rather
+        // than a gate in front of one, so a returning user who has cleared
+        // their storage loses a swipe rather than their place.
+        .sheet(isPresented: $isShowingOnboarding) {
+            OnboardingView(store: store)
+        }
+        .task {
+            guard !Self.suppressOnboarding else { return }
+            guard !hasSeenOnboarding else { return }
+            hasSeenOnboarding = true
+            isShowingOnboarding = true
+        }
     }
 
     private var openAlert: Binding<Bool> {
         Binding(get: { openError != nil }, set: { if !$0 { openError = nil } })
-    }
-}
-
-struct PlaceholderTab: View {
-    let name: String
-    let phase: String
-    let detail: String
-
-    var body: some View {
-        NavigationStack {
-            ContentUnavailableView {
-                Label(name, systemImage: "hammer")
-            } description: {
-                VStack(spacing: Spacing.s) {
-                    Text(detail)
-                    Text("Arrives in \(phase).")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-            .navigationTitle(name)
-        }
     }
 }
 

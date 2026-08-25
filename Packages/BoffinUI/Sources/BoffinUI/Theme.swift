@@ -59,14 +59,71 @@ public enum ScientificPalette {
     }
 }
 
-/// Typography. Sequence text is monospaced and scales with Dynamic Type, but
-/// never below a legibility floor: an unreadable sequence is worse than a
-/// sequence that ignores the user's smallest setting.
+/// Typography for sequence text: monospaced, with a legibility floor.
+///
+/// The comment here used to claim this scaled with Dynamic Type. It never did.
+/// `Font.system(size:)` is a fixed point size and ignores the user's text size
+/// setting entirely, so a sequence set with it stayed 13 points at the largest
+/// accessibility setting. The floor was real and tested; the scaling was a
+/// sentence describing an intention, and a test that only checked the floor
+/// could not tell the difference.
+///
+/// Both behaviours now exist and are named for what they do:
+///
+/// - ``Typography/sequence(size:)`` is FIXED, and is correct inside a drawn
+///   canvas. A residue label in the ruler or the heatmap has to fit the column
+///   it labels; scaling it to 310% does not make the chart accessible, it makes
+///   it unreadable. Those views are made accessible through VoiceOver and Audio
+///   Graphs instead, which is what a shape wants anyway.
+/// - ``SwiftUI/View/sequenceFont(size:)`` SCALES, and is correct for sequence
+///   text laid out as text: an editor, a card, anything the user reads rather
+///   than looks at.
 public enum Typography {
+    /// The smallest a sequence is ever drawn.
+    ///
+    /// An unreadable sequence is worse than one that ignores the user's
+    /// smallest setting. 11 points is also Apple's own floor for legibility.
     public static let sequenceMinimumPointSize: CGFloat = 11
 
+    /// The size a sequence is actually drawn at, floor applied.
+    ///
+    /// Pulled out as plain arithmetic so the floor can be tested without
+    /// standing up a view hierarchy. `ScaledMetric` only resolves inside one,
+    /// so a test written against the modifier can only check that it compiles,
+    /// which is not what needs checking.
+    public static func sequencePointSize(_ requested: CGFloat) -> CGFloat {
+        max(requested, sequenceMinimumPointSize)
+    }
+
+    /// A fixed monospaced font. Does not respond to Dynamic Type: for canvases.
     public static func sequence(size: CGFloat) -> Font {
-        .system(size: max(size, sequenceMinimumPointSize), weight: .regular, design: .monospaced)
+        .system(size: sequencePointSize(size), weight: .regular, design: .monospaced)
+    }
+}
+
+/// Sequence text that responds to Dynamic Type, with the same legibility floor.
+///
+/// The floor is applied to the SCALED size rather than the base one, so a user
+/// on the smallest text setting still gets 11 points, which is the whole point
+/// of having a floor.
+public struct SequenceFont: ViewModifier {
+    // Declared bare and initialised in `init`: the attribute's argument
+    // form needs a wrappedValue it does not have here.
+    @ScaledMetric private var scaled: CGFloat
+
+    public init(size: CGFloat) {
+        _scaled = ScaledMetric(wrappedValue: size, relativeTo: .body)
+    }
+
+    public func body(content: Content) -> some View {
+        content.font(Typography.sequence(size: scaled))
+    }
+}
+
+extension View {
+    /// Monospaced sequence text that scales with the user's text size.
+    public func sequenceFont(size: CGFloat = 13) -> some View {
+        modifier(SequenceFont(size: size))
     }
 }
 

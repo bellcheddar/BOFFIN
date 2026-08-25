@@ -14,7 +14,7 @@ final class OrderTabUITests: XCTestCase {
 
     func testPasteASequenceAndSeeItAnalysed() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         // The empty state offers the way in.
         let pasteButton = app.buttons["Paste a sequence"]
@@ -58,7 +58,7 @@ final class OrderTabUITests: XCTestCase {
 
     func testEmptyInputIsRejectedGracefully() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         app.buttons["Paste a sequence"].tap()
         // Analyse must be disabled with nothing typed, rather than producing an
@@ -74,7 +74,7 @@ final class OrderTabUITests: XCTestCase {
     /// looking for the truth.
     func testAcknowledgementsCreditEverythingAndStateUnknownTerms() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         let link = app.buttons["boffin.acknowledgements-link"]
         XCTAssertTrue(link.waitForExistence(timeout: 20), "no acknowledgements link")

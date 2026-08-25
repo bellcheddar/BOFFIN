@@ -38,7 +38,7 @@ struct SequenceInputView: View {
                     .foregroundStyle(.secondary)
 
                 TextEditor(text: $text)
-                    .font(Typography.sequence(size: 13))
+                    .sequenceFont(size: 13)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                     .scrollContentBackground(.hidden)

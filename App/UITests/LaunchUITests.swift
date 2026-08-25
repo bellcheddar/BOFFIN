@@ -22,7 +22,7 @@ final class LaunchUITests: XCTestCase {
     /// matters: can you get to the tab and does its screen appear.
     func testAppLaunches() {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
 
         let order = app.buttons["Order"].firstMatch
         XCTAssertTrue(
@@ -63,6 +63,18 @@ final class LaunchUITests: XCTestCase {
 //  destination arriving rather than on the tap appearing to work.
 
 extension XCUIApplication {
+
+    /// Launch past the one-time welcome sheet.
+    ///
+    /// Every UI test but `OnboardingUITests` drives a specific screen, and on a
+    /// fresh install a sheet over the tabs fails all of them for a reason that
+    /// has nothing to do with what they assert. That test is the one that
+    /// launches without the argument, so this cannot quietly become "onboarding
+    /// is never shown to anyone".
+    func launchSkippingOnboarding() {
+        launchArguments.append("-boffin.skip-onboarding")
+        launch()
+    }
 
     /// Switch to a tab and wait for its screen.
     func openTab(_ name: String, file: StaticString = #filePath, line: UInt = #line) {

@@ -16,7 +16,7 @@ final class BoundaryTabUITests: XCTestCase {
     /// outcomes are accepted here and exactly one must occur.
     func testBoundaryTabEnforcesKinaseMotifs() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.buttons["Paste a sequence"].tap()
         app.buttons["Use the CDK2 example"].tap()
         app.buttons["Analyse"].tap()

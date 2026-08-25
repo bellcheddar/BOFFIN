@@ -452,6 +452,7 @@ Disorder, secondary structure, TM spans, ΔLLR, motifs and structure-derived int
 8. **British English, no em dashes** (colons or parentheses instead) in all user-facing copy, comments and docs.
 9. **Every new dependency needs a licence check** recorded in `Docs/ATTRIBUTIONS.md`.
 10. **One phase at a time.** Do not start Phase N+1 until Phase N acceptance criteria are met.
+11. **Finishing a phase is not a question.** When a phase's acceptance criteria are met, commit, push, and start the next one in the same turn. Do not stop to report and wait. Marc has asked for this repeatedly and it is the single most common failure on this project: a phase ends, a summary gets written, and the session sits idle until he types "proceed". Pause only for a decision that is genuinely his: a scientific default, a licence, something destructive or outward-facing, or anything needing `sudo`. If a question does arise mid-build, send a `PushNotification` and keep working on everything that does not depend on the answer.
 
 ---
 

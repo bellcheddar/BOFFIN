@@ -25,9 +25,11 @@ struct FitnessTabView: View {
         NavigationStack {
             Group {
                 if store.sequence == nil {
-                    ContentUnavailableView(
-                        "No sequence", systemImage: "square.grid.3x3",
-                        description: Text("Load a sequence in the Order tab first."))
+                    NoSequenceView(
+                        title: "No sequence", systemImage: "square.grid.3x3",
+                        promise: "Every point mutation, scored by how much the model "
+                            + "dislikes it, appears here.",
+                        store: store)
                 } else {
                     content
                 }

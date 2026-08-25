@@ -20,9 +20,11 @@ struct BoundaryTabView: View {
         NavigationStack {
             Group {
                 if store.sequence == nil {
-                    ContentUnavailableView(
-                        "No sequence", systemImage: "scissors",
-                        description: Text("Load a sequence in the Order tab first."))
+                    NoSequenceView(
+                        title: "No sequence", systemImage: "scissors",
+                        promise: "Construct boundaries, tags, proteases and primer-ready "
+                            + "DNA appear here.",
+                        store: store)
                 } else {
                     content
                 }
@@ -123,7 +125,7 @@ struct BoundaryTabView: View {
                         .font(.system(.caption2, design: .monospaced))
                         .foregroundStyle(.secondary)
                         Text(constraint.kind == .signalPeptide ? "removable" : "kept")
-                            .font(.system(size: 9))
+                            .font(.caption2)
                             .foregroundStyle(
                                 constraint.kind == .signalPeptide ? .secondary : Brand.accent)
                     }
@@ -163,7 +165,7 @@ struct BoundaryTabView: View {
                                 .foregroundStyle(Brand.accent)
                             Spacer()
                             Text("scar \(protease.scar)")
-                                .font(.system(size: 9, design: .monospaced))
+                                .font(.system(.caption2, design: .monospaced))
                                 .foregroundStyle(.tertiary)
                         }
                         Text(protease.note)
@@ -188,7 +190,7 @@ struct BoundaryTabView: View {
                             .font(.system(.caption2, design: .monospaced))
                         Spacer()
                         Text("at residue \(refusal.position + 1) of the construct")
-                            .font(.system(size: 9, design: .monospaced))
+                            .font(.system(.caption2, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
                     .foregroundStyle(.orange)
@@ -221,7 +223,7 @@ struct BoundaryTabView: View {
 
             ScrollView(.horizontal) {
                 Text(card.text())
-                    .font(.system(size: 10, design: .monospaced))
+                    .sequenceFont(size: 10)
                     .textSelection(.enabled)
             }
             .frame(maxHeight: 320)

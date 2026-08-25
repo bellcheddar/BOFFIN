@@ -28,9 +28,12 @@ struct FamilyTabView: View {
         NavigationStack {
             Group {
                 if store.sequence == nil {
-                    ContentUnavailableView(
-                        "No sequence", systemImage: "point.3.connected.trianglepath.dotted",
-                        description: Text("Load a sequence in the Order tab first."))
+                    NoSequenceView(
+                        title: "No sequence",
+                        systemImage: "point.3.connected.trianglepath.dotted",
+                        promise: "Family, motifs, canonical numbering and the closest "
+                            + "relatives in the PDB appear here.",
+                        store: store)
                 } else {
                     content
                 }
@@ -189,7 +192,7 @@ struct FamilyTabView: View {
                     HStack {
                         Text(anchor.name).font(.caption.weight(.semibold))
                         Text(anchor.label)
-                            .font(.system(size: 9, design: .monospaced))
+                            .font(.system(.caption2, design: .monospaced))
                             .foregroundStyle(.tertiary)
                         Spacer()
                         Text(anchor.description)
@@ -283,7 +286,7 @@ struct FamilyTabView: View {
     private func measure(_ label: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(value).font(.system(.caption, design: .monospaced))
-            Text(label).font(.system(size: 9)).foregroundStyle(.tertiary)
+            Text(label).font(.caption2).foregroundStyle(.tertiary)
         }
     }
 

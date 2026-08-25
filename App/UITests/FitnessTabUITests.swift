@@ -19,7 +19,7 @@ final class FitnessTabUITests: XCTestCase {
 
     func testFastPreviewProducesAHeatmapAndLogo() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         loadUbiquitin(app)
 
         app.openTab("Fitness")
@@ -73,7 +73,7 @@ final class FitnessTabUITests: XCTestCase {
 
     func testFitnessTabTellsYouToLoadASequenceFirst() throws {
         let app = XCUIApplication()
-        app.launch()
+        app.launchSkippingOnboarding()
         app.openTab("Fitness")
         XCTAssertTrue(app.staticTexts["No sequence"].waitForExistence(timeout: 10))
     }

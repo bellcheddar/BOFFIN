@@ -850,3 +850,31 @@ were on +y, making it a second cis case. The real-structure test passing while
 that one failed is what said the code was right and the fixture was not.
 
 38 BoffinStructure tests.
+
+
+## Phase 8 (part 3): `.pml` round-tripping (2026-08-25)
+
+A scene deck built on a phone opens on a desktop. The build plan asks for the
+export specifically and asks that it not be dropped.
+
+**The import is the half that has to fail loudly.** A `.pml` file is a program:
+it can do things BOFFIN has no equivalent for, and a viewer that quietly ignores
+those commands draws a scene that is subtly not the one the file describes, with
+nothing to say which parts were lost. Unsupported commands are collected with
+their line numbers and reported, so a user can find them rather than being handed
+a count.
+
+**The selection expression travels verbatim.** BOFFIN's selection language is
+PyMOL's, which is the entire reason for choosing that syntax rather than
+inventing one: `byres (polymer within 5 of organic)` is the same string on both
+sides.
+
+**Notes survive as comments.** PyMOL has no field for presenter notes, and
+dropping them would lose the half of a deck that explains the other half.
+
+The colour mapping is deliberately lossy and says so in the source: PyMOL's
+`spectrum` and `util.cbc` are not the functions BOFFIN uses, so an exported scene
+reproduces the intent rather than the exact pixels.
+
+45 BoffinStructure tests, including a round trip of BOFFIN's own output through
+its own importer with nothing reported as unsupported.

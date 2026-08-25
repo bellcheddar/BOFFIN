@@ -49,8 +49,14 @@ class ConvHead(nn.Module):
     """A small dilated 1D convolutional stack over frozen embeddings.
 
     Dilation widens the receptive field without adding depth or parameters:
-    kernel 5 at dilations 1, 2 and 4 sees 25 residues, which comfortably spans a
+    kernel 5 at dilations 1, 2 and 4 sees 29 residues, which comfortably spans a
     helix turn or a strand pairing, for a head that is still a few hundred KB.
+
+    29, not the 25 this said until 2026-08-25. A kernel-5 block at dilation d
+    adds 4*d to the receptive field, so three blocks add 4 + 8 + 16 = 28, and
+    the centre residue makes 29. The wrong figure was quoted onward into a
+    capacity experiment's design before the arithmetic was checked against the
+    code, which is the ordinary way a comment's error becomes a decision's.
     """
 
     def __init__(self, classes: int, width: int = 128, dropout: float = 0.2):

@@ -386,6 +386,10 @@ struct StructureTabView: View {
         await model.load(data, format: .binaryCIF, source: .bundled("1hck.bcif"))
         loadedStore = store
         loadedViewerStore = store
+        // Disulfides are the one construct constraint that cannot be read off
+        // a sequence, so the Boundary tab only learns about them once a
+        // structure is on screen.
+        self.store.noteStructure(store)
         let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
         profile = InteractionProfiler.profile(store, ligand: ligand)
     }
@@ -538,7 +542,9 @@ struct StructureTabView: View {
             let data = try? Data(contentsOf: url)
         else { return }
         await model.load(data, format: .binaryCIF, source: .bundled("1ubq.bcif"))
-        loadedViewerStore = (try? BinaryCIF.decode(data)).flatMap { try? AtomStore.from($0) }
+        let atoms = (try? BinaryCIF.decode(data)).flatMap { try? AtomStore.from($0) }
+        loadedViewerStore = atoms
+        if let atoms { store.noteStructure(atoms) } else { store.forgetStructure() }
     }
 
     /// Map a track onto author numbering and send it.

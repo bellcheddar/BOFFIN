@@ -110,7 +110,7 @@ struct BoundaryTabView: View {
                         + "transmembrane spans were predicted, so every boundary above "
                         + "rests on the disorder track alone."
                 )
-                .font(.caption).foregroundStyle(.orange)
+                .font(.caption).foregroundStyle(ScientificPalette.warning)
                 .fixedSize(horizontal: false, vertical: true)
             } else {
                 ForEach(store.constructConstraints, id: \.self) { constraint in
@@ -131,10 +131,60 @@ struct BoundaryTabView: View {
                     }
                 }
             }
+
+            disulfideStatus
         }
         .padding(Spacing.s)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Brand.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    /// Whether disulfides were checked at all.
+    ///
+    /// Stated either way, and this is the half that matters: with no structure
+    /// loaded, a constraint list showing motifs and transmembrane spans reads
+    /// as a complete account of what may not be cut. It is not. Nothing in a
+    /// sequence says which cysteines pair, so silence here would let a user
+    /// conclude the boundaries had been checked against disulfides when the
+    /// question was never asked.
+    @ViewBuilder
+    private var disulfideStatus: some View {
+        Divider().padding(.vertical, Spacing.xs)
+        if store.disulfides.isEmpty {
+            Label(
+                "Disulfides not checked: load a structure in the Structure tab. "
+                    + "Nothing in a sequence says which cysteines pair.",
+                systemImage: "link.badge.plus"
+            )
+            .font(.caption2).foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("boffin.disulfides.unchecked")
+        } else {
+            let intrachain = store.disulfides.filter(\.isIntrachain).count
+            let interchain = store.disulfides.count - intrachain
+            VStack(alignment: .leading, spacing: 2) {
+                Label(
+                    "\(store.disulfides.count) disulfide "
+                        + "\(store.disulfides.count == 1 ? "bond" : "bonds") measured "
+                        + "in the loaded structure.",
+                    systemImage: "link"
+                )
+                .font(.caption2).foregroundStyle(.secondary)
+                if interchain > 0 {
+                    // Real bonds, and not boundary constraints: an inter-chain
+                    // disulfide says something about the assembly rather than
+                    // about where this chain may be cut. Counted separately so
+                    // the two numbers cannot silently disagree.
+                    Text(
+                        "\(interchain) of them cross chains and do not constrain "
+                            + "this construct."
+                    )
+                    .font(.caption2).foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .accessibilityIdentifier("boffin.disulfides.found")
+        }
     }
 
     /// Tag placement, and the protease check that matters more than it.

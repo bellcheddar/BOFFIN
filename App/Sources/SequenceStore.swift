@@ -11,6 +11,7 @@
 import BoffinCore
 import BoffinData
 import BoffinML
+import BoffinStructure
 import Observation
 import SwiftUI
 
@@ -42,6 +43,14 @@ final class SequenceStore {
     /// Deposited constructs for the best hit: the crystallisation precedent
     /// Phase 6 plans against.
     private(set) var precedent: [ObservedConstruct] = []
+
+    /// Disulfide bonds measured in a structure the user has loaded.
+    ///
+    /// The one construct constraint that cannot come from the sequence. Nothing
+    /// in a run of residues says which cysteines pair, so this stays empty
+    /// until a structure is on screen, and the Boundary tab says so rather than
+    /// implying it has checked.
+    private(set) var disulfides: [Disulfide] = []
 
     enum HomologState: Equatable {
         case idle
@@ -278,6 +287,32 @@ final class SequenceStore {
                         ? "signal peptide" : "transmembrane span"))
         }
 
+        // Disulfides, carried from author numbering into this sequence's own.
+        //
+        // A boundary inside the span separates a covalent bond, so this is a
+        // constraint the solver ENFORCES rather than scores. Only intra-chain
+        // pairs qualify: an inter-chain bond is real and says something about
+        // the assembly, not about where this chain may be cut.
+        //
+        // A pair that cannot be mapped is DROPPED rather than approximated.
+        // Guessing a span in the wrong numbering would forbid a boundary that
+        // is fine and permit one that is not, and it would look identical to a
+        // correct answer on screen.
+        if let best = homologs.first {
+            for bond in disulfides {
+                guard let span = bond.span else { continue }
+                guard let first = queryIndex(forAuthor: span.lowerBound, in: best),
+                    let last = queryIndex(forAuthor: span.upperBound, in: best),
+                    first <= last
+                else { continue }
+                constraints.append(
+                    ConstructConstraint(
+                        kind: .disulfide,
+                        range: first...last,
+                        label: "disulfide \(span.lowerBound) to \(span.upperBound)"))
+            }
+        }
+
         constructConstraints = constraints.sorted {
             $0.range.lowerBound < $1.range.lowerBound
         }
@@ -340,6 +375,46 @@ final class SequenceStore {
                 constraints: constructConstraints,
                 dna: ReverseTranslator.translate(residues))
         }
+    }
+
+    /// Take the disulfide bonds from a structure the user has loaded.
+    ///
+    /// Called by the Structure tab rather than pulled by the store, because the
+    /// store cannot see the viewer and should not learn to: the app is the only
+    /// layer that can see both, which is the dependency rule working rather
+    /// than being worked around.
+    func noteStructure(_ atoms: AtomStore) {
+        let found = DisulfideFinder.find(in: atoms)
+        guard found != disulfides else { return }
+        disulfides = found
+        recomputeConstructs()
+    }
+
+    /// Forget the structure's contribution when it is unloaded.
+    ///
+    /// Not merely tidiness. A disulfide constraint left behind after the
+    /// structure has gone is a hard constraint with nothing standing behind it,
+    /// enforced against a user who can no longer see where it came from.
+    func forgetStructure() {
+        guard !disulfides.isEmpty else { return }
+        disulfides = []
+        recomputeConstructs()
+    }
+
+    /// Where a structure's author residue number lands in the user's sequence.
+    ///
+    /// Author numbering is what the structure and a paper both quote, and it is
+    /// not the user's numbering: a construct with an expression tag, or one
+    /// solved from a different species, renumbers everything. The homolog
+    /// alignment already carries author numbers alongside query indices, so the
+    /// crossing is a lookup rather than a second alignment.
+    private func queryIndex(forAuthor number: Int, in alignment: HomologAlignment) -> Int? {
+        guard let sequence else { return nil }
+        for index in 0..<sequence.count
+        where alignment.mapping(forQueryResidue: index).authorNumber == number {
+            return index
+        }
+        return nil
     }
 
     /// Where a homolog's UniProt residue number lands in the user's sequence.

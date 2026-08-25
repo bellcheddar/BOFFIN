@@ -1335,3 +1335,62 @@ BoffinStructure 72, BoffinML 45, 17 UI tests. Lint and module graph clean.
 
 Outstanding in this phase: TestFlight, which needs the Apple Developer account
 and an App Store Connect record.
+
+---
+
+## Phase 6 (rest): disulfide pairs as a hard constraint (2026-08-25)
+
+The last open Phase 6 item, and the one construct constraint that could not
+come from the sequence. Nothing in a run of residues says which cysteines pair,
+which is why it waited for the structure viewer.
+
+**Measured, not read.** Geometry rather than the deposited `_struct_conn`
+annotation, because the annotation is the depositor's, it is absent from a
+predicted model entirely, and BOFFIN already measures interactions and
+secondary structure from coordinates. One answer produced one way, and it works
+on an AlphaFold model where there is nothing to read.
+
+**Three things that look like details and are not.**
+
+*Sulfur forms one bond.* Thresholding every SG pair under 2.5 A will pair one
+sulfur with two partners, which is not a close call, it is chemically
+impossible. Real structures produce the arrangement anyway through alternate
+conformations and crowded sites, so pairs are assigned by a greedy
+shortest-first matching in which each sulfur is spent once.
+
+*Alternate locations are two models of one atom.* A cysteine modelled half
+bonded and half free has two SG atoms at the same residue about 1 A apart.
+Counting both invents a disulfide from a residue to itself, which would become
+a construct constraint over a span of zero residues: nonsense that looks like
+data. Only the highest-occupancy altloc of each residue is considered.
+
+*An NMR ensemble is twenty copies of the protein.* Searching every model at
+once pairs a sulfur with its own image in another model.
+
+**Validated on a positive and two different negatives.** PETase has two
+disulfides, Cys203 to Cys239 and Cys273 to Cys289, measured at 2.046 and
+2.052 A against a canonical 2.03. CDK2 has three cysteines and no bonds,
+because it is intracellular and the cytosol is reducing: a negative that still
+exercises the pairing search rather than the early exit, and the fixture that
+would catch a detector which simply pairs every cysteine it sees. Ubiquitin has
+no cysteine at all.
+
+**The test was wrong and the finder was right.** It asserted one PETase
+disulfide, from recollection rather than from the structure, and the finder
+returned two. Hard rule 6 says to write the test from the published definition
+before the implementation, and it works exactly as well when the test turns out
+to be the wrong half: what it must never be is written from the output.
+
+**Stated either way in the UI.** With no structure loaded, the Boundary tab
+says disulfides were not checked. Silence there would let a constraint list
+showing motifs and transmembrane spans read as a complete account of what may
+not be cut, when the question had never been asked. A pair that cannot be
+mapped from author numbering into the user's own is dropped rather than
+approximated, since a span guessed in the wrong numbering forbids a boundary
+that is fine, permits one that is not, and looks identical to a correct answer.
+
+Inter-chain pairs are found and reported and do not constrain a construct: a
+real bond that says something about the assembly rather than about where this
+chain may be cut.
+
+BoffinStructure 81 tests, 17 UI tests.

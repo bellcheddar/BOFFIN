@@ -1266,3 +1266,72 @@ is a boundary a user can overrule.
 from PDB entries train heads that match the ones trained on NetSurfP's versions
 of the same underlying data. The licence question was never a question about
 quality.
+
+---
+
+## Phase 11: onboarding, empty states, Dynamic Type and errors (2026-08-25)
+
+The rest of the polish phase, bar TestFlight.
+
+**Onboarding.** A one-time welcome sheet, in the order a new user needs things:
+nothing leaves the device, one pass gives four answers, and what it gets wrong.
+The third is the point. A welcome screen that only sells is how someone comes
+to trust the closed-set classifier the first time it is confidently wrong. It
+ends on an action rather than a dismiss, because the fastest way to understand
+a ruler with six tracks on it is to be looking at one.
+
+**Empty states that act.** Fitness, Family and Boundary each said "load a
+sequence in the Order tab first" and offered no way to do it: a dead end
+wearing the clothes of an explanation. Each now carries the input sheet and
+both bundled examples, and says what that tab will show rather than only that
+it is empty.
+
+**A flag with its own guard.** Fourteen UI tests would fail on a fresh install
+with a sheet over the tabs, so they pass `-boffin.skip-onboarding`. That switch
+carries the standard hazard: suppressing a feature everywhere looks exactly
+like never having built it, and fourteen green tests would say nothing either
+way. `OnboardingUITests` therefore launches WITHOUT it. The three tests pass on
+a repeat run, which is the check that matters: the override genuinely re-shows
+the sheet rather than riding a first install.
+
+**Dynamic Type: ten fixed sizes, classified.** The audit turns on a distinction
+a protein app has to make. Text laid out as text must scale; text drawn inside
+a canvas must not, because a residue label has to fit the column it labels and
+scaling it to 310% makes the heat map unreadable and unaligned rather than
+accessible. Charts are made accessible through VoiceOver and Audio Graphs,
+which is what a shape wants anyway. Nine were text and are fixed; the canvases
+are deliberately untouched. All nine were 9 or 10 points, below Apple's
+legibility floor of 11 even at the default setting, and several sat directly
+beside a correctly scaled `.caption2` sibling in the same `HStack`, so they
+were slips rather than decisions.
+
+**The defect the audit found.** `Typography.sequence(size:)` claimed in its own
+doc comment to scale with Dynamic Type. It never did: `Font.system(size:)` is a
+fixed point size. The floor was real, implemented and tested; the scaling was a
+sentence. The test checked only the half that existed, so nothing could
+contradict the half that did not. Both behaviours now exist and are named for
+what they do, and the floor applies to the scaled size rather than the base
+one, which is the ordering that matters: applied to the base, a user on the
+smallest setting scales 13 points down past 11 and the floor never fires, which
+is the one setting it exists for.
+
+**Error states.** Five places handed the user `String(describing: error)`,
+which for a Core ML failure is a good diagnostic and not a message.
+`UserFacingError` splits a failure into what did not happen, what to do about
+it, and the raw text, kept verbatim and demoted rather than discarded, because
+a bug report carrying the Core ML error code is worth far more than one saying
+"analysis failed". Cancellation is never reported as a failure; being offline
+says what still works; recovery advice is absent rather than invented.
+
+**The conflation underneath.** Three state enums each had one case carrying
+both "this asset was never downloaded" and "this operation failed", so a
+corrupt homolog index displayed as a download in progress. `FitnessTabView` had
+the tell: it compared the payload string against a constant to work out which
+of the two had happened, which is a string comparison standing in for a type
+distinction.
+
+Tests: BoffinCore 171, BoffinUI 4, BoffinCharts 36, BoffinData 41,
+BoffinStructure 72, BoffinML 45, 17 UI tests. Lint and module graph clean.
+
+Outstanding in this phase: TestFlight, which needs the Apple Developer account
+and an App Store Connect record.

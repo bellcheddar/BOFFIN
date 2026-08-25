@@ -204,4 +204,5 @@ final class StructureTabUITests: XCTestCase {
             app.buttons["boffin.load-structure"].waitForExistence(timeout: 10),
             "dismissing the presentation did not return to the tab")
     }
+
 }

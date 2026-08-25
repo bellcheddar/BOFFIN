@@ -1001,3 +1001,58 @@ excluded by name and our own page and bridge are checked for any remote host at
 all, which is narrower and stricter than excluding the directory.
 
 12 UI tests on iPhone and iPad.
+
+
+## Phase 7 revisited: two commands that were doing nothing (2026-08-25)
+
+The viewer UMD build exports **thirteen names**. `Shape`, `StateTransforms`,
+`Symmetry` and `OrderedSet` are not among them: they live under `molstar.lib`.
+Code written against the top-level names does not throw. It evaluates to
+`undefined` and takes the fallback branch.
+
+Two commands were committed that way and every test passed, because the tests
+checked that a command was DISPATCHED rather than that it did anything:
+
+* `listAssemblies` asked `molstar.ModelSymmetry`, got `undefined`, and returned
+  an empty list forever. The assembly picker never appeared for any structure,
+  which is indistinguishable from a structure that declares no assembly.
+* picking fell back to element index 0 when `molstar.OrderedSet` was absent, so
+  every tap reported the FIRST atom of the unit rather than the one tapped. The
+  inspector always showed a plausible residue, which is why nobody noticed.
+
+Both now go through `molstar.lib`: `StructureElement.Loci.firstElement` and
+`StructureProperties` for picks, which is the supported path and does not depend
+on the shape of `atomicHierarchy`, and a guarded chain of candidates for
+assemblies.
+
+**An empty assembly list now carries a note saying which path was taken**, so
+"the structure declares none" and "the viewer could not look" no longer read the
+same. That distinction is the whole defect.
+
+### Three ways this bit back while being fixed
+
+Destructuring `molstar.lib` at file scope took the entire bridge down: a missing
+name throws while the script is still evaluating, `window.boffinDispatch` is
+never defined, and every command then fails with a message about dispatch rather
+than about the name that was absent. Resolved inside a function now.
+
+`molstar.lib.structure.Symmetry` exists and has no `.Provider`, so the obvious
+`Symmetry.Provider.get(model)` fails with "undefined is not an object" and takes
+the load with it.
+
+A SwiftUI `Picker` does not surface its accessibility identifier: it renders as a
+button labelled "Assembly, Deposited coordinates". A test querying by identifier
+finds nothing whether the picker is present or not, so the assertion could only
+ever pass.
+
+### A test that was deleted rather than tuned
+
+A UI test asserting the picker appears for 1HCK was written and removed. It could
+not be made to pass without pinning what Mol* reports for one file, which is
+Mol*'s business and changes between versions. The invariant that matters is
+covered by the note, and a test tuned until it passes is worth less than no test.
+**Assembly discovery is implemented and is not verified against a structure known
+to declare one.** That is on the To Do rather than in a commit message claiming
+otherwise.
+
+12 UI tests on iPhone and iPad, 10 BoffinViewer tests.

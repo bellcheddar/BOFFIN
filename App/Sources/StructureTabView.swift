@@ -203,7 +203,7 @@ struct StructureTabView: View {
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 HStack {
                     Button("Profile interactions") {
-                        Task { await profileInteractions() }
+                        Task { await profileInteractions(into: model) }
                     }
                     .buttonStyle(.bordered).font(.caption2)
                     .accessibilityIdentifier("boffin.profile-interactions")
@@ -288,12 +288,19 @@ struct StructureTabView: View {
         return store.residueName[first]
     }
 
-    private func profileInteractions() async {
+    /// Load the kinase fixture and profile it.
+    ///
+    /// The structure is loaded into the VIEWER as well as parsed, because
+    /// profiling something you are not looking at is a report about a different
+    /// molecule. It also means the assembly controls are exercised against a
+    /// structure that declares one, which 1UBQ does not.
+    private func profileInteractions(into model: StructureViewerModel) async {
         guard let url = Self.fixture(named: "1hck.bcif"),
             let data = try? Data(contentsOf: url),
             let file = try? BinaryCIF.decode(data),
             let store = try? AtomStore.from(file)
         else { return }
+        await model.load(data, format: .binaryCIF, source: .bundled("1hck.bcif"))
         loadedStore = store
         let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
         profile = InteractionProfiler.profile(store, ligand: ligand)
@@ -333,6 +340,18 @@ struct StructureTabView: View {
                 .font(.caption2).foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
             }
+        }
+        if let note = model.assemblyNote {
+            // An empty list because the structure declares no assembly is a
+            // fact. An empty list because the viewer could not look is a defect,
+            // and the two must not read the same on screen.
+            Label(
+                "Biological assemblies could not be read: \(note)",
+                systemImage: "exclamationmark.triangle"
+            )
+            .font(.caption2).foregroundStyle(.orange)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("boffin.assembly-note")
         }
         if model.modelCount > 1 {
             Label(

@@ -44,6 +44,9 @@ public final class StructureViewerModel {
     public private(set) var assemblies: [Assembly] = []
     /// The assembly currently built, or `nil` for the deposited coordinates.
     public private(set) var assembly: String?
+    /// Set when the assembly list is empty for a reason other than the
+    /// structure declaring none.
+    public private(set) var assemblyNote: String?
     /// How many models the file holds. More than one is an NMR ensemble.
     public private(set) var modelCount: Int = 1
 
@@ -145,12 +148,19 @@ public final class StructureViewerModel {
             struct Declared: Decodable {
                 let assemblies: [Assembly]
                 let models: Int
+                /// Why the list is empty, when it is empty for a reason other
+                /// than the structure declaring none.
+                let note: String?
             }
             let declared = try await bridge.send(
                 ListAssembliesCommand(), expecting: Declared.self)
             assemblies = declared.assemblies
             modelCount = declared.models
             assembly = nil
+            // An empty list because the structure has no assemblies is a fact;
+            // an empty list because the viewer could not look is a defect, and
+            // the two must not read the same. The note carries which it was.
+            assemblyNote = declared.assemblies.isEmpty ? declared.note : nil
         } catch {
             state = .failed(String(describing: error))
         }

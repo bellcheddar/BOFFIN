@@ -15,6 +15,27 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 - **Last completed:** Phase 9's interaction profiler on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
+### Mol* API findings
+
+- **The viewer UMD build exports THIRTEEN names.** `Shape`, `StateTransforms`,
+  `Symmetry`, `OrderedSet` are not among them: they live under `molstar.lib`.
+  Code written against the top-level names does not throw, it evaluates to
+  `undefined` and takes the fallback branch, which is how two commands were
+  committed doing nothing at all. Probe the bundle before writing against it:
+  `node -e "const m=(0,eval)(src+';molstar'); console.log(Object.keys(m))"`.
+- **Do not destructure `molstar.lib` at file scope.** A missing name throws
+  while the script is still evaluating, `window.boffinDispatch` is never
+  defined, and every command then fails with a message about dispatch rather
+  than about the name that was absent. Resolve inside a function.
+- **A SwiftUI `Picker` does not surface its accessibility identifier.** It
+  renders as a button labelled "Title, Selection", so a test querying by
+  identifier finds nothing whether the picker is there or not and can only ever
+  pass.
+- **`molstar.lib.structure.Symmetry` exists and has no `.Provider`.** Assemblies
+  are read from `model.symmetry.assemblies`, each candidate inside its own
+  guard, and an empty list now carries a note saying which path was taken so
+  "declares none" is distinguishable from "could not look".
+
 ### Phase 8 and 9 UI findings
 
 - **An accessibility identifier on a STACK makes the whole stack one element**

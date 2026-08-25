@@ -32,26 +32,45 @@
     }
   }
 
-  // Read chain and author number out of a Mol* location.
+  // Mol*'s own API, reached through the one namespace the viewer build exports.
   //
-  // The hierarchy indirection is the awkward part and it is not decoration: an
-  // element index addresses an ATOM, and the chain and residue it belongs to are
-  // found by walking the segment maps. Reading auth_asym_id at the element index
-  // directly returns whatever chain happens to sit at that ordinal, which is
-  // usually the right answer for a single-chain structure and wrong for every
-  // other one.
-  function describe(location) {
-    const unit = location.unit;
-    const element = location.element;
-    const hierarchy = unit.model.atomicHierarchy;
-    const chainIndex = hierarchy.chainAtomSegments.index[element];
-    const residueIndex = hierarchy.residueAtomSegments.index[element];
+  // The UMD viewer bundle exports THIRTEEN names, and `Shape`,
+  // `StateTransforms`, `Symmetry` and `OrderedSet` are not among them: they live
+  // under `molstar.lib`. Code written against the top-level names does not throw,
+  // it evaluates to `undefined` and takes the fallback branch, which is how two
+  // commands in this file came to be committed doing nothing at all.
+  // Resolved LAZILY, inside a function, never at load time.
+  //
+  // Destructuring these at the top of the file looked tidier and took the whole
+  // bridge down: if any name is missing the property access throws while the
+  // script is still evaluating, `window.boffinDispatch` is never defined, and
+  // EVERY command fails with a message about dispatch rather than about the
+  // name that was actually absent.
+  function api() {
+    const lib = (molstar && molstar.lib) || {};
+    const structure = lib.structure || {};
     return {
-      chain: hierarchy.chains.auth_asym_id.value(chainIndex),
-      number: hierarchy.residues.auth_seq_id.value(residueIndex),
-      residue: hierarchy.atoms.label_comp_id
-        ? hierarchy.atoms.label_comp_id.value(element)
-        : '',
+      StructureElement: structure.StructureElement,
+      StructureProperties: structure.StructureProperties,
+      Symmetry: structure.Symmetry,
+      Shape: (lib.shape || {}).Shape,
+    };
+  }
+
+  // Read chain and author number out of a picked loci.
+  //
+  // Through StructureProperties, which is the supported path. Walking
+  // `atomicHierarchy` segment maps by hand works and is one refactor of Mol*
+  // away from silently reading the wrong column.
+  function describeLoci(loci) {
+    const { StructureElement, StructureProperties } = api();
+    if (!StructureElement || !StructureProperties) return null;
+    const location = StructureElement.Loci.firstElement(loci);
+    if (!location) return null;
+    return {
+      chain: StructureProperties.chain.auth_asym_id(location),
+      number: StructureProperties.residue.auth_seq_id(location),
+      residue: StructureProperties.atom.label_comp_id(location),
     };
   }
 
@@ -63,14 +82,8 @@
       try {
         const loci = event.current && event.current.loci;
         if (!loci || !loci.elements || !loci.elements.length) return;
-        const first = loci.elements[0];
-        const location = {
-          unit: first.unit,
-          element: first.unit.elements[molstar.OrderedSet
-            ? molstar.OrderedSet.start(first.indices)
-            : 0],
-        };
-        const info = describe(location);
+        const info = describeLoci(loci);
+        if (!info) return;
         post({ kind: 'picked', chain: info.chain, number: info.number });
       } catch (error) {
         // A pick that cannot be described is not worth an error banner: the
@@ -99,9 +112,24 @@
 
   // Commands. Each returns a plain object, which becomes the Swift reply.
   const commands = {
+    // Reports which parts of Mol*'s API this build actually exposes.
+    //
+    // The viewer UMD bundle exports thirteen names and the rest live under
+    // `molstar.lib`. A command written against a name that is not there does not
+    // throw, it takes the fallback branch and returns an empty result, so this
+    // exists to make the absence visible rather than inferred from a feature
+    // that quietly does nothing.
     async ping() {
       await ensurePlugin();
-      return { ok: true, molstar: molstar.PluginConfig ? 'ready' : 'unknown' };
+      const available = api();
+      return {
+        ok: true,
+        version: molstar.version || 'unknown',
+        structureElement: !!available.StructureElement,
+        structureProperties: !!available.StructureProperties,
+        symmetry: !!available.Symmetry,
+        shape: !!available.Shape,
+      };
     },
 
     // Structures arrive as base64 rather than by URL. The app has already read
@@ -158,6 +186,10 @@
       const structures = plugin.managers.structure.hierarchy.current.structures;
       if (!structures.length) return { painted: 0 };
 
+      const { StructureProperties } = api();
+      if (!StructureProperties) {
+        return { painted: 0, error: 'StructureProperties is not available' };
+      }
       const lookup = new Map();
       for (const entry of payload.residues) {
         lookup.set(entry.chain + ':' + entry.number, entry.colour);
@@ -175,14 +207,8 @@
             granularity: 'group',
             color: (location) => {
               try {
-                const unit = location.unit;
-                const element = location.element;
-                const chain = unit.model.atomicHierarchy.chains.auth_asym_id.value(
-                  unit.model.atomicHierarchy.chainAtomSegments.index[element]
-                );
-                const number = unit.model.atomicHierarchy.residues.auth_seq_id.value(
-                  unit.model.atomicHierarchy.residueAtomSegments.index[element]
-                );
+                const chain = StructureProperties.chain.auth_asym_id(location);
+                const number = StructureProperties.residue.auth_seq_id(location);
                 const found = lookup.get(chain + ':' + number);
                 return found === undefined ? fallback : found >>> 0;
               } catch (error) {
@@ -218,17 +244,44 @@
     async listAssemblies() {
       const viewer = await ensurePlugin();
       const structures = viewer.plugin.managers.structure.hierarchy.current.structures;
-      if (!structures.length) return { assemblies: [], models: 1 };
+      if (!structures.length) return { assemblies: [], models: 1, note: 'no structure' };
+      // Where the assemblies live depends on the build, and guessing throws.
+      //
+      // `molstar.ModelSymmetry` does not exist in the viewer bundle at all;
+      // `molstar.lib.structure.Symmetry` DOES exist and has no `.Provider`, so
+      // the obvious `Symmetry.Provider.get(model)` fails with "undefined is not
+      // an object" and takes the whole load with it. Each candidate is tried
+      // inside its own guard and the reason is reported when none works, so an
+      // empty picker is distinguishable from an absent one.
       const model = structures[0].cell.obj.data.models[0];
-      const symmetry = model && molstar.ModelSymmetry
-        ? molstar.ModelSymmetry.Provider.get(model)
-        : null;
-      const assemblies = symmetry && symmetry.assemblies
-        ? symmetry.assemblies.map((a) => ({
-            id: a.id,
-            details: a.details || '',
-          }))
-        : [];
+      const { Symmetry } = api();
+      let source = [];
+      let note = '';
+      let via = 'none';
+      try {
+        if (model && model.symmetry && model.symmetry.assemblies) {
+          source = model.symmetry.assemblies;
+          via = 'model.symmetry';
+        } else if (Symmetry && Symmetry.Provider && Symmetry.Provider.get) {
+          const symmetry = Symmetry.Provider.get(model);
+          source = (symmetry && symmetry.assemblies) || [];
+          via = 'Symmetry.Provider';
+        } else {
+          note = 'no symmetry provider in this Mol* build';
+        }
+      } catch (error) {
+        note = String(error && error.message ? error.message : error);
+        source = [];
+      }
+      if (!note && source.length === 0) {
+        // Distinguish "asked and the structure declares none" from "could not
+        // ask". Both produce an empty picker and only one of them is a fact.
+        note = 'read via ' + via + ', none declared';
+      }
+      const assemblies = source.map((a) => ({
+        id: a.id,
+        details: a.details || '',
+      }));
       const trajectory = viewer.plugin.managers.structure.hierarchy.current.models;
       return { assemblies: assemblies, models: trajectory.length || 1 };
     },

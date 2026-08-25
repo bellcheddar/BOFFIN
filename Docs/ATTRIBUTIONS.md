@@ -51,6 +51,26 @@ structure with a language model*, Science 379:1123 (2023).
 
 ---
 
+## PLIP, and why nothing of it is here
+
+The interaction profiler in `BoffinStructure/InteractionProfiler.swift` is a
+CLEAN-ROOM implementation. **PLIP is GPL v2 and is never linked, ported or
+consulted**, which is hard rule 4 and the reason the file exists at all rather
+than being a wrapper.
+
+What is reimplemented are the geometric criteria: a distance cutoff between two
+carbon atoms is standard structural chemistry from the primary literature and not
+anybody's property. The numbers are those tabulated in
+`Docs/BOFFIN_BUILD_PLAN.md` section 8.2, which cites them, and they live in a
+single `InteractionCriteria` struct so each can be checked against the literature
+in one place.
+
+Cite for the criteria: Adasme et al., *PLIP 2021: expanding the scope of the
+protein-ligand interaction profiler*, Nucleic Acids Res 49:W530 (2021), as the
+source of the tabulated defaults rather than of any code.
+
+---
+
 ## Mol\*, vendored 2026-08-25
 
 The structure viewer. **MIT licensed**, verified in the npm registry metadata for

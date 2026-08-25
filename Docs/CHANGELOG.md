@@ -878,3 +878,42 @@ reproduces the intent rather than the exact pixels.
 
 45 BoffinStructure tests, including a round trip of BOFFIN's own output through
 its own importer with nothing reported as unsupported.
+
+
+## Phase 9 (part): interaction profiling (2026-08-25)
+
+A clean-room implementation of published non-covalent interaction criteria.
+**PLIP is GPL v2 and is never linked, ported or consulted** (hard rule 4). What is
+reimplemented are the geometric criteria, which are standard structural chemistry
+from the primary literature: a distance cutoff between two carbons is not a
+copyrightable expression. They live in one `InteractionCriteria` struct so each
+can be checked against the literature in one place.
+
+**Protonation is the hard part and the honest answer is to say what was
+assumed.** Most crystal structures have no hydrogens, so whether a histidine
+donates or accepts, whether a carboxylate is charged, whether a cysteine is a
+thiolate, is all inferred from residue and atom names at an assumed pH. A profile
+that guesses silently is worse than one that says what it guessed, because a
+reader cannot otherwise tell which contacts survive a different assumption.
+Every profile carries an `InteractionAssumptions` whose `statement` is not
+optional and names the specific choices: histidine neutral, aspartate and
+glutamate charged, lysine and arginine protonated.
+
+Where a criterion cannot be applied it is not applied silently. Hydrogen bond
+angles need hydrogens; halogen bond angles need the connectivity of the halogen's
+carbon, which the file does not always carry. Both are reported by distance with
+the assumptions saying the angles were not measured.
+
+### Checked against CDK2, not against itself
+
+1HCK is CDK2 with ATP bound and its site is one of the best described in the
+literature. The profile contacts the hinge (Glu81 to Leu83), which is why every
+ATP-competitive inhibitor ever designed targets it, and the glycine-rich loop.
+Hydrogen bonds reach the hinge; the triphosphate makes salt bridges to basic
+residues; hydrophobic contacts are carbon to carbon within 4.0 A.
+
+One test tightens the cutoffs and asserts strictly fewer contacts, because a
+criterion that is read but never applied looks exactly like one that is applied
+and generous.
+
+53 BoffinStructure tests.

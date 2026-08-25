@@ -88,8 +88,34 @@ def spans_from(labels: np.ndarray, value: int) -> list[tuple[int, int]]:
     return runs
 
 
+def tidy(spans: list[tuple[int, int]], gap: int, minimum: int) -> list[tuple[int, int]]:
+    """Merge spans separated by a short gap, then drop the short ones.
+
+    Raw per-residue argmax fragments a single membrane helix wherever a few
+    residues in the middle fall the other way, and each fragment then misses the
+    true boundaries. Measured on the validation split, that is what took span
+    PRECISION to 0.58 while per-residue F1 was 0.886: the head was not finding
+    phantom helices, it was cutting real ones in half and being charged for
+    both halves.
+
+    Merging first and filtering second is the order that matters. Filtering
+    first deletes the fragments that a merge would have joined into one correct
+    span.
+    """
+    if not spans:
+        return []
+    merged = [list(spans[0])]
+    for start, end in spans[1:]:
+        if start - merged[-1][1] - 1 <= gap:
+            merged[-1][1] = end
+        else:
+            merged.append([start, end])
+    return [(a, b) for a, b in merged if b - a + 1 >= minimum]
+
+
 def span_agreement(
-    true: np.ndarray, predicted: np.ndarray, value: int, tolerance: int = 5
+    true: np.ndarray, predicted: np.ndarray, value: int, tolerance: int = 5,
+    gap: int = 0, minimum: int = 1,
 ) -> tuple[int, int, int]:
     """Matched, expected and predicted span counts for one label.
 
@@ -99,7 +125,7 @@ def span_agreement(
     helix is still a cut inside the helix.
     """
     expected = spans_from(true, value)
-    found = spans_from(predicted, value)
+    found = tidy(spans_from(predicted, value), gap=gap, minimum=minimum)
     used = set()
     matched = 0
     for start, end in expected:
@@ -113,7 +139,10 @@ def span_agreement(
     return matched, len(expected), len(found)
 
 
-def evaluate(head, bundle, boundaries, indices, device, batch_size, tolerance=5):
+def evaluate(
+    head, bundle, boundaries, indices, device, batch_size, tolerance=5,
+    gap: int = 0, minimum: int = 1,
+):
     head.eval()
     confusion = np.zeros((len(LABEL_NAMES), len(LABEL_NAMES)), dtype=np.int64)
     spanMatched = spanExpected = spanPredicted = 0
@@ -135,7 +164,7 @@ def evaluate(head, bundle, boundaries, indices, device, batch_size, tolerance=5)
                     confusion[t, p] += 1
 
                 matched, expected, predicted = span_agreement(
-                    truth, logits, 1, tolerance)
+                    truth, logits, 1, tolerance, gap=gap, minimum=minimum)
                 spanMatched += matched
                 spanExpected += expected
                 spanPredicted += predicted
@@ -171,6 +200,10 @@ def main() -> int:
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--width", type=int, default=128)
     parser.add_argument("--device", default="cpu", choices=["cpu", "mps"])
+    parser.add_argument(
+        "--reuse", action="store_true",
+        help="load Models/heads/topology.pt instead of training, so the span "
+             "post-processing can be swept without a 25 minute retrain")
     args = parser.parse_args()
 
     path = DATA / "topology.npz"
@@ -191,9 +224,16 @@ def main() -> int:
 
     rng = np.random.default_rng(0)
     order = rng.permutation(len(boundaries))
-    trainEnd = int(len(order) * 0.85)
-    trainIndices, testIndices = order[:trainEnd], order[trainEnd:]
-    print(f"  train {len(trainIndices):,} chains, test {len(testIndices):,}")
+    # Three splits. The span post-processing has two free parameters, and
+    # choosing them on the test split would be fitting to the set the numbers
+    # are then reported on.
+    trainEnd = int(len(order) * 0.80)
+    validateEnd = int(len(order) * 0.90)
+    trainIndices = order[:trainEnd]
+    validateIndices = order[trainEnd:validateEnd]
+    testIndices = order[validateEnd:]
+    print(f"  train {len(trainIndices):,}, validate {len(validateIndices):,}, "
+          f"test {len(testIndices):,} chains")
 
     # The subset of test chains whose TRANSMEM spans are experimentally
     # evidenced, scored separately: see the module docstring.
@@ -222,6 +262,11 @@ def main() -> int:
     optimiser = torch.optim.AdamW(head.parameters(), lr=args.learning_rate, weight_decay=0.01)
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimiser, T_max=args.epochs)
 
+    if args.reuse and (MODELS / "topology.pt").exists():
+        head.load_state_dict(torch.load(MODELS / "topology.pt", map_location=device))
+        print("reusing the trained head from Models/heads/topology.pt")
+        args.epochs = 0
+
     for epoch in range(1, args.epochs + 1):
         head.train()
         shuffled = rng.permutation(trainIndices)
@@ -246,14 +291,39 @@ def main() -> int:
         schedule.step()
         print(f"  epoch {epoch:>3}: loss {running / max(seen, 1):.4f}")
 
+    # Choose the merge gap and minimum span on VALIDATION, by F1 over spans.
+    print("\n--- choosing span post-processing on the validation split ---")
+    best = (0.0, 0, 1)
+    for gap in (0, 2, 4, 6, 8):
+        for minimum in (1, 8, 12, 15, 18):
+            _, m, e, p, _ = evaluate(
+                head, bundle, boundaries, validateIndices, device, args.batch_size,
+                gap=gap, minimum=minimum)
+            recall = m / max(e, 1)
+            precision = m / max(p, 1)
+            f1 = 2 * recall * precision / max(recall + precision, 1e-9)
+            print(f"  gap {gap:>2}  min {minimum:>2}  recall {recall:.3f}  "
+                  f"precision {precision:.3f}  F1 {f1:.3f}")
+            if f1 > best[0]:
+                best = (f1, gap, minimum)
+    _, gap, minimum = best
+    print(f"  chosen: merge gaps up to {gap}, drop spans under {minimum} residues")
+
     confusion, matched, expected, predicted, exact = evaluate(
-        head, bundle, boundaries, testIndices, device, args.batch_size)
+        head, bundle, boundaries, testIndices, device, args.batch_size,
+        gap=gap, minimum=minimum)
     report("held-out test, all entries", confusion, matched, expected, predicted,
            exact, len(testIndices))
 
+    rawConfusion, rawMatched, rawExpected, rawPredicted, rawExact = evaluate(
+        head, bundle, boundaries, testIndices, device, args.batch_size)
+    report("held-out test, WITHOUT post-processing", rawConfusion, rawMatched,
+           rawExpected, rawPredicted, rawExact, len(testIndices))
+
     if len(experimental):
         confusion2, matched2, expected2, predicted2, exact2 = evaluate(
-            head, bundle, boundaries, experimental, device, args.batch_size)
+            head, bundle, boundaries, experimental, device, args.batch_size,
+            gap=gap, minimum=minimum)
         report("held-out test, EXPERIMENTAL evidence only", confusion2, matched2,
                expected2, predicted2, exact2, len(experimental))
 
@@ -262,6 +332,8 @@ def main() -> int:
     (MODELS / "topology_metrics.json").write_text(json.dumps({
         "labels": LABEL_NAMES,
         "width": args.width,
+        "merge_gap": gap,
+        "minimum_span": minimum,
         "span_recall": matched / max(expected, 1),
         "span_precision": matched / max(predicted, 1),
         "chains_fully_correct": exact / max(len(testIndices), 1),

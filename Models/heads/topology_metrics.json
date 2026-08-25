@@ -1,0 +1,15 @@
+{
+  "labels": [
+    "outside",
+    "transmembrane",
+    "signal"
+  ],
+  "width": 128,
+  "merge_gap": 0,
+  "minimum_span": 18,
+  "span_recall": 0.8112128146453089,
+  "span_precision": 0.8447180301826847,
+  "chains_fully_correct": 0.8046153846153846,
+  "test_chains": 1300,
+  "experimental_chains": 26
+}

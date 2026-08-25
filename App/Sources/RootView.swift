@@ -24,9 +24,7 @@ struct RootView: View {
                 FamilyTabView(store: store)
             }
             Tab("Boundary", systemImage: "scissors") {
-                PlaceholderTab(
-                    name: "Boundary", phase: "Phase 6",
-                    detail: "Construct design with motif and TM hard constraints.")
+                BoundaryTabView(store: store)
             }
             Tab("Structure", systemImage: "atom") {
                 PlaceholderTab(

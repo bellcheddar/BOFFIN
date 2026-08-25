@@ -342,3 +342,81 @@ polyubiquitin-C: a 685-residue polyprotein of nine tandem repeats. The vector is
 of the polyprotein, so it lands near other repetitive proteins. That is the
 documented limitation of a per-accession index behaving exactly as described,
 found by looking at the answers rather than at a score.
+
+
+## Phase 3 (rest): transmembrane spans and signal peptide (2026-08-25)
+
+Trained on **Swiss-Prot curated features**, not on DeepTMHMM or TOPCONS. Those
+are the obvious sources and neither can ship: DeepTMHMM needs a paid commercial
+licence outside academia and TOPCONS states no terms at all. UniProt is CC BY
+4.0, verified, and curates `TRANSMEM`, `SIGNAL`, `INTRAMEM` and `TOPO_DOM`
+directly.
+
+| | |
+|---|---|
+| Entries | 13,000 (6,000 membrane, 4,000 soluble, 3,000 secreted) |
+| Residues | 5.81 M |
+| Label balance | 89.2% outside, 8.9% transmembrane, 1.9% signal |
+| Head | 391,171 parameters, **0.78 MB** at fp16 |
+| Core ML latency | **0.71 ms** at bucket 1024 (ceiling 3.0 ms) |
+| Parity | relative 0.11%, argmax agreement 100% |
+
+### Held-out test, 1,300 chains
+
+| | recall | precision | F1 |
+|---|---|---|---|
+| outside | 0.981 | 0.993 | 0.987 |
+| transmembrane | 0.933 | 0.842 | 0.885 |
+| signal peptide | 0.955 | 0.932 | 0.943 |
+
+**Span level**, which is what the Boundary tab actually consumes:
+
+| | span recall | span precision | chains fully correct |
+|---|---|---|---|
+| raw argmax | 0.842 | **0.581** | 0.709 |
+| **post-processed** | 0.811 | **0.845** | **0.805** |
+| experimental evidence only (n=26) | 0.688 | 0.826 | 0.577 |
+
+### The post-processing, and the hypothesis it disproved
+
+Raw span precision was 0.581 against a per-residue F1 of 0.885, and the obvious
+reading is fragmentation: one helix broken in the middle, scored as two wrong
+spans. The obvious fix is to merge short gaps. Swept on the VALIDATION split,
+that is the wrong fix:
+
+| merge gap | minimum span | recall | precision | F1 |
+|---|---|---|---|---|
+| **0** | **18** | **0.819** | **0.852** | **0.835** |
+| 2 | 18 | 0.767 | 0.802 | 0.784 |
+| 4 | 18 | 0.691 | 0.756 | 0.722 |
+| 8 | 15 | 0.515 | 0.650 | 0.575 |
+
+Merging costs recall at every gap, because adjacent helices in a polytopic
+membrane protein are separated by short loops: closing a gap of four fuses two
+genuine helices and destroys both. The low precision was short spurious spans,
+not split real ones, and a length filter alone removes them for almost nothing
+(recall 0.841 to 0.819, precision 0.600 to 0.852).
+
+The chosen parameters are written into `Models/heads/config.json` and read by
+the app, so the Swift side cannot drift from the sweep that chose them.
+
+### Acceptance, on the fixtures
+
+The build plan accepts this phase when "the GPCR fixture shows seven TM spans".
+Run end to end against the converted backbone and head:
+
+- **Beta-2 adrenergic receptor: exactly 7 spans**, each 18 to 40 residues, in
+  order, between residues 20 and 360.
+- **Ubiquitin: 0 spans.** The negative control matters as much: a head that
+  finds membrane helices in a cytosolic protein is useless as a hard constraint
+  however good its aggregate numbers look.
+- **PETase: 0 spans.**
+
+### What the numbers do not say
+
+Only **6.9%** of Swiss-Prot `TRANSMEM` spans carry experimental evidence
+(ECO:0000269); the rest are curated inference. The test split is therefore
+scored twice, and on the experimental subset span recall falls from 0.811 to
+0.688. That subset is 26 chains, which is too few to call precisely, but it is
+the honest direction of travel and the reason the aggregate figure should not be
+quoted alone.

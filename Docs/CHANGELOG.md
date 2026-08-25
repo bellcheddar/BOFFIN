@@ -444,3 +444,70 @@ outer one is covered by the inner and reports itself unhittable. Every tab
 interaction in the suite now goes through one helper that takes `.firstMatch`
 and asserts on the destination arriving. Seven UI tests pass on both iPhone 17
 Pro and iPad Pro 13-inch.
+
+
+## Phase 3 (rest): transmembrane spans and signal peptide (2026-08-25)
+
+Phase 3 is complete. Its blocker was never technical.
+
+DeepTMHMM and TOPCONS are the obvious training sources and neither can ship:
+DeepTMHMM needs a paid commercial licence outside academia, TOPCONS and the DTU
+pages state no terms at all. `Docs/ATTRIBUTIONS.md` has recorded that as
+unverified since the phase began. UniProt is **CC BY 4.0**, verified at source,
+and Swiss-Prot curates `TRANSMEM`, `SIGNAL`, `INTRAMEM` and `TOPO_DOM` directly,
+so the labels now come from somewhere the app can actually redistribute.
+
+13,000 entries, 5.81 M residues, a 0.78 MB head at 0.71 ms per 1024-residue
+window. Per-residue F1 0.885 for transmembrane and 0.943 for signal peptide.
+
+**Acceptance, which is a fixture and not an average.** The build plan accepts
+this phase when the GPCR fixture shows seven transmembrane spans. Run end to end
+against the converted backbone and head, the beta-2 adrenergic receptor shows
+**exactly seven**, each 18 to 40 residues, in order, between residues 20 and
+360. Ubiquitin shows none and PETase shows none, which matters as much: a head
+that finds membrane helices in a cytosolic protein is useless as a hard
+constraint whatever its aggregate numbers say.
+
+### A hypothesis, and the sweep that disproved it
+
+Raw span precision was **0.581** against a per-residue F1 of 0.885. The obvious
+reading is fragmentation: one helix broken in the middle by a few stray
+residues, scored as two wrong spans instead of one right one. The obvious fix is
+to merge short gaps, and the code was written that way, with a comment
+confidently explaining why.
+
+Swept on the validation split, merging is the wrong fix at every gap:
+
+| merge gap | minimum span | recall | precision | F1 |
+|---|---|---|---|---|
+| **0** | **18** | **0.819** | **0.852** | **0.835** |
+| 2 | 18 | 0.767 | 0.802 | 0.784 |
+| 4 | 18 | 0.691 | 0.756 | 0.722 |
+| 8 | 15 | 0.515 | 0.650 | 0.575 |
+
+Adjacent helices in a polytopic membrane protein are separated by short loops,
+so closing a gap of four fuses two genuine helices and destroys both. The low
+precision was short spurious spans, not split real ones, and a length filter
+alone fixes it for almost nothing: recall 0.841 to 0.819, precision 0.600 to
+0.845 on the test split, and chains with every span correct from 0.709 to 0.805.
+
+The merge parameter is kept, defaulted to zero, with the sweep in the comment
+and a test that pins the mechanism: merging a four-residue loop between two
+twenty-residue helices reports one span of forty-four, which is not a thing.
+
+### Two things about the labels, stated before any number is quoted
+
+Only **6.9%** of Swiss-Prot `TRANSMEM` spans carry experimental evidence; the
+rest are curated inference. The test split is scored twice, and on the
+experimental subset span recall falls from 0.811 to 0.688. That is 26 chains,
+too few to call precisely, and it is the honest direction of travel.
+
+Unlike the disorder case, the **negatives here are real**. A curated soluble
+protein with no `TRANSMEM` feature is a genuine negative, because a curator
+would have annotated one had it existed. DisProt offered no such guarantee,
+which is why it could not train a disorder classifier at all.
+
+Intramembrane regions are labelled -1 and excluded from the loss rather than
+folded into a neighbour. A re-entrant loop dips into the bilayer without
+crossing it, so calling it transmembrane teaches the head that a span can end
+where the chain turns round, and calling it outside teaches the opposite.

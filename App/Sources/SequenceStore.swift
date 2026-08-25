@@ -52,6 +52,17 @@ final class SequenceStore {
         case unavailable(String)
     }
 
+    // MARK: - Boundary
+
+    /// Proposed constructs, or the reason there are none.
+    private(set) var constructs: ConstructSolverResult = .declined(
+        "Load a sequence to propose constructs.")
+
+    /// The regions no construct boundary may fall inside, with where each came
+    /// from, so the UI can say what is being enforced rather than only that
+    /// something is.
+    private(set) var constructConstraints: [ConstructConstraint] = []
+
     // MARK: - Fitness
 
     private(set) var llr: LLRMatrix?
@@ -131,6 +142,8 @@ final class SequenceStore {
             numbering = nil
             numberingScheme = nil
             familyCall = nil
+            constructs = .declined("Analysing.")
+            constructConstraints = []
             homologs = []
             precedent = []
             homologState = .idle
@@ -198,10 +211,95 @@ final class SequenceStore {
             modelState = .ready(passes: embedding.passes)
             // The fourth, off the same vector: no extra inference at all.
             await searchHomologs(pooled: embedding.pooled, sequence: sequence)
+            // Constructs need the disorder and topology tracks AND the homolog
+            // precedent, so this runs last.
+            recomputeConstructs()
         } catch {
             modelTracks = []
             predictions = nil
             modelState = .unavailable(String(describing: error))
+        }
+    }
+
+    /// Assemble the solver's inputs from three modules that cannot see each
+    /// other, and run it.
+    ///
+    /// The adaptation lives here on purpose. `ConstructSolver` is in BoffinCore
+    /// and knows nothing about topology heads or SIFTS: it reasons about regions
+    /// that must not be cut and about where other people have cut before. The
+    /// app is the only place that can see all three sources, which is the
+    /// dependency rule working rather than a workaround.
+    private func recomputeConstructs() {
+        guard let sequence else {
+            constructs = .declined("Load a sequence to propose constructs.")
+            constructConstraints = []
+            return
+        }
+
+        var constraints: [ConstructConstraint] = []
+
+        for (family, found) in motifs {
+            for motif in found {
+                constraints.append(
+                    ConstructConstraint(
+                        kind: .motif,
+                        range: motif.range.lowerBound...motif.range.upperBound,
+                        label: "\(displayName(family)) \(motif.name)"))
+            }
+        }
+
+        for span in predictions?.topologySpans() ?? [] {
+            constraints.append(
+                ConstructConstraint(
+                    kind: span.kind == .signalPeptide ? .signalPeptide : .transmembrane,
+                    range: span.range,
+                    label: span.kind == .signalPeptide
+                        ? "signal peptide" : "transmembrane span"))
+        }
+
+        constructConstraints = constraints.sorted {
+            $0.range.lowerBound < $1.range.lowerBound
+        }
+
+        // Precedent, mapped into THIS sequence's coordinates through the best
+        // homolog's alignment. A deposited range in the homolog's UniProt
+        // numbering means nothing here until it has been carried across, and
+        // carrying it across is what the alignment is for.
+        var deposited: [ClosedRange<Int>] = []
+        if let best = homologs.first {
+            for construct in precedent {
+                guard let first = queryIndex(forUniProt: construct.first, in: best),
+                    let last = queryIndex(forUniProt: construct.last, in: best),
+                    first <= last
+                else { continue }
+                deposited.append(first...last)
+            }
+        }
+
+        constructs = ConstructSolver.propose(
+            residueCount: sequence.count,
+            disordered: predictions?.isDisordered ?? [],
+            constraints: constructConstraints,
+            precedent: deposited)
+    }
+
+    /// Where a homolog's UniProt residue number lands in the user's sequence.
+    private func queryIndex(forUniProt number: Int, in alignment: HomologAlignment) -> Int? {
+        guard let sequence else { return nil }
+        for index in 0..<sequence.count {
+            if case .mapped(_, let uniprot) = alignment.mapping(forQueryResidue: index),
+                uniprot == number
+            {
+                return index
+            }
+        }
+        return nil
+    }
+
+    private func displayName(_ family: MotifFamily) -> String {
+        switch family {
+        case .proteinKinase: "protein kinase"
+        case .classAGPCR: "class A GPCR"
         }
     }
 
@@ -425,6 +523,7 @@ final class SequenceStore {
                 numberingScheme = "GPCRdb"
             }
         }
+        recomputeConstructs()
         tracks = AnalyticalTracks.all(
             for: sequence, hydropathyWindow: hydropathyWindow, scale: pKaScale)
         properties = SequenceProperties(sequence, pKaScale: pKaScale)

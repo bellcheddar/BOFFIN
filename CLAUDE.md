@@ -11,8 +11,8 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 5 (Family tab) **complete**: motifs, canonical numbering, the Pfam classifier, SIFTS mapping and the homolog index
-- **Last completed:** Phase 5 SIFTS mapping and homolog search on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 3 and 5 **complete**. Next: Phase 6, the Boundary tab
+- **Last completed:** Phase 3's transmembrane and signal-peptide head on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
 ### Phase 5 findings
@@ -122,6 +122,24 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
   like a hung conversion.
 - **`AnalysisHeads.headWindow` and `EmbeddingEngine.scoringBatchSize` must match
   the converter by hand.** Both fail only at runtime.
+
+### Phase 3 findings (rest)
+
+- **A licence problem can have a data solution.** DeepTMHMM and TOPCONS cannot
+  ship; Swiss-Prot curates `TRANSMEM` and `SIGNAL` directly and UniProt is CC BY
+  4.0. Check whether the annotation already exists somewhere redistributable
+  before concluding a feature is blocked.
+- **Merging fragmented spans makes transmembrane prediction WORSE.** It is the
+  obvious cure for span precision of 0.58 and the validation sweep rejects it at
+  every gap: adjacent helices are separated by short loops, so closing a gap of
+  four fuses two real helices. A length filter alone took precision to 0.845 for
+  a recall cost of 0.03.
+- **Only 6.9% of Swiss-Prot `TRANSMEM` spans are experimentally evidenced.**
+  Score the test split twice; span recall falls from 0.811 to 0.688 on the
+  experimental subset.
+- **Swiss-Prot negatives are real**, unlike DisProt's: a curated soluble protein
+  with no `TRANSMEM` feature is a genuine negative because a curator would have
+  annotated one.
 
 ### Phase 3 findings, each of which failed silently
 
@@ -314,6 +332,7 @@ Disorder, secondary structure, TM spans, ΔLLR, motifs and structure-derived int
 ## Hard rules
 
 1. **`BOFFIN.xcodeproj` is committed and is the source of truth.** Make project changes (targets, capabilities, resources, build settings) in Xcode and commit the resulting `project.pbxproj` diff. Never commit `xcuserdata`. Tuist was dropped on 2026-08-24 in favour of a plain native Xcode project.
+   **Adding a source file is the one exception**, because every phase from 6 onward adds several and the alternative is piling unrelated types into existing files. `python3 Tools/add-file-to-target.py <path> <target>` makes exactly the four edits Xcode makes, deterministically and idempotently. Any three of those four produce a project that builds and silently omits the file, which is why it is a script rather than a hand edit.
 2. **Never break offline operation.** No CDN references, no network in any core path. Network features are additive and degrade cleanly.
 3. **Never string-interpolate into JavaScript.** All Mol* traffic goes through the typed command envelope in `BoffinViewer`.
 4. **Never link or port PLIP.** It is GPL v2. The interaction profiler is a clean-room Swift implementation of published geometric criteria.

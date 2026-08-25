@@ -116,6 +116,10 @@ public struct HeadPredictions: Sendable {
     public let disorderProbability: [Double]
     /// The decision threshold the disorder head was calibrated with.
     public let disorderThreshold: Double
+    /// Gaps of at most this many residues are closed before filtering.
+    public let topologyMergeGap: Int
+    /// Spans shorter than this are dropped.
+    public let topologyMinimumSpan: Int
     /// Per-residue membrane topology, absent when the head is not bundled.
     ///
     /// Optional rather than defaulted to `.outside` everywhere: "no prediction"
@@ -128,12 +132,16 @@ public struct HeadPredictions: Sendable {
         secondaryStructure: [SecondaryStructure],
         disorderProbability: [Double],
         disorderThreshold: Double,
-        topology: [TopologyClass]? = nil
+        topology: [TopologyClass]? = nil,
+        topologyMergeGap: Int = HeadPredictions.defaultMergeGap,
+        topologyMinimumSpan: Int = HeadPredictions.defaultMinimumSpan
     ) {
         self.secondaryStructure = secondaryStructure
         self.disorderProbability = disorderProbability
         self.disorderThreshold = disorderThreshold
         self.topology = topology
+        self.topologyMergeGap = topologyMergeGap
+        self.topologyMinimumSpan = topologyMinimumSpan
     }
 
     /// Residues called disordered at the calibrated threshold.
@@ -141,32 +149,88 @@ public struct HeadPredictions: Sendable {
         disorderProbability.map { $0 > disorderThreshold }
     }
 
-    /// Contiguous runs of transmembrane and signal-peptide residues.
+    /// Contiguous runs of transmembrane and signal-peptide residues, merged
+    /// across short gaps and then filtered by length.
     ///
-    /// Runs shorter than `minimumSpan` are dropped. A membrane-spanning helix
-    /// crosses about 30 A of bilayer, which takes roughly 20 residues of helix,
-    /// so a three-residue "span" is noise. Dropping it matters because the
-    /// Boundary tab turns every span into a hard constraint, and a spurious one
-    /// forbids a cut site that is actually fine.
-    public func topologySpans(minimumSpan: Int = 8) -> [TopologySpan] {
+    /// The default gap is ZERO, and that is a measurement rather than an
+    /// oversight.
+    ///
+    /// Raw per-residue argmax held span precision at 0.60 while per-residue F1
+    /// was 0.886, and the obvious explanation is fragmentation: a single helix
+    /// broken in the middle by a few stray residues, scored as two wrong spans
+    /// instead of one right one. Merging short gaps is the obvious fix. Swept on
+    /// the validation split, it is the wrong one:
+    ///
+    ///     gap 0, min 18   recall 0.819   precision 0.852   F1 0.835
+    ///     gap 2, min 18   recall 0.767   precision 0.802   F1 0.784
+    ///     gap 4, min 18   recall 0.691   precision 0.756   F1 0.722
+    ///     gap 8, min 15   recall 0.515   precision 0.650   F1 0.575
+    ///
+    /// Merging costs recall at every gap, because in a multi-pass membrane
+    /// protein adjacent helices are separated by short loops: closing a gap of
+    /// four fuses two genuine helices and destroys both. The low precision was
+    /// short spurious spans, not split real ones, and the LENGTH FILTER removes
+    /// those for almost nothing (recall 0.841 to 0.819, precision 0.600 to
+    /// 0.852).
+    ///
+    /// The gap parameter is kept because it is worth being able to reproduce
+    /// that, and because the order matters if it is ever non-zero: filtering
+    /// first would delete the fragments a merge would have rejoined.
+    ///
+    /// - Parameters:
+    ///   - mergeGap: gaps of at most this many residues between two runs of the
+    ///     same class are closed.
+    ///   - minimumSpan: runs shorter than this are dropped afterwards. A
+    ///     bilayer is about 30 A, which takes roughly 20 residues of helix to
+    ///     cross, so a three-residue "span" is noise. It matters because the
+    ///     Boundary tab turns every span into a hard constraint and a spurious
+    ///     one forbids a cut site that is perfectly good.
+    /// - Returns: spans in ascending order.
+    public func topologySpans(
+        mergeGap: Int? = nil, minimumSpan: Int? = nil
+    ) -> [TopologySpan] {
+        let mergeGap = mergeGap ?? topologyMergeGap
+        let minimumSpan = minimumSpan ?? topologyMinimumSpan
         guard let topology else { return [] }
-        var spans: [TopologySpan] = []
+
+        var runs: [(kind: TopologyClass, start: Int, end: Int)] = []
         var index = 0
         while index < topology.count {
             let kind = topology[index]
             var end = index
             while end + 1 < topology.count, topology[end + 1] == kind { end += 1 }
-            if kind != .outside, end - index + 1 >= minimumSpan {
-                spans.append(TopologySpan(kind: kind, range: index...end))
-            }
+            if kind != .outside { runs.append((kind, index, end)) }
             index = end + 1
         }
-        return spans
+
+        var merged: [(kind: TopologyClass, start: Int, end: Int)] = []
+        for run in runs {
+            if var last = merged.last, last.kind == run.kind,
+                run.start - last.end - 1 <= mergeGap
+            {
+                last.end = run.end
+                merged[merged.count - 1] = last
+            } else {
+                merged.append(run)
+            }
+        }
+
+        return
+            merged
+            .filter { $0.end - $0.start + 1 >= minimumSpan }
+            .map { TopologySpan(kind: $0.kind, range: $0.start...$0.end) }
     }
 
+    /// Swept on the validation split, not chosen: see `train_topology_head.py`.
+    public static let defaultMergeGap = 0
+    public static let defaultMinimumSpan = 18
+
     /// How many membrane-spanning segments were predicted.
-    public func transmembraneSpanCount(minimumSpan: Int = 8) -> Int {
-        topologySpans(minimumSpan: minimumSpan).count { $0.kind == .transmembrane }
+    public func transmembraneSpanCount(
+        mergeGap: Int? = nil, minimumSpan: Int? = nil
+    ) -> Int {
+        topologySpans(mergeGap: mergeGap, minimumSpan: minimumSpan)
+            .count { $0.kind == .transmembrane }
     }
 }
 
@@ -175,11 +239,20 @@ struct HeadConfiguration: Decodable {
     let embedWidth: Int
     let headWidth: Int
     let disorderThreshold: Double
+    /// Span post-processing, swept on the validation split by
+    /// `train_topology_head.py` and written here so the Swift side cannot drift
+    /// from the sweep that chose them. `CLAUDE.md` records two constants that
+    /// already had to be kept in step by hand and failed only at runtime; this
+    /// is the same hazard, so it is published rather than duplicated.
+    let topologyMergeGap: Int?
+    let topologyMinimumSpan: Int?
 
     enum CodingKeys: String, CodingKey {
         case embedWidth = "embed_width"
         case headWidth = "head_width"
         case disorderThreshold = "disorder_threshold"
+        case topologyMergeGap = "topology_merge_gap"
+        case topologyMinimumSpan = "topology_minimum_span"
     }
 }
 
@@ -413,7 +486,11 @@ public actor AnalysisHeads {
             secondaryStructure: structure,
             disorderProbability: disorderProbability,
             disorderThreshold: configuration.disorderThreshold,
-            topology: topologyCalls)
+            topology: topologyCalls,
+            topologyMergeGap: configuration.topologyMergeGap
+                ?? HeadPredictions.defaultMergeGap,
+            topologyMinimumSpan: configuration.topologyMinimumSpan
+                ?? HeadPredictions.defaultMinimumSpan)
     }
 
     private func run(
@@ -549,9 +626,11 @@ extension HeadPredictions {
     /// of residue 212. Returns `nil` when the head is absent, so the ruler shows
     /// no row at all rather than a row of "outside" that looks like a
     /// prediction.
-    public func topologyTrack(minimumSpan: Int = 8) -> AnyResidueTrack? {
+    public func topologyTrack(
+        mergeGap: Int? = nil, minimumSpan: Int? = nil
+    ) -> AnyResidueTrack? {
         guard topology != nil else { return nil }
-        let spans = topologySpans(minimumSpan: minimumSpan)
+        let spans = topologySpans(mergeGap: mergeGap, minimumSpan: minimumSpan)
         guard !spans.isEmpty else { return nil }
         let transmembrane = spans.count { $0.kind == .transmembrane }
         return AnyResidueTrack(

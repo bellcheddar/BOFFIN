@@ -6,5 +6,7 @@
   "backbone": "esm2_t12_35M_UR50D",
   "best_q3": 0.8243748740041663,
   "best_disorder_mcc": 0.5258393004128151,
-  "disorder_threshold": 0.9000000000000002
+  "disorder_threshold": 0.9000000000000002,
+  "topology_merge_gap": 0,
+  "topology_minimum_span": 18
 }

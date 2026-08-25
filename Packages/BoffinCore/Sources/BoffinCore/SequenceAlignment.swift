@@ -94,44 +94,79 @@ public enum SequenceAlignment {
     public static let gapOpen = -11
     public static let gapExtend = -1
 
+    /// The largest alignment this will attempt, in matrix cells.
+    ///
+    /// Gotoh's algorithm is O(n*m) in both time and memory, and the memory is
+    /// the binding constraint on a phone: the three score matrices for a
+    /// 2,500-by-2,500 alignment are 150 MB. Homolog search returns entries up to
+    /// 2,500 residues, so without a bound a single long hit against a long query
+    /// would allocate more than the app's whole budget while the user waited.
+    ///
+    /// Nine million cells is a 3,000-by-3,000 alignment, comfortably above any
+    /// pair the app aligns in practice (the index's median entry is 248
+    /// residues) and well inside what fits. Beyond it the aligner returns an
+    /// EMPTY alignment rather than a truncated or approximate one, so a caller
+    /// sees no correspondence instead of a wrong one.
+    public static let maximumCells = 9_000_000
+
     /// Global alignment with affine gaps (Needleman-Wunsch, Gotoh's algorithm).
     ///
     /// Global rather than local because the reference here is a curated
     /// full-length entry and the query is meant to be the same protein: a local
     /// alignment would happily match one well-conserved domain and silently
     /// ignore that the rest does not correspond.
+    ///
+    /// - Returns: the alignment, or an empty one when either sequence is empty
+    ///   or the matrix would exceed ``maximumCells``.
     public static func align(query: [AminoAcid], reference: [AminoAcid]) -> Alignment {
         let n = query.count
         let m = reference.count
         guard n > 0, m > 0 else { return Alignment(columns: [], score: 0) }
+        guard n * m <= maximumCells else { return Alignment(columns: [], score: 0) }
 
-        let negativeInfinity = Int.min / 4
+        let negativeInfinity = Int32.min / 4
+        let width = m + 1
 
-        // main[i][j]  best score ending with query[i-1] aligned to reference[j-1]
-        // fromQuery    best score ending with a gap in the REFERENCE
+        // One flat buffer per matrix, indexed by `i * width + j`.
+        //
+        // These were `[[Int]]`, which is a row of pointers to independently
+        // allocated rows: every access is two loads and a retain-free bounds
+        // check on a separately allocated buffer, and the storage is 8 bytes a
+        // cell plus per-row overhead. Flat Int32 halves the memory and removes
+        // the indirection. Int32 is ample: the score is bounded by the sequence
+        // length times BLOSUM62's maximum of 11.
+        //
+        // main          best score ending with query[i-1] against reference[j-1]
+        // fromQuery     best score ending with a gap in the REFERENCE
         // fromReference best score ending with a gap in the QUERY
-        var main = [[Int]](
-            repeating: [Int](repeating: negativeInfinity, count: m + 1), count: n + 1)
+        var main = [Int32](repeating: negativeInfinity, count: (n + 1) * width)
         var fromQuery = main
         var fromReference = main
 
-        main[0][0] = 0
-        for i in 1...n { fromQuery[i][0] = gapOpen + gapExtend * (i - 1) }
-        for j in 1...m { fromReference[0][j] = gapOpen + gapExtend * (j - 1) }
+        main[0] = 0
+        for i in 1...n { fromQuery[i * width] = Int32(gapOpen + gapExtend * (i - 1)) }
+        for j in 1...m { fromReference[j] = Int32(gapOpen + gapExtend * (j - 1)) }
+
+        let open = Int32(gapOpen)
+        let extend = Int32(gapExtend)
 
         for i in 1...n {
+            let row = i * width
+            let previousRow = row - width
+            let queryAcid = query[i - 1]
             for j in 1...m {
-                let substitution = score(query[i - 1], reference[j - 1])
+                let substitution = Int32(score(queryAcid, reference[j - 1]))
+                let diagonal = previousRow + j - 1
                 let best = max(
-                    main[i - 1][j - 1], fromQuery[i - 1][j - 1], fromReference[i - 1][j - 1])
-                main[i][j] = best + substitution
+                    main[diagonal], max(fromQuery[diagonal], fromReference[diagonal]))
+                main[row + j] = best + substitution
 
-                fromQuery[i][j] = max(
-                    main[i - 1][j] + gapOpen,
-                    fromQuery[i - 1][j] + gapExtend)
-                fromReference[i][j] = max(
-                    main[i][j - 1] + gapOpen,
-                    fromReference[i][j - 1] + gapExtend)
+                fromQuery[row + j] = max(
+                    main[previousRow + j] + open,
+                    fromQuery[previousRow + j] + extend)
+                fromReference[row + j] = max(
+                    main[row + j - 1] + open,
+                    fromReference[row + j - 1] + extend)
             }
         }
 
@@ -139,8 +174,9 @@ public enum SequenceAlignment {
         var columns: [AlignmentColumn] = []
         var i = n
         var j = m
-        var state = bestState(main[n][m], fromQuery[n][m], fromReference[n][m])
-        let finalScore = max(main[n][m], max(fromQuery[n][m], fromReference[n][m]))
+        let corner = n * width + m
+        var state = bestState(main[corner], fromQuery[corner], fromReference[corner])
+        let finalScore = Int(max(main[corner], max(fromQuery[corner], fromReference[corner])))
 
         while i > 0 || j > 0 {
             switch state {
@@ -150,27 +186,28 @@ public enum SequenceAlignment {
                     continue
                 }
                 columns.append(.match(query: i - 1, reference: j - 1))
-                let substitution = score(query[i - 1], reference[j - 1])
-                let target = main[i][j] - substitution
+                let substitution = Int32(score(query[i - 1], reference[j - 1]))
+                let target = main[i * width + j] - substitution
                 i -= 1
                 j -= 1
+                let cell = i * width + j
                 state = bestState(
-                    main[i][j] == target ? target : negativeInfinity,
-                    fromQuery[i][j] == target ? target : negativeInfinity,
-                    fromReference[i][j] == target ? target : negativeInfinity)
+                    main[cell] == target ? target : negativeInfinity,
+                    fromQuery[cell] == target ? target : negativeInfinity,
+                    fromReference[cell] == target ? target : negativeInfinity)
                 if state == .none { state = .main }
 
             case .fromQuery:
                 guard i > 0 else { state = .main; continue }
                 columns.append(.queryGap(query: i - 1))
-                let opened = main[i - 1][j] + gapOpen == fromQuery[i][j]
+                let opened = main[(i - 1) * width + j] + open == fromQuery[i * width + j]
                 i -= 1
                 state = opened ? .main : .fromQuery
 
             case .fromReference:
                 guard j > 0 else { state = .main; continue }
                 columns.append(.referenceGap(reference: j - 1))
-                let opened = main[i][j - 1] + gapOpen == fromReference[i][j]
+                let opened = main[i * width + j - 1] + open == fromReference[i * width + j]
                 j -= 1
                 state = opened ? .main : .fromReference
 
@@ -184,7 +221,11 @@ public enum SequenceAlignment {
 
     private enum State { case main, fromQuery, fromReference, none }
 
-    private static func bestState(_ main: Int, _ fromQuery: Int, _ fromReference: Int) -> State {
+    private static func bestState(
+        _ main: Int32, _ fromQuery: Int32, _ fromReference: Int32
+    )
+        -> State
+    {
         if main >= fromQuery && main >= fromReference { return .main }
         if fromQuery >= fromReference { return .fromQuery }
         return .fromReference

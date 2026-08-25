@@ -79,6 +79,24 @@ def main() -> int:
     differences = np.abs(exactScores - quantisedScores / (127.0 * 127.0))
     print(f"  cosine error: mean {differences.mean():.5f}, max {differences.max():.5f}")
 
+    # What does an UNRELATED pair score?
+    #
+    # This decides the similarity floor, and it cannot be guessed. Pooled
+    # language-model embeddings are not spread over the sphere: they occupy a
+    # narrow cone, so two proteins with nothing in common still score far above
+    # zero. A floor picked for looking sensible (0.5, say) would admit
+    # everything and the ranked list would present the nearest twenty entries as
+    # answers for any input at all.
+    print("\n--- what an unrelated pair scores ---")
+    left = rng.choice(len(index), size=200_000)
+    right = rng.choice(len(index), size=200_000)
+    keep = left != right
+    null = np.einsum("ij,ij->i", exact[left[keep]], exact[right[keep]])
+    print(f"  {len(null):,} random pairs: mean {null.mean():.3f}, "
+          f"sd {null.std():.3f}, min {null.min():.3f}, max {null.max():.3f}")
+    for percentile in (50, 90, 99, 99.9, 99.99):
+        print(f"  {percentile:>6}th percentile: {np.percentile(null, percentile):.4f}")
+
     print("\n--- nearest neighbours for known proteins ---")
     position = {entry["accession"]: row for row, entry in enumerate(index)}
     for accession, expectation in PROBES:

@@ -12,8 +12,8 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 ## Current state
 
 - **Phase:** 5 (Family tab) **complete**: motifs, canonical numbering, the Pfam classifier, SIFTS mapping and the homolog index
-- **Last completed:** Phase 5 family motifs on 2026-08-25 (see `Docs/CHANGELOG.md`)
-- **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
+- **Last completed:** Phase 5 SIFTS mapping and homolog search on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
 ### Phase 5 findings
 

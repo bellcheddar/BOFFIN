@@ -189,6 +189,52 @@ public struct ListAssembliesCommand: ViewerCommand {
     public init() {}
 }
 
+/// Draw the interaction profile as dashed lines in the structure.
+///
+/// Endpoints are named by author chain, author residue number and atom name:
+/// the fields BOFFIN reads out of the file itself. There is deliberately no
+/// element index in this envelope, because an index means two implementations
+/// agreeing about the order of atoms in a structure, and the two previous
+/// attempts at this feature both foundered on exactly that assumption.
+public struct DrawInteractionsCommand: ViewerCommand {
+    public let name = "drawInteractions"
+    public let lines: [Line]
+
+    public struct Endpoint: Encodable, Sendable, Hashable {
+        public let chain: String
+        public let number: Int
+        public let atom: String
+
+        public init(chain: String, number: Int, atom: String) {
+            self.chain = chain
+            self.number = number
+            self.atom = atom
+        }
+    }
+
+    public struct Line: Encodable, Sendable, Hashable {
+        public let a: Endpoint
+        public let b: Endpoint
+        public let kind: String
+
+        public init(a: Endpoint, b: Endpoint, kind: String) {
+            self.a = a
+            self.b = b
+            self.kind = kind
+        }
+    }
+
+    public init(lines: [Line]) {
+        self.lines = lines
+    }
+}
+
+/// Remove the interaction overlay, leaving the structure alone.
+public struct ClearInteractionsCommand: ViewerCommand {
+    public let name = "clearInteractions"
+    public init() {}
+}
+
 /// Render the current view as a PNG, at a size the viewport does not have.
 ///
 /// This is the command that turns the viewer into something a figure comes out

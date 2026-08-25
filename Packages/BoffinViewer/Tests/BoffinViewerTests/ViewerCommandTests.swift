@@ -81,6 +81,8 @@ struct ViewerCommandTests {
             PaintTrackCommand(title: "", residues: []).name,
             ListAssembliesCommand().name,
             SetAssemblyCommand(assemblyId: nil).name,
+            DrawInteractionsCommand(lines: []).name,
+            ClearInteractionsCommand().name,
             ExportImageCommand(width: 1920, height: 1080, transparent: false).name,
             ResetCameraCommand().name,
             ClearCommand().name,
@@ -252,5 +254,48 @@ struct ExportImageTests {
             data: Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00]),
             width: 0, height: 0)
         #expect(truncated.declaredSize == nil)
+    }
+}
+
+@Suite("Interaction overlay")
+struct OverlayResultTests {
+
+    @Test("A complete overlay says nothing")
+    func silenceWhenComplete() {
+        let result = StructureViewerModel.OverlayResult(
+            requested: 40, drawn: 40, unresolved: [])
+        #expect(result.isComplete)
+        #expect(result.shortfall == nil, "a working overlay must not produce a notice")
+    }
+
+    @Test("A partial overlay names the count, not a vague warning")
+    func shortfallIsSpecific() {
+        // "Some interactions could not be drawn" is the kind of message that
+        // trains people to ignore messages. A number is checkable against the
+        // diagram beside it.
+        let result = StructureViewerModel.OverlayResult(
+            requested: 40, drawn: 37, unresolved: ["A/125/N to A/401/O1: nothing"])
+        #expect(!result.isComplete)
+        #expect(result.shortfall == "3 of 40 contacts could not be placed on the structure.")
+    }
+
+    @Test("Drawing nothing at all is a shortfall, not a success")
+    func zeroIsNotComplete() {
+        // This is the exact state the second attempt reached: 0 of 40, with no
+        // error anywhere and every test green. It must be impossible for that
+        // to read as completion.
+        let result = StructureViewerModel.OverlayResult(
+            requested: 40, drawn: 0, unresolved: [])
+        #expect(!result.isComplete)
+        #expect(result.shortfall == "40 of 40 contacts could not be placed on the structure.")
+    }
+
+    @Test("Nothing requested is not a shortfall")
+    func nothingRequestedIsFine() {
+        // A structure with no ligand has no contacts to draw, and reporting
+        // "0 of 0 could not be placed" would be a warning about nothing.
+        let result = StructureViewerModel.OverlayResult(requested: 0, drawn: 0, unresolved: [])
+        #expect(result.isComplete)
+        #expect(result.shortfall == nil)
     }
 }

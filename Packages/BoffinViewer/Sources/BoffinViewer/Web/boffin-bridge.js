@@ -145,6 +145,23 @@
       // binary flag set. Passing 'bcif' returns "unknown data format name",
       // which is at least a clear error and was the first thing this bridge got
       // wrong.
+      // Replace, do not accumulate.
+      //
+      // `loadStructureFromData` ADDS a structure to the hierarchy; it does not
+      // clear what is already there. Every read below indexes `structures[0]`,
+      // which stays the FIRST structure ever loaded, so after a second load the
+      // viewer showed the new molecule while every query answered about the
+      // old one.
+      //
+      // That is the real cause of the 3D interaction overlay failing twice. It
+      // was diagnosed as a selection-language problem, and the selection
+      // language was innocent: the endpoints were being resolved against
+      // ubiquitin while the profile had been computed on a kinase, so of course
+      // nothing matched. It also meant the reported atom count after a second
+      // load was the first structure's.
+      await viewer.plugin.clear();
+      state.structure = null;
+
       const isBinary = payload.format === 'bcif';
       await viewer.loadStructureFromData(
         isBinary ? bytes.buffer : binary,
@@ -302,6 +319,108 @@
         .cell.obj.data.elementCount;
       post({ kind: 'loaded', atomCount: count });
       return { atomCount: count };
+    },
+
+    // Draw the interaction profile as dashed lines in 3D.
+    //
+    // Built twice before this and removed twice. Both attempts failed at the
+    // same place: resolving which ATOM each end of a line refers to.
+    //
+    // The first assembled a list of shapes and did nothing with them. The
+    // second used the measurement manager, which is the right manager, with
+    // endpoints named in PyMOL syntax through `StructureSelectionFromScript`,
+    // which returns an EMPTY selection in this build with the state cell
+    // reporting success and no error. It measured 0 of 40 lines drawn.
+    //
+    // This one resolves endpoints with `StructureElement.Loci.fromSchema`,
+    // which takes the fields BOFFIN already has (author chain, author residue
+    // number, atom name) and is a declarative selector rather than a parsed
+    // language. There is no element index on either side to agree about, which
+    // is the assumption the previous attempts were making.
+    //
+    // The counter stays regardless. An overlay drawing nothing looks exactly
+    // like one with nothing to draw, so the count of lines ACTUALLY added is
+    // returned and the caller is expected to check it against what it asked
+    // for. That counter is what caught the second attempt.
+    async drawInteractions(payload) {
+      const viewer = await ensurePlugin();
+      const lib = (molstar && molstar.lib) || {};
+      const structureLib = lib.structure || {};
+      const StructureElement = structureLib.StructureElement;
+      if (!StructureElement || !StructureElement.Loci
+          || typeof StructureElement.Loci.fromSchema !== 'function') {
+        throw new Error(
+          'molstar.lib.structure.StructureElement.Loci.fromSchema is not available'
+        );
+      }
+
+      const manager = viewer.plugin.managers.structure.measurement;
+      if (!manager || typeof manager.addDistance !== 'function') {
+        throw new Error('managers.structure.measurement.addDistance is not available');
+      }
+
+      const cell = viewer.plugin.managers.structure.hierarchy.current.structures[0];
+      const structure = cell && cell.cell.obj && cell.cell.obj.data;
+      if (!structure) throw new Error('no structure is loaded');
+
+      function locus(end) {
+        return StructureElement.Loci.fromSchema(structure, {
+          auth_asym_id: end.chain,
+          auth_seq_id: end.number,
+          auth_atom_id: end.atom,
+        });
+      }
+
+      const lines = payload.lines || [];
+      let drawn = 0;
+      const unresolved = [];
+
+      for (const line of lines) {
+        let a, b;
+        try {
+          a = locus(line.a);
+          b = locus(line.b);
+        } catch (error) {
+          unresolved.push(describe(line) + ': ' + error.message);
+          continue;
+        }
+        // An empty Loci is the exact failure that went unnoticed last time, so
+        // it is counted and named rather than passed on to a manager that will
+        // accept it happily.
+        if (StructureElement.Loci.isEmpty(a) || StructureElement.Loci.isEmpty(b)) {
+          unresolved.push(describe(line) + ': one or both endpoints resolved to nothing');
+          continue;
+        }
+        await manager.addDistance(a, b, {
+          visualParams: { dashLength: 0.2 },
+          selectionTag: 'boffin-interactions',
+        });
+        drawn += 1;
+      }
+
+      function describe(line) {
+        return line.a.chain + '/' + line.a.number + '/' + line.a.atom
+          + ' to ' + line.b.chain + '/' + line.b.number + '/' + line.b.atom;
+      }
+
+      state.hasInteractionOverlay = drawn > 0;
+      // The first few reasons, not all of them: forty identical failures say
+      // the same thing as three and cost more to carry back across the bridge.
+      return { requested: lines.length, drawn: drawn, unresolved: unresolved.slice(0, 3) };
+    },
+
+    // Remove the overlay without disturbing the structure.
+    async clearInteractions() {
+      const viewer = await ensurePlugin();
+      const manager = viewer.plugin.managers.structure.measurement;
+      if (manager && typeof manager.getTransforms === 'function') {
+        const transforms = manager.getTransforms();
+        for (const transform of transforms) {
+          await viewer.plugin.state.data.build().delete(transform.ref).commit();
+        }
+      }
+      state.hasInteractionOverlay = false;
+      return { ok: true };
     },
 
     // Render offscreen at an arbitrary size, so a figure can come off a phone.

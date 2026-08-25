@@ -218,6 +218,52 @@ public final class StructureViewerModel {
             "The structure was released to free memory. Load it again to carry on."
     }
 
+    /// Draw the interaction profile in 3D, and report how much of it landed.
+    ///
+    /// The return value is the point. This feature has been built and removed
+    /// twice, and the second attempt drew **0 of 40** lines while every test
+    /// passed, because the tests asserted the command had been dispatched. An
+    /// overlay that draws nothing is pixel-for-pixel identical to one with
+    /// nothing to draw, so the only way to know is to count.
+    @discardableResult
+    public func drawInteractions(
+        _ lines: [DrawInteractionsCommand.Line]
+    ) async throws -> OverlayResult {
+        let result = try await bridge.send(
+            DrawInteractionsCommand(lines: lines), expecting: OverlayResult.self)
+        overlay = result
+        return result
+    }
+
+    public func clearInteractions() async {
+        try? await bridge.send(ClearInteractionsCommand())
+        overlay = nil
+    }
+
+    /// What the last overlay attempt achieved, or `nil` if none was attempted.
+    public private(set) var overlay: OverlayResult?
+
+    public struct OverlayResult: Decodable, Sendable, Hashable {
+        public let requested: Int
+        public let drawn: Int
+        /// Why the first few failures failed, verbatim from the viewer.
+        public let unresolved: [String]
+
+        /// Whether every line asked for was drawn.
+        public var isComplete: Bool { drawn == requested }
+
+        /// A sentence for the user, or `nil` when there is nothing to say.
+        ///
+        /// Silence when it all worked, and a specific count when it did not.
+        /// "Some interactions could not be drawn" is the kind of message that
+        /// trains people to ignore messages.
+        public var shortfall: String? {
+            guard requested > 0, drawn < requested else { return nil }
+            let missing = requested - drawn
+            return "\(missing) of \(requested) contacts could not be placed on the structure."
+        }
+    }
+
     /// Render the current view as a PNG at an arbitrary size.
     ///
     /// Returns the decoded bytes and the size the renderer actually produced,

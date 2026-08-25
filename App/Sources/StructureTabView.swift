@@ -34,6 +34,7 @@ struct StructureTabView: View {
     @State private var exportError: UserFacingError?
     @State private var isExporting = false
     @State private var wantsTransparentBackground = true
+    @State private var overlayError: UserFacingError?
 
     var body: some View {
         NavigationStack {
@@ -307,6 +308,38 @@ struct StructureTabView: View {
                     }
                 }
 
+                // How much of the profile actually reached the structure.
+                //
+                // Shown, not merely returned. An overlay drawing nothing is
+                // pixel-for-pixel identical to one with nothing to draw, and
+                // that indistinguishability is how this feature shipped broken
+                // twice. The count is the only thing that tells them apart, so
+                // it is on screen rather than in a log.
+                if let overlay = model.overlay {
+                    Text("\(String(overlay.drawn)) of \(String(overlay.requested)) drawn in 3D")
+                        .font(.system(.caption2, design: .monospaced))
+                        .foregroundStyle(
+                            overlay.isComplete ? .secondary : ScientificPalette.warning
+                        )
+                        .accessibilityIdentifier("boffin.overlay.count")
+                    if let shortfall = overlay.shortfall {
+                        Text(shortfall)
+                            .font(.caption2)
+                            .foregroundStyle(ScientificPalette.warning)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ForEach(overlay.unresolved, id: \.self) { reason in
+                            Text(reason)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundStyle(.tertiary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+
+                if let overlayError {
+                    FailureView(overlayError)
+                }
+
                 if let profile, let store = loadedStore {
                     // The assumptions are shown above the results, not below
                     // them: a reader who stops after the numbers has to have
@@ -398,7 +431,39 @@ struct StructureTabView: View {
         // structure is on screen.
         self.store.noteStructure(store)
         let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
-        profile = InteractionProfiler.profile(store, ligand: ligand)
+        let computed = InteractionProfiler.profile(store, ligand: ligand)
+        profile = computed
+        await drawOverlay(computed, atoms: store, into: model)
+    }
+
+    /// Put the profile on the structure, and say how much of it landed.
+    ///
+    /// Endpoints are named by chain, residue number and atom name rather than
+    /// by index. That is the whole design: an index means BOFFIN's atom order
+    /// and Mol*'s element order agreeing, and both previous attempts at this
+    /// feature assumed exactly that and drew nothing.
+    private func drawOverlay(
+        _ profile: InteractionProfile, atoms: AtomStore, into model: StructureViewerModel
+    ) async {
+        let lines = profile.interactions.map { interaction in
+            DrawInteractionsCommand.Line(
+                a: DrawInteractionsCommand.Endpoint(
+                    chain: atoms.chainID[interaction.ligandAtom],
+                    number: atoms.authorNumber[interaction.ligandAtom],
+                    atom: atoms.atomName[interaction.ligandAtom]),
+                b: DrawInteractionsCommand.Endpoint(
+                    chain: atoms.chainID[interaction.partnerAtom],
+                    number: atoms.authorNumber[interaction.partnerAtom],
+                    atom: atoms.atomName[interaction.partnerAtom]),
+                kind: interaction.kind.rawValue)
+        }
+        guard !lines.isEmpty else { return }
+        do {
+            _ = try await model.drawInteractions(lines)
+            overlayError = nil
+        } catch {
+            overlayError = UserFacingError(error, whileDoing: "drawing the interactions")
+        }
     }
 
     // MARK: - Figure export

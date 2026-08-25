@@ -298,3 +298,112 @@ extension StructureTabUITests {
             "the rendered figure cannot be shared anywhere")
     }
 }
+
+// MARK: - The 3D interaction overlay
+
+extension StructureTabUITests {
+
+    /// Phase 9's last acceptance, and the one that has failed twice before.
+    ///
+    /// The overlay was built and removed twice. The second attempt measured
+    /// **0 of 40 lines drawn**, and every test in the suite passed throughout,
+    /// because they asserted that a command had been DISPATCHED. It was. It
+    /// resolved both endpoints to empty selections and the state cell reported
+    /// success.
+    ///
+    /// So this test asserts the count. Not that the button worked, not that no
+    /// error appeared, not that a command was sent: the number of contacts that
+    /// actually reached the structure, compared against the number the profiler
+    /// found. Those two agreeing is the entire claim, and it is the only thing
+    /// that distinguishes a working overlay from one drawing nothing, since
+    /// both look identical on screen.
+    func testInteractionOverlayActuallyDrawsWhatItProfiled() throws {
+        let app = XCUIApplication()
+        app.launchSkippingOnboarding()
+        app.openTab("Structure")
+
+        // The profiling control only exists once the viewer is up, so the
+        // structure has to be loaded first.
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            "the structure never loaded")
+
+        let profile = app.buttons["boffin.profile-interactions"]
+        XCTAssertTrue(profile.waitForExistence(timeout: 30), "no profiling control")
+        profile.tap()
+
+        let count = app.staticTexts["boffin.overlay.count"]
+        XCTAssertTrue(
+            count.waitForExistence(timeout: 90),
+            "no overlay count appeared, so nothing was even attempted")
+
+        // "N of M drawn in 3D". Both numbers must be non-zero and equal: a
+        // profile with contacts in it, all of which reached the structure.
+        let parts = count.label.split(separator: " ")
+        guard parts.count >= 3, let drawn = Int(parts[0]), let requested = Int(parts[2]) else {
+            return XCTFail("could not read the overlay count from \(count.label)")
+        }
+
+        XCTAssertGreaterThan(
+            requested, 0,
+            "the profiler found no contacts on CDK2's ATP site, so this test proves nothing")
+        XCTAssertEqual(
+            drawn, requested,
+            "the overlay drew \(drawn) of \(requested) contacts: "
+                + "endpoints are not resolving, which is how this shipped broken twice")
+    }
+}
+
+extension StructureTabUITests {
+
+    /// Loading a structure REPLACES the previous one.
+    ///
+    /// `loadStructureFromData` adds to the hierarchy rather than clearing it,
+    /// and every read in the bridge indexes `structures[0]`, which stays the
+    /// first structure ever loaded. So after a second load the viewer showed
+    /// the new molecule while every query answered about the old one.
+    ///
+    /// This is the defect that made the 3D interaction overlay fail twice. It
+    /// was diagnosed both times as a selection-language problem, and the
+    /// selection language was innocent: the endpoints were being resolved
+    /// against ubiquitin while the profile had been computed on a kinase.
+    ///
+    /// It is tested here on the atom count rather than through the overlay,
+    /// because the count is the simplest observable that distinguishes the two
+    /// structures, and because a bug this general should not be guarded only by
+    /// the one feature that happened to expose it.
+    func testLoadingASecondStructureReplacesTheFirst() throws {
+        let app = XCUIApplication()
+        app.launchSkippingOnboarding()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            "ubiquitin did not load")
+
+        // Profiling loads CDK2, which has 2,510 atoms.
+        let profile = app.buttons["boffin.profile-interactions"]
+        XCTAssertTrue(profile.waitForExistence(timeout: 20), "no profiling control")
+        profile.tap()
+
+        // Formatted the same way the label formats it, rather than hardcoded:
+        // the count is rendered with `.formatted()`, so 2,510 carries a
+        // separator in this locale and would carry a different one in another.
+        // 660 has no separator, which is exactly why the existing single-load
+        // test never noticed.
+        let kinase = "\(2510.formatted()) atoms"
+        XCTAssertTrue(
+            app.staticTexts[kinase].waitForExistence(timeout: 60),
+            "the viewer still reports ubiquitin's atom count after loading a kinase, "
+                + "so the structures are accumulating instead of replacing")
+        XCTAssertFalse(
+            app.staticTexts["\(660.formatted()) atoms"].exists,
+            "both structures are present at once")
+    }
+}

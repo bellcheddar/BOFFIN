@@ -1505,3 +1505,62 @@ while testing nothing, which is the failure mode a golden fixture set exists to
 prevent. The manifest now records where altlocs actually live.
 
 BoffinStructure 87 tests.
+
+---
+
+## Phase 9 (rest): the 3D interaction overlay, third attempt (2026-08-25)
+
+Built and removed twice before this. Both times the diagnosis was the selection
+language, and **both times the selection language was innocent**.
+
+**The real defect.** Mol*'s `loadStructureFromData` ADDS a structure to the
+hierarchy; it does not clear what is already there. Every read in the bridge
+indexes `structures[0]`, which therefore stays the first structure ever loaded.
+The viewer showed the new molecule and answered every query about the old one.
+
+So an interaction profile computed on CDK2 was having its endpoints resolved
+against ubiquitin, and nothing matched, and the previous attempt read that as
+"`StructureSelectionFromScript` returns an empty selection". It does return an
+empty selection, correctly, because ubiquitin has no ATP site.
+
+The same defect had a second symptom nobody had looked for: the atom count
+reported after a second load was the PREVIOUS structure's. It survived because
+the only count ever asserted was ubiquitin's 660, and 660 looks plausible for
+anything.
+
+**How it was found this time.** Not by reasoning about it. A headless WKWebView
+test harness loads the vendored bundle on macOS in about five seconds, so the
+Mol* API surface could be enumerated instead of assumed: 13 top-level names,
+`lib.shape` holding only `Shape` and `ShapeGroup` with no geometry builders,
+and `StructureElement.Loci.fromSchema` present and taking exactly the fields
+BOFFIN already has. Then a direct call with a known-good endpoint pair returned
+`drawn 1, requested 1`, which proved the handler correct and moved the
+suspicion to its inputs, which is where it belonged.
+
+**The design that follows from it.** Endpoints are named by author chain,
+author residue number and atom name. There is deliberately no element index in
+the envelope, because an index means two implementations agreeing about the
+order of atoms in a structure, and that is the assumption both previous
+attempts were making. The build plan asked for "an explicit test that BOFFIN's
+atom index and Mol*'s element index agree"; removing the index is better than
+testing it.
+
+**The counter stays and is on screen.** An overlay drawing nothing is
+pixel-for-pixel identical to one with nothing to draw, so the number of
+contacts that actually reached the structure is displayed beside the diagram,
+in amber when it falls short, with the first few reasons verbatim. 55 of 55 now
+reach the structure.
+
+**Two regression tests, deliberately separate.** One asserts the overlay draws
+what it profiled. The other asserts that loading a second structure replaces
+the first, tested on the atom count rather than through the overlay, because a
+bug this general should not be guarded only by the one feature that happened to
+expose it.
+
+That second test failed on its first run for an unrelated and now-familiar
+reason: the label renders the count with `.formatted()`, so 2,510 carries a
+separator and 660 does not, which is precisely why a single-load test could
+never have noticed. The expectation is now formatted the same way rather than
+hardcoded.
+
+BoffinViewer 17 tests, 20 UI tests.

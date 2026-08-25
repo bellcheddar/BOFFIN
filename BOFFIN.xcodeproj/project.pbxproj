@@ -39,6 +39,7 @@
 		3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */; };
 		D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */; };
 		0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */; };
+		420D9554BDDF1D84569E4BA6 /* AnnotationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = App/Sources/OnboardingView.swift; sourceTree = "<group>"; };
 		2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingUITests.swift; path = App/UITests/OnboardingUITests.swift; sourceTree = "<group>"; };
 		8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionBuilderView.swift; path = App/Sources/SelectionBuilderView.swift; sourceTree = "<group>"; };
+		C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnnotationCanvas.swift; path = App/Sources/AnnotationCanvas.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,6 +203,7 @@
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
 				889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */,
+				C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */,
 				8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */,
 				BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */,
 				263D5703A26771A32159B0E2 /* NoSequenceView.swift */,
@@ -403,6 +406,7 @@
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
 				F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */,
+				420D9554BDDF1D84569E4BA6 /* AnnotationCanvas.swift in Sources */,
 				0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */,
 				3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */,
 				807E5CBA693529F97233770D /* NoSequenceView.swift in Sources */,

@@ -1606,3 +1606,50 @@ person reading "position 0" of their own typing has to translate, which is how
 the wrong character gets deleted.
 
 BoffinStructure 90 tests, 21 UI tests.
+
+---
+
+## Phase 8 (part): Pencil annotation (2026-08-25)
+
+Explaining a structure to a room means pointing at it, and a laser pointer
+leaves no record. A Pencil circles the pocket, marks the mutation, and the mark
+is still there when the deck is sent to whoever asked for it afterwards.
+
+**Strokes, not a bitmap.** PencilKit's serialised form is stored, so an
+annotation redraws at the display's resolution (a phone in the hand, a
+projector across a hall) and can still be edited. Flattening is not reversible.
+
+**Anchored to the scene's identity, not its index.** The build plan said
+"anchored to scene index", and an index is not an anchor: `move(from:to:)` and
+`remove(at:)` both renumber every scene after the one they touch, so an
+annotation keyed by position slides onto a different slide the first time a
+deck is reordered. Nothing errors, and the drawing looks perfectly deliberate
+on the wrong structure, in front of a room.
+
+**Which exposed a second defect.** `ViewerScene.id` was its `name`. A name is
+not an identity: two scenes can share one, and renaming silently changed what a
+scene was, so anything keyed by it (a `ForEach`, an annotation) attached to the
+wrong scene or to none. Identity is now a `UUID`, deliberately excluded from
+equality and hashing, because identity and content are different questions: a
+scene exported to `.pml` and read back is a different object with the same
+content, and the round-trip tests are right to call those equal.
+
+**A performance trap that presented as a correctness failure.**
+`PKCanvasView` is a `UIScrollView` subclass, and merely having one in the
+hierarchy took the presentation test's accessibility query from 24 seconds to
+188 and then to a timeout: "failed to get matching snapshots", which reads as a
+broken deck rather than a busy tree. Marking it accessibility-hidden was not
+enough, because the view is still there to be walked. The live canvas now
+exists only while the pen is up, and the strokes render as an image otherwise,
+so annotating (rare) pays the cost and rotating (common) does not.
+
+**And a test target that could not test anything.** `SceneDeckModel` lived in
+the app beside its views, where `@testable import BOFFIN` fails to link,
+because the app's unit-test bundle is configured as a UI-test target. Its one
+existing test had been asserting `Bool(true)` ever since. There is nothing
+about the model that needs to be in the app (it is scenes, an index and a
+dictionary), so it moved into `BoffinViewer`, where it runs under `swift test`
+with no simulator, following the project's own rule that real behaviour is
+tested inside a package.
+
+BoffinViewer 23 tests, 21 UI tests.

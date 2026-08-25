@@ -14,63 +14,6 @@ import BoffinUI
 import BoffinViewer
 import SwiftUI
 
-@MainActor
-@Observable
-final class SceneDeckModel {
-    private(set) var scenes: [ViewerScene] = []
-    /// Which scene is showing, or `nil` when the deck is not being presented.
-    private(set) var current: Int?
-
-    var isPresenting: Bool { current != nil }
-
-    func capture(
-        name: String, selection: String?, representation: ViewerRepresentation,
-        colourTheme: ViewerColourTheme, notes: String
-    ) {
-        scenes.append(
-            ViewerScene(
-                name: name.isEmpty ? "Scene \(scenes.count + 1)" : name,
-                selection: selection,
-                representation: representation.rawValue,
-                colourTheme: colourTheme.rawValue,
-                notes: notes))
-    }
-
-    func remove(at offsets: IndexSet) {
-        scenes.remove(atOffsets: offsets)
-        if scenes.isEmpty { current = nil }
-    }
-
-    func move(from source: IndexSet, to destination: Int) {
-        scenes.move(fromOffsets: source, toOffset: destination)
-    }
-
-    func present() {
-        guard !scenes.isEmpty else { return }
-        current = 0
-    }
-
-    func dismiss() { current = nil }
-
-    /// Advance, stopping at the end rather than wrapping.
-    ///
-    /// Wrapping is the wrong default in front of a room: reaching the end and
-    /// finding the first slide again reads as having lost your place.
-    func advance() {
-        guard let index = current else { return }
-        current = min(index + 1, scenes.count - 1)
-    }
-
-    func retreat() {
-        guard let index = current else { return }
-        current = max(index - 1, 0)
-    }
-
-    var script: String {
-        PyMOLScript.export(scenes, structureName: "structure")
-    }
-}
-
 struct SceneDeckView: View {
     @Bindable var model: SceneDeckModel
     let viewer: StructureViewerModel
@@ -156,12 +99,56 @@ struct PresentationView: View {
     @Bindable var model: SceneDeckModel
     let viewer: StructureViewerModel
 
+    /// Whether the Pencil canvas is taking input.
+    ///
+    /// Off by default, and this is the important half: in front of a room you
+    /// rotate the molecule far more often than you annotate it, so a canvas
+    /// that is always live would swallow every drag meant for the structure.
+    /// The annotation stays VISIBLE when input is off, so turning it off is
+    /// putting the pen down rather than rubbing the drawing out.
+    @State private var isAnnotating = false
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.black.ignoresSafeArea()
 
             #if canImport(UIKit)
             StructureViewerView(model: viewer).ignoresSafeArea()
+
+            if let index = model.current, model.scenes.indices.contains(index) {
+                let scene = model.scenes[index]
+                if isAnnotating {
+                    // The live canvas exists ONLY while the pen is up.
+                    //
+                    // `PKCanvasView` is a `UIScrollView` subclass, and merely
+                    // having one in the hierarchy took an accessibility query
+                    // in the presentation test from 24 seconds to 188 and then
+                    // to a TIMEOUT: "failed to get matching snapshots", which
+                    // reads as a broken deck rather than a busy tree. Marking
+                    // it hidden was not enough, because the view is still
+                    // there to be walked.
+                    //
+                    // Annotating is the rare state and rotating is the common
+                    // one, so the rare state pays the cost.
+                    AnnotationCanvas(
+                        drawing: annotationBinding(for: scene.id), isActive: true
+                    )
+                    .ignoresSafeArea()
+                } else if let strokes = model.annotation(for: scene.id),
+                    let image = AnnotationCanvas.render(strokes)
+                {
+                    // Put the pen down and the drawing stays: it is rendered
+                    // from the same strokes rather than rubbed out. Strokes
+                    // remain the stored form, so this is a view of the data and
+                    // not a second copy of it.
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
             #endif
 
             if let index = model.current, index < model.scenes.count {
@@ -188,6 +175,18 @@ struct PresentationView: View {
                         // where the web view's own gesture area covered them:
                         // the test tapped, nothing advanced, and the failure
                         // looked like the deck logic.
+                        Button {
+                            isAnnotating.toggle()
+                        } label: {
+                            Image(systemName: isAnnotating ? "pencil.circle.fill" : "pencil.circle")
+                                .font(.title3)
+                                .padding(.horizontal, Spacing.s)
+                                .padding(.vertical, Spacing.s)
+                                .contentShape(Rectangle())
+                        }
+                        .accessibilityIdentifier("boffin.annotate-toggle")
+                        .accessibilityLabel(isAnnotating ? "Put the pen down" : "Annotate")
+
                         Button {
                             model.retreat()
                         } label: {
@@ -243,5 +242,16 @@ struct PresentationView: View {
                 .foregroundStyle(.white)
                 .accessibilityIdentifier("boffin.end-presentation")
         }
+    }
+
+    /// Read and write the annotation for one scene.
+    ///
+    /// Written through the model rather than held in view state, so the drawing
+    /// survives leaving the presentation and comes back attached to the same
+    /// scene rather than to whatever is now in that position.
+    private func annotationBinding(for scene: ViewerScene.ID) -> Binding<Data> {
+        Binding(
+            get: { model.annotation(for: scene) ?? Data() },
+            set: { model.annotate(scene, with: $0) })
     }
 }

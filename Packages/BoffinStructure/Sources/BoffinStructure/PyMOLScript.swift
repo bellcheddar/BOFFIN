@@ -26,17 +26,49 @@ public struct ViewerScene: Sendable, Hashable, Identifiable {
     /// Presenter notes, which travel with the scene and not with the file name.
     public let notes: String
 
-    public var id: String { name }
+    /// A stable identity, separate from anything the user can change.
+    ///
+    /// This was `name`, which is not an identity: two scenes can be given the
+    /// same name, and renaming one silently changed what it was. Anything keyed
+    /// by it (a `ForEach`, a Pencil annotation) then attaches to the wrong
+    /// scene or to none, without erroring.
+    ///
+    /// Deliberately excluded from equality and hashing below, because identity
+    /// and content are different questions. A scene exported to `.pml` and read
+    /// back is a different object with the same content, and the round-trip
+    /// tests are right to call those equal.
+    public let id: UUID
 
     public init(
         name: String, selection: String? = nil, representation: String = "cartoon",
-        colourTheme: String = "chain", notes: String = ""
+        colourTheme: String = "chain", notes: String = "", id: UUID = UUID()
     ) {
         self.name = name
         self.selection = selection
         self.representation = representation
         self.colourTheme = colourTheme
         self.notes = notes
+        self.id = id
+    }
+
+    /// Content equality, ignoring identity.
+    ///
+    /// Two scenes with the same name, selection, representation, theme and
+    /// notes ARE the same scene as far as a `.pml` round trip is concerned, and
+    /// that is what the export tests check. Including the UUID here would make
+    /// every round trip fail for a reason that has nothing to do with the file.
+    public static func == (lhs: ViewerScene, rhs: ViewerScene) -> Bool {
+        lhs.name == rhs.name && lhs.selection == rhs.selection
+            && lhs.representation == rhs.representation
+            && lhs.colourTheme == rhs.colourTheme && lhs.notes == rhs.notes
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(selection)
+        hasher.combine(representation)
+        hasher.combine(colourTheme)
+        hasher.combine(notes)
     }
 }
 

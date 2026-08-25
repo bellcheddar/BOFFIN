@@ -29,10 +29,6 @@ let package = Package(
         .testTarget(
             name: "BoffinMLTests",
             dependencies: ["BoffinML"],
-            // The cross-language reference for the open-set distance: five
-            // embeddings and the distances PyTorch computes for them, so a
-            // Swift-side mistake cannot hide behind its own self-consistency.
-            resources: [.process("Fixtures_maha_reference.json")],
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
     ]

@@ -792,3 +792,74 @@ fine-tuned backbone is a second copy of it rather than an edit to the head.
 
 That is a project-direction question rather than an engineering one, and it is
 recorded here rather than answered.
+
+## 500 families, and a rejection method that reversed (2026-08-26)
+
+### Coverage
+
+The classifier grew from 100 Pfam families to 500: 40,158 sequences fetched
+(87,354 multi-domain entries skipped, single-label only), embedded in about 35
+minutes, and trained on the same protocol.
+
+| | 100 families | 500 families |
+|---|---|---|
+| Top-1 | 0.9792 | **0.9858** |
+| Top-5 | 0.9988 | 0.9963 |
+| Calibration error | 0.0082 | 0.0040 |
+| Random baseline | 0.0100 | 0.0020 |
+
+**Accuracy went up while the task got five times harder.** A 500-way choice is
+strictly harder than a 100-way one, so this is the larger per-family sample
+(100 sequences against an average of 82) more than compensating. Temperature
+scaling was fitted and again not applied: the head is already calibrated.
+
+### The reversal
+
+The trainer had been printing a detection rate of 0.805 beside the new
+threshold. That number was measured on the **100-family** model, and it was
+hardcoded. Re-running the experiment at the new family count, holding out 100
+families instead of 20:
+
+| Score | 100 families | 500 families |
+|---|---|---|
+| Mahalanobis AUROC | 0.969 ± 0.005 | 0.941 ± 0.011 |
+| Max softmax AUROC | 0.945 ± 0.014 | 0.941 ± 0.010 |
+| **Mahalanobis @5% FPR** | **0.805 ± 0.017** | **0.736 ± 0.038** |
+| **Max softmax @5% FPR** | **0.761 ± 0.061** | **0.763 ± 0.009** |
+
+At 500 classes Mahalanobis is no better on AUROC, **worse at the operating
+point**, and **four times less stable** across which families happen to be
+held out. Max softmax held flat and became far steadier.
+
+### What ships, and why the argument reversed with it
+
+The case for Mahalanobis at 100 families was stated explicitly: stability
+matters more than the mean when a threshold has to ship, because a score whose
+usefulness depends on which families are missing is not one to ship a threshold
+on. Applied consistently at 500 families, that same argument selects max
+softmax.
+
+So the 1.88 MB asset, its binary format, its loader and its cross-language
+parity test are all removed. The head's own confidence is the score, the
+threshold is one float in the metadata JSON, and it is fitted on the
+calibration split rather than on train (optimistic, the head has seen those) or
+test (the set the flagging rate is reported on).
+
+Confidence floor 0.9700, flagging 5.3% of held-out in-distribution proteins.
+
+Offered as hypothesis: 500 class means estimated under one shared covariance
+are individually noisier than 100, so distance to the nearest mean degrades,
+while a softmax over 500 competitors gives a novel protein more ways to be
+uncertain.
+
+### The failure this avoided
+
+Nothing would have broken. The Mahalanobis asset would have loaded, the
+distances would have computed, the threshold would have applied, and the app
+would have shipped the worse of two scores while quoting a detection rate
+belonging to a model it no longer runs. The only reason it surfaced is that the
+family count changed and the measurement was repeated rather than inherited.
+
+A test now pins the family count the rate was measured at, so retraining at a
+different size fails loudly instead of quietly invalidating the sentence on
+screen.

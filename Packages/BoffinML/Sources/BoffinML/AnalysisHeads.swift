@@ -295,7 +295,7 @@ public actor AnalysisHeads {
     private let familyTop1: Double
     private let familyCentroids: [[Double]]
     private let familySimilarityFloor: Double
-    private let openSet: OpenSetModel?
+    private let openSetConfidenceFloor: Double?
     private var compiled: [URL: URL] = [:]
 
     private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "AnalysisHeads")
@@ -318,10 +318,12 @@ public actor AnalysisHeads {
             let top1: Double
             let centroids: [[Double]]?
             let similarityFloor: Double?
+            let confidenceThreshold: Double?
 
             enum CodingKeys: String, CodingKey {
                 case families, temperature, top1, centroids
                 case similarityFloor = "similarity_floor"
+                case confidenceThreshold = "openset_confidence_threshold"
             }
         }
         let metadata = try? JSONDecoder().decode(
@@ -332,11 +334,7 @@ public actor AnalysisHeads {
         self.familyTop1 = metadata?.top1 ?? 0
         self.familyCentroids = metadata?.centroids ?? []
         self.familySimilarityFloor = metadata?.similarityFloor ?? 0
-        // Optional, like the classifier itself: without it the app falls back
-        // to the cosine, which was measured as the weaker score but is better
-        // than nothing and needs no extra asset.
-        self.openSet = OpenSetModel(
-            contentsOf: directory.appending(path: "family_openset.bin"))
+        self.openSetConfidenceFloor = metadata?.confidenceThreshold
         do {
             let data = try Data(contentsOf: directory.appending(path: "config.json"))
             self.configuration = try JSONDecoder().decode(HeadConfiguration.self, from: data)
@@ -692,12 +690,9 @@ public struct FamilyClassification: Sendable {
     /// How many families the classifier can answer with.
     public let familyCount: Int
 
-    /// Squared Mahalanobis distance to the nearest training family, when the
-    /// open-set asset is bundled.
-    public let openSetDistance: Double?
-
-    /// The distance above which a protein is called out of distribution.
-    public let openSetThreshold: Double?
+    /// The confidence below which a call is treated as probably outside the
+    /// training families, when the head's metadata carries one.
+    public let openSetConfidenceFloor: Double?
 
     /// The measured fraction of genuinely unseen families this catches.
     ///
@@ -708,11 +703,18 @@ public struct FamilyClassification: Sendable {
 
     /// What the open-set flag is measured to catch, at the shipped threshold.
     ///
-    /// From `Tools/heads/openset_experiment.py`, holding out whole families:
-    /// 0.805 +/- 0.017. Stated rather than rounded to "most", because one
-    /// unseen protein in five is still missed and a reader is entitled to know
-    /// that before trusting the absence of a warning.
-    static let openSetDetectionRate = 0.805
+    /// From `Tools/heads/openset_experiment.py`, holding out whole families at
+    /// the shipped family count: 0.763 +/- 0.009.
+    ///
+    /// Re-measured when the classifier grew from 100 families to 500. It was
+    /// 0.805 for a different score on the smaller model, and carrying that
+    /// number forward would have quoted a measurement of a model the app no
+    /// longer runs.
+    ///
+    /// Stated rather than rounded to "most", because roughly one unseen protein
+    /// in four is still missed and a reader is entitled to know that before
+    /// treating the absence of a warning as an all-clear.
+    static let openSetDetectionRate = 0.763
 
     /// Below this, the call is presented as uncertain rather than as an answer.
     ///
@@ -853,21 +855,29 @@ extension AnalysisHeads {
 
         let similarity = nearestFamilySimilarity(to: embedding.pooled)
 
-        // Open-set rejection.
+        // Open-set rejection, by the confidence the head already produced.
         //
-        // Mahalanobis distance in the embedding space, measured at AUROC 0.969
-        // against 0.850 for the centroid cosine this replaces. Not a
-        // replacement for saying the classifier is closed set: at the shipped
-        // threshold it catches about four unseen proteins in five, so one in
-        // five still gets a confident wrong family and the caveat stays.
-        let distance = openSet?.distance(from: embedding.pooled)
+        // This was Mahalanobis distance over a 1.88 MB bundled asset, chosen
+        // when the classifier knew 100 families and measured there at AUROC
+        // 0.969 against 0.945 for max softmax.
+        //
+        // Re-measured at 500 families the ordering reverses: 0.941 against
+        // 0.941 on AUROC, and at the operating point 0.736 +/- 0.038 for
+        // Mahalanobis against 0.763 +/- 0.009 for max softmax. Worse, and four
+        // times less stable across which families happen to be missing.
+        //
+        // The argument for Mahalanobis was explicitly that stability matters
+        // more than the mean when a threshold has to ship. Applied
+        // consistently, it now selects max softmax, which is also free: no
+        // asset, no matrix, no load-time work.
+        let topConfidence = ranked.first?.confidence ?? 0
         let outsideTrainingSet: Bool
-        if let distance, let openSet {
-            outsideTrainingSet = distance > openSet.threshold
+        if let floor = openSetConfidenceFloor {
+            outsideTrainingSet = topConfidence < floor
         } else {
-            // The old instrument, kept as the fallback rather than deleted:
-            // some build without the asset is better served by a weak signal
-            // than by none.
+            // Only for a head whose metadata predates the threshold. The
+            // cosine is weak (AUROC 0.826 at this family count) but is better
+            // than declaring everything in distribution.
             outsideTrainingSet = similarity < familySimilarityFloor
         }
 
@@ -878,8 +888,8 @@ extension AnalysisHeads {
             similarityToNearestFamily: similarity,
             isInDistribution: !outsideTrainingSet,
             familyCount: families.count,
-            openSetDistance: distance,
-            openSetThreshold: openSet?.threshold,
-            openSetDetectionRate: openSet == nil ? nil : FamilyClassification.openSetDetectionRate)
+            openSetConfidenceFloor: openSetConfidenceFloor,
+            openSetDetectionRate: openSetConfidenceFloor == nil
+                ? nil : FamilyClassification.openSetDetectionRate)
     }
 }

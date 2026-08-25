@@ -242,14 +242,36 @@ def main() -> int:
     print(f"  in-distribution similarity: mean {nearest.mean():.3f}, "
           f"5th percentile {similarityFloor:.3f}")
 
-    # Open-set rejection by Mahalanobis distance.
+    # Open-set rejection by MAXIMUM SOFTMAX, not Mahalanobis distance.
     #
-    # Measured against four alternatives in Tools/heads/openset_experiment.py,
-    # holding out whole FAMILIES rather than sequences: AUROC 0.969 +/- 0.005,
-    # against 0.945 for max softmax and 0.850 for the centroid cosine that was
-    # tried first. It is also far the most stable across splits, which matters
-    # more than the mean here, because a score whose usefulness depends on which
-    # families happen to be missing is not one to ship a threshold on.
+    # This reversed when the classifier grew from 100 families to 500, and the
+    # reversal is the whole reason the measurement is repeated rather than
+    # inherited. Holding out whole families in
+    # Tools/heads/openset_experiment.py:
+    #
+    #                        100 families        500 families
+    #   mahalanobis AUROC    0.969 +/- 0.005     0.941 +/- 0.011
+    #   max softmax AUROC    0.945 +/- 0.014     0.941 +/- 0.010
+    #   mahalanobis @5% FPR  0.805 +/- 0.017     0.736 +/- 0.038
+    #   max softmax @5% FPR  0.761 +/- 0.061     0.763 +/- 0.009
+    #
+    # At 500 classes Mahalanobis is no better on AUROC, WORSE at the operating
+    # point, and four times less stable across splits. Max softmax held flat and
+    # became far steadier.
+    #
+    # The argument for Mahalanobis at 100 families was explicitly that stability
+    # matters more than the mean when a threshold has to ship. Applied
+    # consistently, that same argument now selects max softmax, which also needs
+    # no 1.88 MB asset at all.
+    #
+    # Why it flipped, offered as hypothesis: 500 class means estimated under one
+    # shared covariance are individually noisier than 100, so "distance to the
+    # nearest mean" degrades, while a softmax over 500 competitors gives a novel
+    # protein more ways to be uncertain.
+    #
+    # The Mahalanobis parameters are still computed and written, because
+    # openset_experiment.py compares against them and a future family count
+    # could flip this back. They are simply not what the app uses.
     #
     # Shared covariance, not per-class: with ~65 sequences per family in 480
     # dimensions a per-class covariance is wildly underdetermined and its
@@ -287,10 +309,30 @@ def main() -> int:
     rejectionThreshold = float(np.quantile(trainDistances, 0.95))
     testDistances = mahalanobis(splits["test"][0].astype(np.float64))
     flaggedInDistribution = float((testDistances > rejectionThreshold).mean())
-    print(f"\n  Mahalanobis threshold {rejectionThreshold:.1f}; "
+    print(f"\n  Mahalanobis threshold {rejectionThreshold:.1f} (computed, not shipped); "
           f"{flaggedInDistribution:.1%} of held-out in-distribution proteins flagged")
-    print("  measured detection of UNSEEN families at this rate: 0.805 +/- 0.017 "
-          "(openset_experiment.py)")
+
+    # What the app actually uses: the confidence BELOW which a call is flagged
+    # as probably outside the training families.
+    #
+    # Fitted on the CALIBRATION split, not on train and not on test. Train would
+    # give an optimistic threshold because the head has seen those sequences,
+    # and test is the set the flagging rate is then reported on.
+    with torch.no_grad():
+        calibrationConfidence = (
+            F.softmax(head(torch.from_numpy(splits["calibrate"][0])), dim=1)
+            .max(dim=1).values.numpy())
+    confidenceThreshold = float(np.quantile(calibrationConfidence, 0.05))
+
+    with torch.no_grad():
+        testConfidence = (
+            F.softmax(head(torch.from_numpy(splits["test"][0])), dim=1)
+            .max(dim=1).values.numpy())
+    flaggedByConfidence = float((testConfidence < confidenceThreshold).mean())
+    print(f"  confidence threshold {confidenceThreshold:.4f}; "
+          f"{flaggedByConfidence:.1%} of held-out in-distribution proteins flagged")
+    print(f"  detection of UNSEEN families at this rate is measured separately by "
+          f"openset_experiment.py and must be re-run when the family count changes")
 
     MODELS.mkdir(parents=True, exist_ok=True)
 
@@ -319,9 +361,9 @@ def main() -> int:
         "embed_width": EMBED_WIDTH,
         "similarity_floor": similarityFloor,
         "closed_set": True,
-        "openset_threshold": rejectionThreshold,
-        "openset_auroc": 0.969,
-        "openset_detection_at_95": 0.805,
+        "openset_mahalanobis_threshold": rejectionThreshold,
+        "openset_confidence_threshold": confidenceThreshold,
+        "openset_flagged_in_distribution": flaggedByConfidence,
     }, indent=2) + "\n")
     print(f"\nwrote {(MODELS / 'family.pt').relative_to(ROOT)}")
     return 0

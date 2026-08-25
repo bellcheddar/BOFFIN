@@ -1907,3 +1907,50 @@ data budget.
 The only route left is to stop freezing the backbone. That conflicts with the
 premises the app rests on, and is recorded as a question for Marc rather than
 answered here.
+
+---
+
+## 500 families, and a rejection method that reversed (2026-08-26)
+
+The classifier grew from 100 Pfam families to 500: 40,158 single-label
+sequences, embedded in about 35 minutes.
+
+| | 100 families | 500 families |
+|---|---|---|
+| Top-1 | 0.9792 | 0.9858 |
+| Calibration error | 0.0082 | 0.0040 |
+| Random baseline | 0.0100 | 0.0020 |
+
+Accuracy went UP while the task got five times harder, which is the larger
+per-family sample more than compensating.
+
+**Then the rejection method reversed.** The trainer had been printing a
+detection rate of 0.805 beside the new threshold, hardcoded from the
+100-family measurement. Re-run at the new family count:
+
+| Score | 100 families | 500 families |
+|---|---|---|
+| Mahalanobis AUROC | 0.969 | 0.941 |
+| Max softmax AUROC | 0.945 | 0.941 |
+| Mahalanobis @5% FPR | 0.805 ± 0.017 | 0.736 ± 0.038 |
+| Max softmax @5% FPR | 0.761 ± 0.061 | 0.763 ± 0.009 |
+
+At 500 classes Mahalanobis is no better on AUROC, worse at the operating point,
+and four times less stable. The case for it was explicitly that stability
+matters more than the mean when a threshold has to ship; applied consistently,
+that argument now selects max softmax, which needs no asset at all.
+
+Removed: the 1.88 MB binary, its format, its loader, and its cross-language
+parity test. Added: one float in the metadata, fitted on the calibration split.
+
+**Nothing would have broken had this gone unchecked.** The asset would have
+loaded, the distances would have computed, the threshold would have applied,
+and the app would have shipped the worse of two scores while quoting a rate
+belonging to a model it no longer runs. It surfaced only because the family
+count changed and the measurement was repeated rather than inherited. A test
+now pins the family count the rate was measured at, so retraining at a
+different size fails loudly.
+
+The README's closed-set entry is also corrected: it claimed no threshold
+catches an out-of-set protein, inferred from one protein, where the measurement
+over ~1,500 unseen sequences gives AUROC 0.941 and a 76% catch rate.

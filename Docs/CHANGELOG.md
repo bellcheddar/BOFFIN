@@ -572,3 +572,32 @@ Linker design, construct card export with primer-ready DNA, and disulfide
 pairing. That last one is not an oversight: pairs cannot be read off a sequence,
 so a boundary can currently separate two cysteines that pair. It needs the
 structure viewer.
+
+
+## Phase 6 (part 2): the construct card (2026-08-25)
+
+The output of the Boundary tab, as plain text somebody can paste into an order
+form, a lab notebook or a message. Plain text on purpose: a construct card is
+read by a person, forwarded, and pasted into a supplier's web form, and every one
+of those survives plain text better than a PDF. The FASTA record at the end is
+there so the same message drops straight into another tool.
+
+**Everything on the card is either measured or labelled as a convention.** Linker
+length has no measurement behind it, so the card prints the provenance beside it
+("length is a choice rather than a prediction") rather than a bare
+recommendation. A card is exactly the artefact that gets forwarded with the
+provenance stripped off, which is the argument for putting it inside the card
+rather than around it.
+
+**A caught mismatch.** The pKa scale started as a parameter to `text()`, so a
+caller could print the EMBOSS provenance line above numbers computed on the
+Bjellqvist scale. Those disagree by 0.2 to 0.5 pH units, and nothing would have
+caught it. The scale is now stored with the properties it produced, so the
+mismatch is not expressible.
+
+**Refused proteases go on the card, not just in the app.** The reason TEV was
+excluded is the part most worth carrying with a construct that gets forwarded.
+
+148 BoffinCore tests, 8 UI tests. Still outstanding: primer-ready DNA, which
+needs a codon usage table fetched and checksummed rather than transcribed, and
+disulfide pairing, which needs the structure viewer.

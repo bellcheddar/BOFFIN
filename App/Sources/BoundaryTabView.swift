@@ -43,6 +43,7 @@ struct BoundaryTabView: View {
                 }
                 constraintList
                 if let plan = store.tagPlan { tagSection(plan) }
+                if let card = store.constructCard { cardSection(card) }
                 caveat
             }
             .padding(Spacing.m)
@@ -199,15 +200,47 @@ struct BoundaryTabView: View {
         .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
     }
 
+    /// The card, and the one control on this screen that leaves the app.
+    private func cardSection(_ card: ConstructCard) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            HStack {
+                Text("Construct card").font(.headline)
+                Spacer()
+                ShareLink(item: card.text()) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                        .font(.caption)
+                }
+                .accessibilityIdentifier("boffin.share-construct-card")
+            }
+            Text(
+                "Plain text: it survives being pasted into an order form, a notebook "
+                    + "or a message, which a PDF does not."
+            )
+            .font(.caption2).foregroundStyle(.tertiary)
+            .fixedSize(horizontal: false, vertical: true)
+
+            ScrollView(.horizontal) {
+                Text(card.text())
+                    .font(.system(size: 10, design: .monospaced))
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: 320)
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+    }
+
     private var caveat: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("Not in this build", systemImage: "hammer")
                 .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             Text(
-                "Linker design and construct card export with primer-ready DNA. "
-                    + "Disulfide pairing is not a constraint either: pairs cannot be "
-                    + "read off a sequence, so a boundary can currently separate two "
-                    + "cysteines that pair. That needs the structure viewer."
+                "Primer-ready DNA, which needs a codon usage table fetched and "
+                    + "checksummed rather than transcribed. Disulfide pairing is not a "
+                    + "constraint either: pairs cannot be read off a sequence, so a "
+                    + "boundary can currently separate two cysteines that pair. That "
+                    + "needs the structure viewer."
             )
             .font(.caption2).foregroundStyle(.tertiary)
             .fixedSize(horizontal: false, vertical: true)

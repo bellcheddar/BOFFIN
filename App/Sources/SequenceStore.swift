@@ -66,6 +66,9 @@ final class SequenceStore {
     /// Tag placement and protease choice for the best proposal.
     private(set) var tagPlan: TagPlan?
 
+    /// The best proposal written out, ready to share.
+    private(set) var constructCard: ConstructCard?
+
     // MARK: - Fitness
 
     private(set) var llr: LLRMatrix?
@@ -148,6 +151,7 @@ final class SequenceStore {
             constructs = .declined("Analysing.")
             constructConstraints = []
             tagPlan = nil
+            constructCard = nil
             homologs = []
             precedent = []
             homologState = .idle
@@ -287,6 +291,7 @@ final class SequenceStore {
             precedent: deposited)
 
         tagPlan = nil
+        constructCard = nil
         if let best = constructs.proposals.first {
             let residues = best.range.compactMap { index -> AminoAcid? in
                 guard sequence.residues.indices.contains(index) else { return nil }
@@ -299,11 +304,27 @@ final class SequenceStore {
             func isDisordered(_ index: Int) -> Bool {
                 disordered.indices.contains(index) ? disordered[index] : false
             }
-            tagPlan = TagPlanner.plan(
+            let plan = TagPlanner.plan(
                 construct: residues,
                 hasSignalPeptide: constructConstraints.contains { $0.kind == .signalPeptide },
                 startsDisordered: isDisordered(best.range.lowerBound),
                 endsDisordered: isDisordered(best.range.upperBound))
+            tagPlan = plan
+            constructCard = ConstructCard(
+                proteinName: sequence.name,
+                range: (best.range.lowerBound + 1)...(best.range.upperBound + 1),
+                residues: residues,
+                rationale: best.rationale,
+                tagPlan: plan,
+                linker: Linker.conventional(
+                    forDisorderedTerminus: plan.terminus == .aminoTerminal
+                        ? isDisordered(best.range.lowerBound)
+                        : isDisordered(best.range.upperBound)),
+                properties: SequenceProperties(
+                    residues: Array(sequence.residues[best.range]), pKaScale: pKaScale),
+                pKaScale: pKaScale,
+                precedentCount: best.precedentCount,
+                constraints: constructConstraints)
         }
     }
 

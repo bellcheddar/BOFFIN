@@ -58,6 +58,17 @@ final class BoundaryTabUITests: XCTestCase {
             proposals.exists && refusal.exists,
             "the Boundary tab showed a proposal and a refusal at once")
 
+        // When there are proposals there must be a card, and it must be
+        // shareable: a construct card that cannot leave the app is a screenshot.
+        if proposals.exists {
+            XCTAssertTrue(
+                app.staticTexts["Construct card"].waitForExistence(timeout: 10),
+                "proposals were shown without a card")
+            XCTAssertTrue(
+                app.buttons["boffin.share-construct-card"].exists,
+                "the construct card cannot be shared")
+        }
+
         let shot = XCTAttachment(screenshot: app.screenshot())
         shot.name = "Boundary tab, CDK2"
         shot.lifetime = .keepAlways

@@ -735,3 +735,43 @@ produces a picture that is beautiful and wrong. Every AlphaFold load carries a
 caveat on screen.
 
 10 UI tests, 9 BoffinViewer tests.
+
+
+## Phase 7 (part 3): assemblies, ensembles and memory (2026-08-25)
+
+**The deposited coordinates are the asymmetric unit**, which is a
+crystallographic convenience and frequently not the molecule. A dimer with one
+chain in the asymmetric unit looks like a monomer until the biological assembly
+is built, and that is a picture of the wrong protein rather than an incomplete
+one. The viewer now lists what a structure declares and can build it, with the
+distinction spelled out on screen rather than left to be known.
+
+The picker appears only when there is something to choose. A picker with one
+entry is furniture.
+
+**NMR ensembles say how many models they hold** and that one is shown.
+Superimposing twenty renders as a single very badly resolved structure, which
+looks like a bad structure rather than like a mistake.
+
+**Memory pressure is handled rather than suffered.** `WKWebView` is a separate
+process and the system terminates it under pressure without asking; releasing
+the structure ourselves returns most of the memory, keeps the page alive, and
+makes recovery one command instead of a blank viewer nobody can explain.
+
+### Two things the tests caught
+
+`SetAssemblyCommand(assemblyId: nil)` encoded to `{}`, because Swift's
+synthesised encoding drops a nil optional. Both branches of the bridge's `if`
+happened to treat a missing key the same as an explicit null, so it worked, and
+relying on that is relying on a coincidence in someone else's conditional. It
+now encodes the key explicitly.
+
+**SPM's `.copy` of a directory does not reliably invalidate when a file inside it
+changes.** The bundled `boffin-bridge.js` lagged the source, so the package would
+have shipped a bridge that did not match the code beside it. The failure reads
+"no handler for listAssemblies" against a file that visibly has one; `rm -rf
+.build` fixes it. The test that reads the bundled copy and checks every Swift
+command name has a handler is the only reason this surfaced at all, which is a
+better argument for that test than the one it was written for.
+
+10 UI tests, 10 BoffinViewer tests.

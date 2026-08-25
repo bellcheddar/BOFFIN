@@ -208,6 +208,49 @@
       return { painted: payload.residues.length };
     },
 
+    // Biological assemblies, symmetry mates and NMR models.
+    //
+    // The deposited coordinates are the ASYMMETRIC UNIT, which is a
+    // crystallographic convenience and frequently not the molecule. A dimer
+    // deposited with one chain in the asymmetric unit looks like a monomer until
+    // the assembly is built, and that is a picture of the wrong protein rather
+    // than an incomplete one.
+    async listAssemblies() {
+      const viewer = await ensurePlugin();
+      const structures = viewer.plugin.managers.structure.hierarchy.current.structures;
+      if (!structures.length) return { assemblies: [], models: 1 };
+      const model = structures[0].cell.obj.data.models[0];
+      const symmetry = model && molstar.ModelSymmetry
+        ? molstar.ModelSymmetry.Provider.get(model)
+        : null;
+      const assemblies = symmetry && symmetry.assemblies
+        ? symmetry.assemblies.map((a) => ({
+            id: a.id,
+            details: a.details || '',
+          }))
+        : [];
+      const trajectory = viewer.plugin.managers.structure.hierarchy.current.models;
+      return { assemblies: assemblies, models: trajectory.length || 1 };
+    },
+
+    async setAssembly(payload) {
+      const viewer = await ensurePlugin();
+      const structures = viewer.plugin.managers.structure.hierarchy.current.structures;
+      if (!structures.length) return { ok: false };
+      await viewer.plugin.managers.structure.hierarchy.updateStructure(
+        structures[0],
+        {
+          type: payload.assemblyId
+            ? { name: 'assembly', params: { id: payload.assemblyId } }
+            : { name: 'model', params: {} },
+        }
+      );
+      const count = viewer.plugin.managers.structure.hierarchy.current.structures[0]
+        .cell.obj.data.elementCount;
+      post({ kind: 'loaded', atomCount: count });
+      return { atomCount: count };
+    },
+
     async resetCamera() {
       const viewer = await ensurePlugin();
       viewer.plugin.managers.camera.reset();

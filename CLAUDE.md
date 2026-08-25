@@ -17,6 +17,12 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ### Phase 7 findings
 
+- **SPM's `.copy` of a directory does not reliably invalidate on inner-file
+  changes.** The bundled `boffin-bridge.js` can lag the source, so the app runs
+  a bridge that does not match the code beside it. It reads as "no handler for
+  X" against a file that visibly has one; `rm -rf .build` fixes it. The
+  handler-coverage test is what catches it at all.
+
 - **A resource bundle must not contain a folder called `Resources`.** SPM's
   `.copy("Resources")` produces one, it is read as a macOS-style bundle, and
   codesign refuses it with "bundle format unrecognized, invalid, or unsuitable"

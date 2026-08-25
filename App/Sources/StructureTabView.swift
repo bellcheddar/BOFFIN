@@ -55,6 +55,16 @@ struct StructureTabView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.black)
                 .accessibilityIdentifier("boffin.structure-viewer")
+                // The web view is a separate process and the system terminates
+                // it under pressure rather than asking. Releasing the structure
+                // ourselves gives most of the memory back and leaves the page
+                // alive, so recovery is one command rather than a blank viewer.
+                .onReceive(
+                    NotificationCenter.default.publisher(
+                        for: UIApplication.didReceiveMemoryWarningNotification)
+                ) { _ in
+                    Task { await model.releaseUnderMemoryPressure() }
+                }
 
             controls(model)
                 .padding(Spacing.s)
@@ -112,6 +122,7 @@ struct StructureTabView: View {
             .pickerStyle(.menu)
             .font(.caption)
 
+            assemblyControls(model)
             trackPainting(model)
             if let selection = model.selection { inspector(selection) }
         }
@@ -174,6 +185,59 @@ struct StructureTabView: View {
             .buttonStyle(.bordered).font(.caption2)
             .disabled(identifier.count < 6)
         }
+    }
+
+    /// Biological assembly and NMR model.
+    ///
+    /// Shown only when the structure declares something to choose, because a
+    /// picker with one entry is furniture. The wording matters: the deposited
+    /// coordinates are the asymmetric unit, which is a crystallographic
+    /// convenience and frequently not the molecule.
+    @ViewBuilder
+    private func assemblyControls(_ model: StructureViewerModel) -> some View {
+        if !model.assemblies.isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+                Picker("Assembly", selection: assemblyBinding(model)) {
+                    Text("Deposited coordinates").tag(String?.none)
+                    ForEach(model.assemblies) { option in
+                        Text(
+                            option.details.isEmpty
+                                ? "Assembly \(option.id)"
+                                : "Assembly \(option.id): \(option.details)"
+                        )
+                        .tag(String?.some(option.id))
+                    }
+                }
+                .pickerStyle(.menu)
+                .font(.caption)
+                .accessibilityIdentifier("boffin.assembly-picker")
+
+                Text(
+                    "The deposited coordinates are the asymmetric unit, which is a "
+                        + "crystallographic convenience and often not the molecule. A "
+                        + "dimer with one chain in the asymmetric unit looks like a "
+                        + "monomer until the assembly is built."
+                )
+                .font(.caption2).foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        if model.modelCount > 1 {
+            Label(
+                "\(model.modelCount) models in this file: an NMR ensemble. One is "
+                    + "shown; superimposing all of them renders as a single very badly "
+                    + "resolved structure.",
+                systemImage: "square.stack.3d.up"
+            )
+            .font(.caption2).foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func assemblyBinding(_ model: StructureViewerModel) -> Binding<String?> {
+        Binding(
+            get: { model.assembly },
+            set: { value in Task { await model.set(assembly: value) } })
     }
 
     /// The point of the whole tab.

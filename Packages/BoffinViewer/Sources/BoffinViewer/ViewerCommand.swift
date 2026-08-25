@@ -178,6 +178,45 @@ public struct PaintTrackCommand: ViewerCommand {
     }
 }
 
+/// Ask what biological assemblies and models the loaded structure declares.
+///
+/// The deposited coordinates are the ASYMMETRIC UNIT, which is a
+/// crystallographic convenience and frequently not the molecule: a dimer with
+/// one chain in the asymmetric unit looks like a monomer until the assembly is
+/// built, which is a picture of the wrong protein rather than an incomplete one.
+public struct ListAssembliesCommand: ViewerCommand {
+    public let name = "listAssemblies"
+    public init() {}
+}
+
+/// Build a biological assembly, or return to the deposited coordinates.
+public struct SetAssemblyCommand: ViewerCommand {
+    public let name = "setAssembly"
+    /// The assembly identifier, or `nil` for the asymmetric unit.
+    public let assemblyId: String?
+
+    public init(assemblyId: String?) {
+        self.assemblyId = assemblyId
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case assemblyId
+    }
+
+    /// Encode `nil` as an explicit null rather than omitting the key.
+    ///
+    /// Swift's synthesised encoding drops a nil optional, which would leave the
+    /// bridge unable to tell "build the asymmetric unit" from "the caller said
+    /// nothing". Both currently take the same branch there, and relying on that
+    /// is relying on a coincidence in someone else's `if`.
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(assemblyId, forKey: .assemblyId)
+    }
+}
+
 public struct ResetCameraCommand: ViewerCommand {
     public let name = "resetCamera"
     public init() {}

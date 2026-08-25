@@ -39,6 +39,19 @@ public final class StructureViewerModel {
     /// Where the loaded structure came from, so the UI can label a prediction.
     public private(set) var source: StructureSource?
 
+    /// Biological assemblies the structure declares, empty when it declares
+    /// none.
+    public private(set) var assemblies: [Assembly] = []
+    /// The assembly currently built, or `nil` for the deposited coordinates.
+    public private(set) var assembly: String?
+    /// How many models the file holds. More than one is an NMR ensemble.
+    public private(set) var modelCount: Int = 1
+
+    public struct Assembly: Sendable, Hashable, Identifiable, Decodable {
+        public let id: String
+        public let details: String
+    }
+
     /// The last residue tapped in the structure, in the structure's own author
     /// numbering.
     ///
@@ -128,6 +141,16 @@ public final class StructureViewerModel {
                 try await bridge.send(SetRepresentation(representation))
             }
             try await bridge.send(SetColourThemeCommand(colourTheme))
+
+            struct Declared: Decodable {
+                let assemblies: [Assembly]
+                let models: Int
+            }
+            let declared = try await bridge.send(
+                ListAssembliesCommand(), expecting: Declared.self)
+            assemblies = declared.assemblies
+            modelCount = declared.models
+            assembly = nil
         } catch {
             state = .failed(String(describing: error))
         }
@@ -153,6 +176,36 @@ public final class StructureViewerModel {
         title: String, residues: [PaintTrackCommand.Residue]
     ) async throws {
         try await bridge.send(PaintTrackCommand(title: title, residues: residues))
+    }
+
+    /// Build a biological assembly, or return to the deposited coordinates.
+    public func set(assembly identifier: String?) async {
+        do {
+            struct Reply: Decodable { let atomCount: Int }
+            let reply = try await bridge.send(
+                SetAssemblyCommand(assemblyId: identifier), expecting: Reply.self)
+            assembly = identifier
+            state = .loaded(atomCount: reply.atomCount)
+        } catch {
+            state = .failed(String(describing: error))
+        }
+    }
+
+    /// Release the web view's memory without losing what is on screen.
+    ///
+    /// `WKWebView` is a separate process and the system will terminate it under
+    /// pressure rather than asking. Clearing the structure ourselves gives back
+    /// most of the memory and leaves the page alive, so recovery is one command
+    /// rather than a reload; the alternative is a blank viewer and a user who
+    /// does not know why.
+    public func releaseUnderMemoryPressure() async {
+        guard case .loaded = state else { return }
+        try? await bridge.send(ClearCommand())
+        state = .ready
+        assemblies = []
+        assembly = nil
+        guardrailNotice =
+            "The structure was released to free memory. Load it again to carry on."
     }
 
     public func resetCamera() async {

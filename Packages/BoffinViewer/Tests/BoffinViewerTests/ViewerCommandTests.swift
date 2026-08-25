@@ -59,6 +59,13 @@ struct ViewerCommandTests {
         // The JavaScript is in the same package, so the two halves can be
         // checked against each other rather than trusted to agree. A command
         // whose name has no handler is a silent no-op at runtime.
+        //
+        // This reads the BUNDLED copy on purpose, and it has already earned it:
+        // SPM's `.copy` of a directory does not reliably invalidate when a file
+        // inside it changes, so the bundle can lag the source and the app can
+        // ship a bridge that does not match the code next to it. The failure
+        // reads as "no handler for listAssemblies" against a file that visibly
+        // has one. `rm -rf .build` is the fix.
         let bridge = try #require(
             Bundle.module.url(forResource: "boffin-bridge", withExtension: "js")
                 ?? Bundle.module.url(
@@ -72,6 +79,8 @@ struct ViewerCommandTests {
             SetRepresentationCommand(.cartoon).name,
             SetColourThemeCommand(.chain).name,
             PaintTrackCommand(title: "", residues: []).name,
+            ListAssembliesCommand().name,
+            SetAssemblyCommand(assemblyId: nil).name,
             ResetCameraCommand().name,
             ClearCommand().name,
         ]
@@ -80,6 +89,19 @@ struct ViewerCommandTests {
                 source.contains("async \(name)("),
                 "boffin-bridge.js has no handler for \(name)")
         }
+    }
+
+    /// `nil` means the deposited coordinates, and it has to survive encoding as
+    /// an explicit null rather than being dropped: an absent key would leave the
+    /// bridge unable to tell "asymmetric unit" from "no opinion".
+    @Test("Returning to the asymmetric unit encodes as an explicit null")
+    func assemblyNullIsExplicit() throws {
+        let fields = try payload(SetAssemblyCommand(assemblyId: nil))
+        #expect(fields.keys.contains("assemblyId"))
+        #expect(fields["assemblyId"] is NSNull)
+
+        let named = try payload(SetAssemblyCommand(assemblyId: "1"))
+        #expect(named["assemblyId"] as? String == "1")
     }
 
     @Test("An event decodes from the bridge's tagged union")

@@ -32,16 +32,47 @@ private struct SegmentRow {
 
 private enum Fixture {
 
-    static func vectors(_ rows: [[Float]]) -> Data {
-        var data = Data("BOFHVEC1".utf8)
+    /// Build a vector file, optionally with a whitening transform.
+    ///
+    /// The default is an identity transform (zero mean, no components), so the
+    /// ranking tests read as plain cosine. `whitenedVectors` exercises the
+    /// transform itself.
+    static func vectors(
+        _ rows: [[Float]], mean: [Float] = [], components: [[Float]] = [],
+        floor: Float = 0.5
+    ) -> Data {
+        var data = Data("BOFHVEC2".utf8)
         let dimension = rows.first?.count ?? 0
-        for value in [UInt32(rows.count), UInt32(dimension), 1, 0] {
+        for value in [
+            UInt32(rows.count), UInt32(dimension), 1, UInt32(components.count),
+        ] {
             withUnsafeBytes(of: value.littleEndian) { data.append(contentsOf: $0) }
         }
+        withUnsafeBytes(of: floor.bitPattern.littleEndian) { data.append(contentsOf: $0) }
+        let meanValues = mean.isEmpty ? [Float](repeating: 0, count: dimension) : mean
+        for value in meanValues {
+            withUnsafeBytes(of: value.bitPattern.littleEndian) { data.append(contentsOf: $0) }
+        }
+        for component in components {
+            for value in component {
+                withUnsafeBytes(of: value.bitPattern.littleEndian) { data.append(contentsOf: $0) }
+            }
+        }
+        // The rows are whitened here exactly as `pack_index_assets.py` whitens
+        // them, because that is what the file format means. Storing raw rows
+        // next to a non-identity transform would describe a file the packer
+        // never produces, and the test would be checking a fiction.
         for row in rows {
-            let norm = row.reduce(0) { $0 + $1 * $1 }.squareRoot()
-            for component in row {
-                let scaled = norm > 0 ? component / norm * 127 : 0
+            var transformed = zip(row, meanValues).map(-)
+            for component in components where component.count == transformed.count {
+                let projection = zip(transformed, component).map(*).reduce(0, +)
+                for index in transformed.indices {
+                    transformed[index] -= projection * component[index]
+                }
+            }
+            let norm = transformed.reduce(0) { $0 + $1 * $1 }.squareRoot()
+            for value in transformed {
+                let scaled = norm > 0 ? value / norm * 127 : 0
                 data.append(UInt8(bitPattern: Int8(clamping: Int(scaled.rounded()))))
             }
         }
@@ -246,6 +277,59 @@ struct HomologIndexFormatTests {
         #expect(throws: HomologIndexError.self) {
             _ = try index.search([1, 0, 0], limit: 1)
         }
+    }
+
+    @Test("The stored whitening transform is applied to the query")
+    func whitening() throws {
+        // Two entries that differ only in the first component, and a stored
+        // mean that removes the shared part. Without the transform a query of
+        // [10, 1, 0, 0] is close to both; with it, the shared offset is gone and
+        // only the difference decides.
+        let rows: [[Float]] = [[1, 1, 0, 0], [-1, 1, 0, 0]]
+        let index = try HomologIndex(
+            vectors: Fixture.write(
+                Fixture.vectors(rows, mean: [0, 1, 0, 0]), named: "vw.bin"),
+            metadata: Fixture.write(
+                Fixture.metadata([
+                    Fixture.record(
+                        accession: "P00001", pdb: "1AAA", chain: "A", resolution: "1.0",
+                        title: "plus", sequence: "AA"),
+                    Fixture.record(
+                        accession: "P00002", pdb: "2BBB", chain: "B", resolution: "1.0",
+                        title: "minus", sequence: "CC"),
+                ]), named: "mw.bin"))
+
+        // After centring, the stored rows are [1,0,0,0] and [-1,0,0,0].
+        // A query of [5, 1, 0, 0] centres to [5, 0, 0, 0], which matches the
+        // first exactly and opposes the second.
+        let hits = try index.search([5, 1, 0, 0], limit: 2, minimumSimilarity: -1)
+        #expect(hits.first?.accession == "P00001")
+        #expect(abs((hits.first?.similarity ?? 0) - 1.0) < 0.01)
+        #expect(hits.last?.accession == "P00002")
+        #expect((hits.last?.similarity ?? 0) < -0.9)
+    }
+
+    @Test("A stored principal direction is projected out of the query")
+    func componentRemoval() throws {
+        // The first axis carries the dominant direction; removing it leaves the
+        // second to decide. Without the projection the first entry would win on
+        // the shared axis alone.
+        let rows: [[Float]] = [[1, 0, 0, 0], [0, 1, 0, 0]]
+        let index = try HomologIndex(
+            vectors: Fixture.write(
+                Fixture.vectors(rows, components: [[1, 0, 0, 0]]), named: "vc.bin"),
+            metadata: Fixture.write(
+                Fixture.metadata([
+                    Fixture.record(
+                        accession: "P00001", pdb: "1AAA", chain: "A", resolution: "1.0",
+                        title: "axis", sequence: "AA"),
+                    Fixture.record(
+                        accession: "P00002", pdb: "2BBB", chain: "B", resolution: "1.0",
+                        title: "other", sequence: "CC"),
+                ]), named: "mc.bin"))
+
+        let hits = try index.search([9, 1, 0, 0], limit: 2, minimumSimilarity: -1)
+        #expect(hits.first?.accession == "P00002", "the dominant axis was not removed")
     }
 
     @Test("Vector and metadata files from different builds refuse to load")

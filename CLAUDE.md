@@ -17,6 +17,25 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ### Phase 5 findings
 
+- **Pooled language-model embeddings are ANISOTROPIC and an index of them must
+  be whitened.** Random pairs scored a cosine of 0.848 on average with a 99.9th
+  percentile of 0.980, so int8 quantisation lost a quarter of the true nearest
+  neighbours (recall@10 0.748) without erroring. Subtracting the mean and
+  projecting out four principal directions took recall@10 to 0.966 and moved the
+  null to 0.000. The transform ships in the file and every query must go through
+  it: skipping it does not fail, it ranks badly.
+- **A threshold on a similarity must be measured, never chosen.** The floor is
+  the 99.9th percentile of unrelated pairs, 0.641, computed at pack time. The
+  0.5 picked by eye beforehand would have admitted the entire index.
+- **A validation stage can fail for its own reasons.** The Core ML cross-check
+  reported the implementations ranking differently; they agree to a Spearman of
+  0.999989. The check had whitened the index and not the query, which is exactly
+  the mismatch it was written to catch.
+- **`app.tabBars` does not exist on iPadOS 26** (a SwiftUI `TabView` renders a
+  top strip), and `isHittable` is false on a tab because each is a Button
+  containing an identical Button. Reach tabs through one helper and assert on
+  the destination.
+
 - **A `#require` inside a test is not a skip: it is a FAILURE.** Artefact-gated
   suites written that way turned a missing build artefact into four consecutive
   red CI runs while every local run stayed green, because the artefacts exist on

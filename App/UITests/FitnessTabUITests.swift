@@ -22,7 +22,7 @@ final class FitnessTabUITests: XCTestCase {
         app.launch()
         loadUbiquitin(app)
 
-        app.buttons["Fitness"].tap()
+        app.openTab("Fitness")
         let fast = app.buttons["Fast preview"]
         XCTAssertTrue(fast.waitForExistence(timeout: 10), "scan controls did not appear")
         fast.tap()
@@ -74,7 +74,7 @@ final class FitnessTabUITests: XCTestCase {
     func testFitnessTabTellsYouToLoadASequenceFirst() throws {
         let app = XCUIApplication()
         app.launch()
-        app.buttons["Fitness"].tap()
+        app.openTab("Fitness")
         XCTAssertTrue(app.staticTexts["No sequence"].waitForExistence(timeout: 10))
     }
 }

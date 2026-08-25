@@ -91,12 +91,28 @@ class ANEConvHead(torch.nn.Module):
     def __init__(self, source, classes: int, width: int):
         super().__init__()
         self.project = self._conv(source.project, width, EMBED_WIDTH_GLOBAL, 1, 1, 0)
-        self.block1 = self._conv(source.block1, width, width, 5, 1, 2)
-        self.block2 = self._conv(source.block2, width, width, 5, 2, 4)
-        self.block3 = self._conv(source.block3, width, width, 5, 4, 8)
-        self.norm1 = self._norm(source.norm1, width)
-        self.norm2 = self._norm(source.norm2, width)
-        self.norm3 = self._norm(source.norm3, width)
+
+        # Two head shapes, one converter. `ConvHead` names its three blocks
+        # individually (`block1`, `norm1`, ...) and its trained weights are on
+        # disk under those keys, so renaming them would orphan every head
+        # already trained. `TopologyHead` uses ModuleLists because it has four
+        # dilations rather than three. Reading whichever the source provides
+        # keeps both working without retraining anything.
+        if hasattr(source, "blocks"):
+            sourceBlocks = list(source.blocks)
+            sourceNorms = list(source.norms)
+        else:
+            sourceBlocks = [source.block1, source.block2, source.block3]
+            sourceNorms = [source.norm1, source.norm2, source.norm3]
+
+        dilations = [2 ** i for i in range(len(sourceBlocks))]
+        self.blocks = torch.nn.ModuleList([
+            self._conv(block, width, width, 5, dilation, dilation * 2)
+            for block, dilation in zip(sourceBlocks, dilations)
+        ])
+        self.norms = torch.nn.ModuleList([
+            self._norm(norm, width) for norm in sourceNorms
+        ])
         self.output = self._conv(source.output, classes, width, 1, 1, 0)
 
     @staticmethod
@@ -124,9 +140,8 @@ class ANEConvHead(torch.nn.Module):
         import torch.nn.functional as F
 
         h = F.gelu(self.project(x))
-        h = h + F.gelu(self.norm1(self.block1(h)))
-        h = h + F.gelu(self.norm2(self.block2(h)))
-        h = h + F.gelu(self.norm3(self.block3(h)))
+        for block, norm in zip(self.blocks, self.norms):
+            h = h + F.gelu(norm(block(h)))
         return self.output(h)
 
 
@@ -249,6 +264,8 @@ def main() -> int:
     specifications = [
         ("secondary_structure", 8, "Per-residue Q8 secondary structure logits, order GHIBESTC."),
         ("disorder", 2, "Per-residue disorder logits: index 0 disordered, index 1 ordered."),
+        ("topology", 3,
+         "Per-residue topology logits: 0 outside, 1 transmembrane, 2 signal peptide."),
     ]
 
     # The family classifier is a different shape: one vector in, one
@@ -263,7 +280,18 @@ def main() -> int:
             print(f"missing {weights}, skipped")
             continue
 
-        head = ConvHead(classes=classes, width=width)
+        # The topology head has a fourth dilation, so it is a different class
+        # with a different state dict. Constructing the wrong one loads with
+        # missing and unexpected keys, which torch reports and which is easy to
+        # scroll past, so the choice is explicit rather than a try/except.
+        if name == "topology":
+            import sys as _sys
+            _sys.path.insert(0, str(ROOT / "Tools/heads"))
+            from train_topology_head import TopologyHead
+
+            head = TopologyHead(classes=classes, width=width)
+        else:
+            head = ConvHead(classes=classes, width=width)
         head.load_state_dict(torch.load(weights, map_location="cpu"))
         head.eval()
 

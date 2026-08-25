@@ -7,6 +7,23 @@
 //  classification is the query here, so searching costs nothing beyond the
 //  forward pass that has already happened.
 //
+//  Whitening
+//  ---------
+//  Pooled language-model embeddings are anisotropic: two random proteins in this
+//  index score a cosine of 0.848 on average and the 99.9th percentile of random
+//  pairs is 0.980, while real homologues score 0.97 to 0.99. Everything useful
+//  lives in a sliver of the range, and int8 quantisation of the raw vectors
+//  destroyed a quarter of it: recall@10 measured 0.748 against exhaustive float
+//  search, silently, with the surviving hits still looking plausible because a
+//  protein's neighbours are mostly its own family.
+//
+//  So the index is whitened before quantisation (Mu and Viswanath, "All-but-the-
+//  top", ICLR 2018): subtract the mean, remove the four dominant principal
+//  directions. That took recall@10 to 0.966 and moved the null distribution from
+//  a mean of 0.848 to 0.000. The mean and the components travel in the file, and
+//  EVERY QUERY MUST BE PUT THROUGH THE SAME TRANSFORM: skipping it does not
+//  error, it just ranks badly.
+//
 //  Brute force, on purpose
 //  -----------------------
 //  An approximate nearest-neighbour structure (HNSW, IVF, product quantisation)
@@ -81,6 +98,23 @@ public struct HomologIndex: Sendable {
     public let dimension: Int
     private let vectorOffset: Int
     private let metaTextOffset: Int
+    /// The mean subtracted from every index vector before quantisation.
+    ///
+    /// Internal rather than private so a test can reconstruct a pre-whitening
+    /// query from a stored row: adding the mean back inverts the transform,
+    /// because the stored row is already orthogonal to the removed components
+    /// and projecting it again is a no-op.
+    let mean: [Float]
+    /// The principal directions removed after centring, row major.
+    private let components: [[Float]]
+
+    /// The similarity an unrelated pair reaches 0.1% of the time, measured over
+    /// 200,000 random pairs when the index was built.
+    ///
+    /// This is the default floor, and it is a measurement because it cannot be
+    /// guessed: before whitening it was 0.980, so any round number chosen by eye
+    /// would have admitted the entire index.
+    public let unrelatedSimilarityCeiling: Double
 
     public init(vectors: URL, metadata: URL) throws {
         do {
@@ -90,20 +124,40 @@ public struct HomologIndex: Sendable {
             throw HomologIndexError.unavailable(error.localizedDescription)
         }
 
-        guard vectorData.count >= 24, vectorData.prefix(8).elementsEqual("BOFHVEC1".utf8) else {
-            throw HomologIndexError.malformed("vector file is not BOFHVEC1")
+        guard vectorData.count >= 24, vectorData.prefix(8).elementsEqual("BOFHVEC2".utf8) else {
+            throw HomologIndexError.malformed("vector file is not BOFHVEC2")
         }
         guard metaData.count >= 16, metaData.prefix(8).elementsEqual("BOFHMET1".utf8) else {
             throw HomologIndexError.malformed("metadata file is not BOFHMET1")
         }
 
         let vectorCount = Int(vectorData.readUInt32(at: 8))
-        dimension = Int(vectorData.readUInt32(at: 12))
+        // Local first: reading `self.dimension` inside the closures below would
+        // be capturing a stored property before initialisation is complete.
+        let width = Int(vectorData.readUInt32(at: 12))
+        dimension = width
         let encoding = vectorData.readUInt32(at: 16)
         guard encoding == 1 else {
             throw HomologIndexError.malformed("unsupported vector encoding \(encoding)")
         }
-        vectorOffset = 24
+        let componentCount = Int(vectorData.readUInt32(at: 20))
+        unrelatedSimilarityCeiling = Double(vectorData.readFloat32(at: 24))
+
+        // A local copy of the mapped data. Referring to the stored property
+        // inside these closures makes them capture `self`, which is not yet
+        // initialised; `Data` is copy-on-write so this costs nothing.
+        let bytes = vectorData
+        var cursor = 28
+        let meanBase = cursor
+        mean = (0..<width).map { bytes.readFloat32(at: meanBase + $0 * 4) }
+        cursor += width * 4
+        let componentBase = cursor
+        components = (0..<componentCount).map { row in
+            let base = componentBase + row * width * 4
+            return (0..<width).map { bytes.readFloat32(at: base + $0 * 4) }
+        }
+        cursor += componentCount * width * 4
+        vectorOffset = cursor
 
         let metaCount = Int(metaData.readUInt32(at: 8))
         metaTextOffset = Int(metaData.readUInt32(at: 12))
@@ -116,7 +170,7 @@ public struct HomologIndex: Sendable {
                 "\(vectorCount) vectors against \(metaCount) metadata records: "
                     + "these two files are from different builds")
         }
-        guard vectorOffset + vectorCount * dimension <= vectorData.count else {
+        guard vectorOffset + vectorCount * width <= vectorData.count else {
             throw HomologIndexError.malformed("vector file is shorter than its header claims")
         }
         count = vectorCount
@@ -127,29 +181,36 @@ public struct HomologIndex: Sendable {
     /// - Parameters:
     ///   - query: a pooled embedding of the same width as the index.
     ///   - limit: how many hits to return.
-    ///   - minimumSimilarity: hits below this are not returned at all. Zero
-    ///     would return the nearest 20 entries for any input including a random
-    ///     one, and a ranked list is read as a set of answers whether or not it
-    ///     deserves to be.
+    ///   - minimumSimilarity: hits below this are not returned at all. Defaults
+    ///     to ``unrelatedSimilarityCeiling``, the measured 99.9th percentile of
+    ///     unrelated pairs. Zero would return the nearest twenty entries for any
+    ///     input including a random one, and a ranked list is read as a set of
+    ///     answers whether or not it deserves to be.
     /// - Returns: hits in descending similarity, possibly fewer than `limit`.
     /// - Throws: ``HomologIndexError/dimensionMismatch(expected:got:)`` when the
     ///   query width does not match the index.
     public func search(
         _ query: [Float],
         limit: Int = 20,
-        minimumSimilarity: Double = 0.5
+        minimumSimilarity: Double? = nil
     ) throws -> [HomologHit] {
+        let floorValue = minimumSimilarity ?? unrelatedSimilarityCeiling
         guard query.count == dimension else {
             throw HomologIndexError.dimensionMismatch(expected: dimension, got: query.count)
         }
         guard count > 0, limit > 0 else { return [] }
 
-        var normalised = query
+        // The same whitening the index went through. Without it the query lives
+        // in a different space from the vectors it is being compared with, which
+        // produces a ranking that is wrong and a similarity that still looks
+        // like a plausible number.
+        let whitened = whiten(query)
+        var normalised = whitened
         var norm: Float = 0
-        vDSP_svesq(query, 1, &norm, vDSP_Length(query.count))
+        vDSP_svesq(whitened, 1, &norm, vDSP_Length(whitened.count))
         guard norm > 0 else { return [] }
         var inverse = 1 / norm.squareRoot()
-        vDSP_vsmul(query, 1, &inverse, &normalised, 1, vDSP_Length(query.count))
+        vDSP_vsmul(whitened, 1, &inverse, &normalised, 1, vDSP_Length(whitened.count))
 
         var scores = [Float](repeating: 0, count: count)
         let width = dimension
@@ -190,7 +251,7 @@ public struct HomologIndex: Sendable {
             }
         }
 
-        let floor = Float(minimumSimilarity) * Self.quantisationScale
+        let floor = Float(floorValue) * Self.quantisationScale
         var best: [(index: Int, score: Float)] = []
         best.reserveCapacity(limit + 1)
         for index in 0..<count where scores[index] >= floor {
@@ -206,6 +267,21 @@ public struct HomologIndex: Sendable {
                 at: candidate.index,
                 similarity: Double(candidate.score / Self.quantisationScale))
         }
+    }
+
+    /// Centre a query and project out the stored principal directions.
+    func whiten(_ query: [Float]) -> [Float] {
+        var centred = query
+        if mean.count == query.count {
+            for index in centred.indices { centred[index] -= mean[index] }
+        }
+        for component in components where component.count == centred.count {
+            var projection: Float = 0
+            vDSP_dotpr(centred, 1, component, 1, &projection, vDSP_Length(centred.count))
+            var scale = -projection
+            vDSP_vsma(component, 1, &scale, centred, 1, &centred, 1, vDSP_Length(centred.count))
+        }
+        return centred
     }
 
     /// Decode one metadata record. Records are read on demand, so a search
@@ -252,6 +328,11 @@ extension Data {
 
     func readInt32(at offset: Int) -> Int32 {
         Int32(bitPattern: readUInt32(at: offset))
+    }
+
+    /// Little-endian `Float32` at a byte offset, without assuming alignment.
+    func readFloat32(at offset: Int) -> Float {
+        Float(bitPattern: readUInt32(at: offset))
     }
 
     func readUInt16(at offset: Int) -> UInt16 {

@@ -70,6 +70,45 @@ public enum SecondaryStructure: Int, CaseIterable, Sendable, Codable {
 }
 
 /// What the heads produced for one sequence.
+/// Membrane topology, in the order the head emits.
+///
+/// Three classes, and intramembrane regions are deliberately not one of them:
+/// they were masked out of the training loss rather than folded into either
+/// neighbour, because a re-entrant loop dips into the bilayer without crossing
+/// it and calling it either way teaches the head something false about where a
+/// span ends.
+public enum TopologyClass: Int, CaseIterable, Sendable, Codable {
+    case outside = 0
+    case transmembrane = 1
+    case signalPeptide = 2
+
+    public var name: String {
+        switch self {
+        case .outside: "Outside"
+        case .transmembrane: "Transmembrane"
+        case .signalPeptide: "Signal peptide"
+        }
+    }
+
+    public var code: String {
+        switch self {
+        case .outside: "o"
+        case .transmembrane: "M"
+        case .signalPeptide: "S"
+        }
+    }
+}
+
+/// A contiguous run of one topology class.
+public struct TopologySpan: Sendable, Hashable, Identifiable {
+    public let kind: TopologyClass
+    /// Zero-based residue indices, inclusive.
+    public let range: ClosedRange<Int>
+
+    public var id: String { "\(kind.rawValue)-\(range.lowerBound)" }
+    public var length: Int { range.count }
+}
+
 public struct HeadPredictions: Sendable {
     /// Per-residue eight-state secondary structure.
     public let secondaryStructure: [SecondaryStructure]
@@ -77,10 +116,57 @@ public struct HeadPredictions: Sendable {
     public let disorderProbability: [Double]
     /// The decision threshold the disorder head was calibrated with.
     public let disorderThreshold: Double
+    /// Per-residue membrane topology, absent when the head is not bundled.
+    ///
+    /// Optional rather than defaulted to `.outside` everywhere: "no prediction"
+    /// and "predicted soluble" are different claims, and the Boundary tab treats
+    /// them differently. A construct solver that cannot see TM spans must refuse
+    /// to enforce the constraint rather than assume there is nothing to enforce.
+    public let topology: [TopologyClass]?
+
+    public init(
+        secondaryStructure: [SecondaryStructure],
+        disorderProbability: [Double],
+        disorderThreshold: Double,
+        topology: [TopologyClass]? = nil
+    ) {
+        self.secondaryStructure = secondaryStructure
+        self.disorderProbability = disorderProbability
+        self.disorderThreshold = disorderThreshold
+        self.topology = topology
+    }
 
     /// Residues called disordered at the calibrated threshold.
     public var isDisordered: [Bool] {
         disorderProbability.map { $0 > disorderThreshold }
+    }
+
+    /// Contiguous runs of transmembrane and signal-peptide residues.
+    ///
+    /// Runs shorter than `minimumSpan` are dropped. A membrane-spanning helix
+    /// crosses about 30 A of bilayer, which takes roughly 20 residues of helix,
+    /// so a three-residue "span" is noise. Dropping it matters because the
+    /// Boundary tab turns every span into a hard constraint, and a spurious one
+    /// forbids a cut site that is actually fine.
+    public func topologySpans(minimumSpan: Int = 8) -> [TopologySpan] {
+        guard let topology else { return [] }
+        var spans: [TopologySpan] = []
+        var index = 0
+        while index < topology.count {
+            let kind = topology[index]
+            var end = index
+            while end + 1 < topology.count, topology[end + 1] == kind { end += 1 }
+            if kind != .outside, end - index + 1 >= minimumSpan {
+                spans.append(TopologySpan(kind: kind, range: index...end))
+            }
+            index = end + 1
+        }
+        return spans
+    }
+
+    /// How many membrane-spanning segments were predicted.
+    public func transmembraneSpanCount(minimumSpan: Int = 8) -> Int {
+        topologySpans(minimumSpan: minimumSpan).count { $0.kind == .transmembrane }
     }
 }
 
@@ -129,6 +215,8 @@ public actor AnalysisHeads {
     private var disorderModel: MLModel?
     private var familyModel: MLModel?
     private let familyURL: URL
+    private var topologyModel: MLModel?
+    private let topologyURL: URL
     private let familyLabels: [String]?
     private let familyTemperature: Double
     private let familyTop1: Double
@@ -146,6 +234,7 @@ public actor AnalysisHeads {
         self.secondaryStructureURL = directory.appending(path: "secondary_structure.mlpackage")
         self.disorderURL = directory.appending(path: "disorder.mlpackage")
         self.familyURL = directory.appending(path: "family.mlpackage")
+        self.topologyURL = directory.appending(path: "topology.mlpackage")
 
         // The family classifier is optional: the Order tab works without it, so
         // a missing one degrades rather than blocking.
@@ -205,6 +294,19 @@ public actor AnalysisHeads {
         return loaded
     }
 
+    /// The topology head, or `nil` when it is not bundled.
+    ///
+    /// Unlike the other three this one is OPTIONAL, because it arrived after
+    /// them and a bundle without it must still produce secondary structure and
+    /// disorder rather than failing wholesale.
+    private func topologyHead() async -> MLModel? {
+        if let topologyModel { return topologyModel }
+        guard FileManager.default.fileExists(atPath: topologyURL.path) else { return nil }
+        guard let loaded = try? await load(url: topologyURL) else { return nil }
+        topologyModel = loaded
+        return loaded
+    }
+
     /// Force the synchronous prediction overload.
     ///
     /// In an async context Swift prefers `prediction(from:) async`, which wants
@@ -251,12 +353,14 @@ public actor AnalysisHeads {
         guard residueCount > 0 else {
             return HeadPredictions(
                 secondaryStructure: [], disorderProbability: [],
-                disorderThreshold: configuration.disorderThreshold)
+                disorderThreshold: configuration.disorderThreshold, topology: nil)
         }
 
         let window = Self.headWindow
         var structureLogits: [[Double]] = []
         var disorderLogits: [[Double]] = []
+        var topologyLogits: [[Double]] = []
+        let topology = await topologyHead()
         structureLogits.reserveCapacity(residueCount)
         disorderLogits.reserveCapacity(residueCount)
 
@@ -272,6 +376,10 @@ public actor AnalysisHeads {
                 contentsOf: try run(structureModel, on: slice, classes: 8, window: window))
             disorderLogits.append(
                 contentsOf: try run(disorder, on: slice, classes: 2, window: window))
+            if let topology {
+                topologyLogits.append(
+                    contentsOf: try run(topology, on: slice, classes: 3, window: window))
+            }
             start = end
         }
 
@@ -293,10 +401,19 @@ public actor AnalysisHeads {
             return total > 0 ? exponentials[0] / total : 0
         }
 
+        let topologyCalls: [TopologyClass]? =
+            topologyLogits.count == residueCount
+            ? topologyLogits.map { logits in
+                let best = logits.enumerated().max { $0.element < $1.element }?.offset ?? 0
+                return TopologyClass(rawValue: best) ?? .outside
+            }
+            : nil
+
         return HeadPredictions(
             secondaryStructure: structure,
             disorderProbability: disorderProbability,
-            disorderThreshold: configuration.disorderThreshold)
+            disorderThreshold: configuration.disorderThreshold,
+            topology: topologyCalls)
     }
 
     private func run(
@@ -425,10 +542,39 @@ extension HeadPredictions {
             colourScheme: .solid)
     }
 
+    /// Membrane topology as spans on the shared ruler.
+    ///
+    /// Spans rather than a per-residue categorical track, because what a reader
+    /// needs from this is "there are seven of them, here" rather than the class
+    /// of residue 212. Returns `nil` when the head is absent, so the ruler shows
+    /// no row at all rather than a row of "outside" that looks like a
+    /// prediction.
+    public func topologyTrack(minimumSpan: Int = 8) -> AnyResidueTrack? {
+        guard topology != nil else { return nil }
+        let spans = topologySpans(minimumSpan: minimumSpan)
+        guard !spans.isEmpty else { return nil }
+        let transmembrane = spans.count { $0.kind == .transmembrane }
+        return AnyResidueTrack(
+            id: TrackID("topology"),
+            title: transmembrane > 0
+                ? "Predicted topology: \(transmembrane) transmembrane "
+                    + (transmembrane == 1 ? "span" : "spans")
+                : "Predicted topology",
+            kind: .span,
+            values: .spans(
+                spans.map {
+                    TrackSpan(
+                        start: $0.range.lowerBound, end: $0.range.upperBound,
+                        label: $0.kind.name.lowercased())
+                }),
+            colourScheme: .categorical)
+    }
+
     /// Every model-derived track, in display order.
     public func tracks() -> [AnyResidueTrack] {
         var result = [secondaryStructureTrack(), disorderTrack()]
         if let spans = disorderSpansTrack() { result.append(spans) }
+        if let topology = topologyTrack() { result.append(topology) }
         return result
     }
 }

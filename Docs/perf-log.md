@@ -258,3 +258,87 @@ every call rather than scored around.
 Spot checks where the trained set does contain the family, all correct:
 CDK2 to PF00069 (protein kinase), beta-2 adrenergic receptor to PF00001 (7TM
 rhodopsin family), PETase to PF00561 (alpha/beta hydrolase).
+
+
+## Phase 5 (part 4): homolog index and SIFTS (2026-08-25)
+
+### The index
+
+| | |
+|---|---|
+| Entries | **72,421** (one per UniProt accession in the PDB) |
+| Dimensions | 480 |
+| Storage | int8, L2-normalised, whitened |
+| Embedding time | 110.6 min on an M1 Max, 74,287 tiles |
+| Packed size | 34.8 MB vectors, 31.3 MB metadata, 43.3 MB SIFTS = **109.3 MB** |
+| **Search latency** | **5.4 ms per query**, release build, exhaustive |
+| Budget | 100 ms for a 100 k index |
+
+Exhaustive, not approximate. One query is a 34.8 M multiply-and-add and lands 18
+times inside the budget, so an ANN structure would buy latency that is not
+needed and pay for it in recall that is silently imperfect.
+
+### Whitening, which the index would have been broken without
+
+Pooled language-model embeddings are anisotropic: they occupy a narrow cone.
+Measured on the raw index, two proteins picked at random score a cosine of
+**0.848**, and the 99.9th percentile of random pairs is **0.980**, while real
+homologues score 0.97 to 0.99. Everything useful lives in a sliver of the range,
+and int8 quantisation of that sliver destroyed a quarter of it.
+
+| | recall@1 | recall@10 | null mean | null 99.9th |
+|---|---|---|---|---|
+| raw | 0.568 | **0.748** | 0.848 | 0.980 |
+| centred | 0.855 | 0.944 | 0.001 | 0.819 |
+| centred, 2 PCs removed | 0.875 | 0.963 | 0.000 | 0.659 |
+| **centred, 4 PCs removed** | **0.892** | **0.966** | **0.000** | **0.641** |
+| centred, 8 PCs removed | 0.890 | 0.962 | 0.001 | 0.602 |
+
+Recall is against exhaustive float search on the same vectors, so it measures
+purely what quantisation costs. Four principal directions is where it stops
+improving. The transform is stored in the vector file and applied to every
+query, because an unwhitened query against a whitened index does not error, it
+just ranks badly.
+
+The similarity floor is the measured 99.9th percentile of unrelated pairs,
+**0.641**, and it travels in the file rather than being a number chosen by eye.
+Before whitening the equivalent figure was 0.980, so any round number picked by
+eye would have admitted the whole index.
+
+### Core ML against PyTorch, end to end
+
+The index is embedded in PyTorch at fp32 and queried by the app in Core ML at
+fp16 on the Neural Engine. Two implementations of one function.
+
+| | |
+|---|---|
+| Pooled cosine, raw | 0.999996 |
+| Pooled cosine, whitened | 0.999984 |
+| Top-20 agreement | **1.00** |
+| Spearman over all 72,421 entries | 0.999989 |
+| Largest score difference at shared hits | 0.0005 |
+
+The first run of this check reported top-5 agreement of 0.80 and told me to
+investigate before shipping. It was right to, and the fault was in the check:
+it whitened the index and not the query. That is precisely the mismatch the
+stage exists to catch, so it caught itself.
+
+### Neighbours, for judgement rather than metrics
+
+A recall figure only says the quantised search agrees with the float search;
+both could agree on nonsense.
+
+| Query | Nearest neighbours |
+|---|---|
+| CDK2 (P24941) | CDK1, PfPK5, CDK6, CDK4: all CMGC kinases |
+| Beta-2 adrenergic receptor (P07550) | H2R, 5-HT2C, 5-HT1F, orexin-2, V1a: all class A GPCRs |
+| PETase (A0A0K8P6T7) | cutinases RgCutII, AdCut, and PETase mutants |
+| Lysozyme C (P00698) | quail, turkey and pheasant lysozymes |
+
+**Ubiquitin is the exception and the reason it is worth listing them.** Its
+nearest neighbours are repeat proteins and designed dimers, not ubiquitin-like
+folds, because the index unit is the UniProt entry and P0CG48 is
+polyubiquitin-C: a 685-residue polyprotein of nine tandem repeats. The vector is
+of the polyprotein, so it lands near other repetitive proteins. That is the
+documented limitation of a per-accession index behaving exactly as described,
+found by looking at the answers rather than at a score.

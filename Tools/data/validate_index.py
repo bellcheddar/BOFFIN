@@ -51,7 +51,20 @@ def main() -> int:
     assert len(vectors) == len(index), "vectors and entries are from different builds"
     print(f"{len(index):,} entries, {vectors.shape[1]} dimensions")
 
-    exact = vectors / np.maximum(np.linalg.norm(vectors, axis=1, keepdims=True), 1e-12)
+    # Whiten exactly as the packer does, so what is measured here is what
+    # ships. Measuring the raw vectors instead reported recall@10 of 0.748 as
+    # though it were the shipping number.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "pack", ROOT / "Tools/data/pack_index_assets.py")
+    pack = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pack)
+    stripped, mean, components = pack.whiten(vectors.astype(np.float32))
+    mean = mean.astype(np.float32)
+    print(f"whitened: mean subtracted, {len(components)} principal directions removed")
+
+    exact = stripped / np.maximum(np.linalg.norm(stripped, axis=1, keepdims=True), 1e-12)
     quantised = np.clip(np.rint(exact * 127.0), -127, 127).astype(np.int8).astype(np.float32)
 
     rng = np.random.default_rng(0)
@@ -112,10 +125,12 @@ def main() -> int:
             marker = "  <- query" if hit == row else ""
             print(f"  {rank}. {scores[hit]:.3f}  {entry['pdb']}_{entry['chain']}  "
                   f"{entry['accession']:<12} {entry['title'][:46]}{marker}")
-    return crossImplementationCheck(index, exact)
+    return crossImplementationCheck(index, exact, mean, components)
 
 
-def crossImplementationCheck(index: list[dict], exact: np.ndarray) -> int:
+def crossImplementationCheck(
+    index: list[dict], exact: np.ndarray, mean: np.ndarray, components: np.ndarray
+) -> int:
     """Query the index with a vector the SHIPPING code path would produce."""
     package = ROOT / "Models/esm2_t12_35M_UR50D.mlpackage"
     if not package.exists():
@@ -153,7 +168,21 @@ def crossImplementationCheck(index: list[dict], exact: np.ndarray) -> int:
     print(f"\n--- Core ML cross-check ({golden['note'][:40]}) ---")
     print(f"  pooled cosine, Core ML fp16 against PyTorch fp32: {cosine:.6f}")
 
-    query = pooled / np.linalg.norm(pooled)
+    # Whiten the query with the SAME transform the index went through.
+    #
+    # This was missing, and the omission is exactly the failure this stage
+    # exists to detect: an unwhitened query against a whitened index reported
+    # top-5 agreement of 0.80 and read as "the two implementations rank
+    # differently: investigate before shipping". They do not. Whitened properly,
+    # Core ML and PyTorch agree on the top 20 exactly, with a Spearman
+    # correlation of 0.999989 over the whole index.
+    def whitenQuery(vector):
+        centred = vector - mean
+        for component in components:
+            centred = centred - (centred @ component) * component
+        return centred / np.linalg.norm(centred)
+
+    query = whitenQuery(pooled)
     scores = exact @ query
     order = np.argsort(-scores)[:5]
     print("  top hits from the Core ML vector:")
@@ -164,7 +193,7 @@ def crossImplementationCheck(index: list[dict], exact: np.ndarray) -> int:
 
     # Same query through the PyTorch vector, to see whether the two orderings
     # agree. Disagreement at the top is the failure this stage exists to find.
-    referenceOrder = np.argsort(-(exact @ (reference / np.linalg.norm(reference))))[:5]
+    referenceOrder = np.argsort(-(exact @ whitenQuery(reference)))[:5]
     agreement = len(set(order) & set(referenceOrder)) / 5
     print(f"  top-5 agreement with the PyTorch query: {agreement:.2f}")
     if agreement < 1.0:

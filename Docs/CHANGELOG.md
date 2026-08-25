@@ -381,3 +381,66 @@ The simulator job was failing for a related reason: tapping "Fast preview"
 without a model returned silently, so the UI test saw no heatmap and no
 explanation. The app now says why, and the test accepts either the heatmap or
 the explanation while insisting on exactly one of them.
+
+
+## Phase 5 (part 5): the index was quietly broken, and whitening fixed it (2026-08-25)
+
+The index built and searched and returned neighbours that looked right. It was
+losing a quarter of them.
+
+Pooled language-model embeddings are ANISOTROPIC: they occupy a narrow cone
+rather than the sphere. Measured over 200,000 random pairs of this index, two
+proteins with nothing in common score a cosine of **0.848 on average**, and the
+99.9th percentile of random pairs is **0.980**. Real homologues score 0.97 to
+0.99. Everything that distinguishes a hit from a stranger lives in the last two
+percent of the range.
+
+That is the range int8 quantisation cannot hold. Measured against exhaustive
+float search on the same vectors, storing the raw normalised index as int8 gave
+**recall@10 of 0.748**: a quarter of the true nearest neighbours simply absent,
+with no error and no symptom, because the ones that survive are still mostly the
+right family.
+
+The fix is the standard anisotropy correction (Mu and Viswanath, "All-but-the-
+top", ICLR 2018): subtract the mean, then project out the dominant principal
+directions. Four of them, chosen where the measured recall stops improving:
+
+| | recall@1 | recall@10 | null mean | null 99.9th |
+|---|---|---|---|---|
+| raw | 0.568 | 0.748 | 0.848 | 0.980 |
+| centred | 0.855 | 0.944 | 0.001 | 0.819 |
+| centred, 4 PCs removed | **0.892** | **0.966** | 0.000 | **0.641** |
+
+It also makes the number on screen mean something. A displayed similarity of
+0.98 was, before this, roughly the 99.9th percentile of random pairs.
+
+**The similarity floor is now measured rather than chosen.** It is the 99.9th
+percentile of unrelated pairs, 0.641, computed when the index is packed and
+stored in the file. The previous default was 0.5, picked because it sounded
+like a sensible half-way point, and against the raw index it would have admitted
+every entry in the PDB for any query at all.
+
+Search is 5.4 ms per query over 72,421 entries in a release build, eighteen
+times inside the 100 ms budget.
+
+**The Core ML cross-check caught itself.** The index is embedded in PyTorch at
+fp32 and queried by the app in Core ML at fp16, and the last validation stage
+exists to prove those two agree. On the whitened index it reported top-5
+agreement of 0.80 and printed "the two implementations rank differently:
+investigate before shipping". The implementations agree to a Spearman of
+0.999989 and on the top 20 exactly. What disagreed was the check: it whitened
+the index and not the query, which is the exact mismatch it was written to
+detect.
+
+### iPad had been failing, for two reasons that were both about the test
+
+`app.tabBars` finds nothing on iPadOS 26, because a SwiftUI `TabView` renders
+its tabs as a top-anchored strip rather than a UIKit tab bar. Asserting on the
+container was asserting on a presentation choice the app never makes.
+
+`app.buttons["Order"].isHittable` then failed too, and not because anything was
+wrong: each tab is published as a Button CONTAINING an identical Button, so the
+outer one is covered by the inner and reports itself unhittable. Every tab
+interaction in the suite now goes through one helper that takes `.firstMatch`
+and asserts on the destination arriving. Seven UI tests pass on both iPhone 17
+Pro and iPad Pro 13-inch.

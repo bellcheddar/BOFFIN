@@ -15,7 +15,7 @@ final class FamilyTabUITests: XCTestCase {
         XCTAssertTrue(
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 
-        app.tabBars.buttons["Family"].tap()
+        app.openTab("Family")
         // Ubiquitin is neither a kinase nor a GPCR. Saying so is the correct
         // answer; inventing a family would be worse than useless.
         XCTAssertTrue(
@@ -47,7 +47,7 @@ final class FamilyTabUITests: XCTestCase {
         let header = app.staticTexts["298 residues \u{00B7} UniProt P24941"]
         XCTAssertTrue(header.waitForExistence(timeout: 20), "sequence header did not appear")
 
-        app.tabBars.buttons["Family"].tap()
+        app.openTab("Family")
 
         // Motifs first: these need no model and no downloaded asset.
         XCTAssertTrue(

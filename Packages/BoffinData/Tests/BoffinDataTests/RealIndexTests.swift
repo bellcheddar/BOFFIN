@@ -25,6 +25,7 @@ private let assetDirectory = URL(fileURLWithPath: #filePath)
     .deletingLastPathComponent()  // Tests
     .deletingLastPathComponent()  // BoffinData
     .deletingLastPathComponent()  // Packages
+    .deletingLastPathComponent()  // the repository root
     .appending(path: "Assets")
 
 private var assetsAreAvailable: Bool {
@@ -84,7 +85,10 @@ struct RealIndexTests {
             try storedVector(at: 1000, index: index), limit: 3, minimumSimilarity: 0)
         let expected = try storedAccession(at: 1000, index: index)
         #expect(hits.first?.accession == expected)
-        #expect((hits.first?.similarity ?? 0) > 0.999)
+        // Not exactly 1: the reconstructed query is built from the QUANTISED
+        // row, so the comparison carries the quantisation error twice, plus the
+        // residue of projecting an already-projected vector. 0.994 measured.
+        #expect((hits.first?.similarity ?? 0) > 0.99)
     }
 
     @Test("Hits come back in descending similarity")
@@ -108,20 +112,34 @@ struct RealIndexTests {
 
         // Debug builds are several times slower than the shipping one, so this
         // is a generous ceiling that still catches an accidental O(n^2). The
-        // number quoted in Docs/perf-log.md is measured in release.
+        // number quoted in Docs/perf-log.md is measured in release, with
+        // `swift test -c release --filter "budget"`.
+        print("SEARCH LATENCY: \(index.count) entries, \(each) per query")
         #expect(each < .milliseconds(500), "search took \(each)")
     }
 
     // MARK: - Helpers
 
-    /// Reconstruct a stored row as a float query.
+    /// Reconstruct a stored row as a query in PRE-WHITENING space.
+    ///
+    /// The stored rows are already whitened and `search` whitens what it is
+    /// given, so handing a stored row straight back would apply the transform
+    /// twice. Adding the mean inverts it: the row is orthogonal to the removed
+    /// components by construction, so projecting it again changes nothing.
     private func storedVector(at row: Int, index: HomologIndex) throws -> [Float] {
         let data = try Data(
             contentsOf: assetDirectory.appending(path: "homolog_vectors.bin"),
             options: .mappedIfSafe)
-        let offset = 24 + row * index.dimension
+        let componentCount = Int(data.readUInt32(at: 20))
+        let header = 28 + (1 + componentCount) * index.dimension * 4
+        let offset = header + row * index.dimension
         return (0..<index.dimension).map {
+            // The mean is added UNSCALED. Whitening subtracts it as it stands,
+            // so `stored + mean` centres back to `stored` exactly; scaling it to
+            // match the int8 range instead leaves a residue of 126 times the
+            // mean in the query, which is most of the vector.
             Float(Int8(bitPattern: data[data.startIndex + offset + $0]))
+                + (index.mean.indices.contains($0) ? index.mean[$0] : 0)
         }
     }
 

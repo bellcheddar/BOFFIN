@@ -1056,3 +1056,38 @@ to declare one.** That is on the To Do rather than in a commit message claiming
 otherwise.
 
 12 UI tests on iPhone and iPad, 10 BoffinViewer tests.
+
+
+## Phase 9: the 3D overlay, built and removed (2026-08-25)
+
+The interaction overlay was implemented against Mol\*'s measurement manager,
+with each contact's endpoints named in PyMOL syntax rather than by atom index.
+The reasoning still holds: BOFFIN's atom indices are rows in `_atom_site` and
+Mol\*'s element indices are its own business, so agreeing about them would be a
+second source of truth for numbering that works right up until a structure with
+altlocs or several models. `chain A and resi 145 and name OD1` means the same
+thing on both sides.
+
+**It draws nothing.** `StructureSelectionFromScript` with `language: 'pymol'`
+returns an empty selection in the viewer UMD build: the state cell SUCCEEDS,
+carries no error text, and selects zero atoms. A caller reading only `cell.obj`
+cannot distinguish a language the build cannot parse from a structure that has no
+such atom, which is why the first diagnostic reported "selected nothing" for all
+forty lines and looked like a data problem.
+
+The command reported **0 of 40**, which is the only reason this is a paragraph
+rather than a shipped feature. The counter exists precisely because an overlay
+that draws nothing looks identical to one that had nothing to draw, and it earned
+its keep on its first run.
+
+**Removed rather than shipped.** The command, the Swift wrapper, the button and
+the test are all gone. What remains is this note and a To Do entry saying what
+was learned: endpoint resolution needs a different strategy, and whatever
+replaces it needs an explicit test that BOFFIN's atom index and Mol\*'s element
+index agree, rather than an assumption that they do.
+
+This is the second time in this phase that something was written and deleted
+before committing. The first drafted a shape list and did nothing with it. Both
+would have been features that appear to work.
+
+12 UI tests, 10 BoffinViewer tests.

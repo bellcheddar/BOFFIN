@@ -17,6 +17,14 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ### Mol* API findings
 
+- **`StructureSelectionFromScript` with `language: 'pymol'` returns an EMPTY
+  selection in the viewer UMD build.** The state cell succeeds, carries no
+  error, and selects zero atoms, so a caller reading only `cell.obj` cannot tell
+  a language the build cannot parse from a structure with no such atom. The 3D
+  interaction overlay was built on it, measured 0 of 40 lines drawn, and was
+  removed rather than shipped. Endpoint resolution needs a different strategy,
+  with an explicit test that BOFFIN's atom index and Mol*'s element index agree.
+
 - **The viewer UMD build exports THIRTEEN names.** `Shape`, `StateTransforms`,
   `Symmetry`, `OrderedSet` are not among them: they live under `molstar.lib`.
   Code written against the top-level names does not throw, it evaluates to

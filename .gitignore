@@ -55,5 +55,6 @@ Datasets/*.json
 # packed assets, all reproducible from Tools/data/build_pdb_index.py; provenance
 # and the exact commands are in Datasets/pdb/MANIFEST.md.
 Datasets/pdb/*
+Datasets/codon/*.fna
 !Datasets/pdb/MANIFEST.md
 Assets/

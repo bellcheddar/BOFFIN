@@ -87,6 +87,8 @@ public struct ConstructCard: Sendable {
     public let precedentCount: Int
     /// Regions the solver was enforcing when it chose these boundaries.
     public let constraints: [ConstructConstraint]
+    /// The insert, when DNA was asked for.
+    public let dna: ReverseTranslation?
 
     public init(
         proteinName: String,
@@ -98,7 +100,8 @@ public struct ConstructCard: Sendable {
         properties: SequenceProperties,
         pKaScale: PKaScale,
         precedentCount: Int,
-        constraints: [ConstructConstraint]
+        constraints: [ConstructConstraint],
+        dna: ReverseTranslation? = nil
     ) {
         self.proteinName = proteinName
         self.range = range
@@ -110,6 +113,7 @@ public struct ConstructCard: Sendable {
         self.pKaScale = pKaScale
         self.precedentCount = precedentCount
         self.constraints = constraints
+        self.dna = dna
     }
 
     public var letters: String { String(residues.map(\.code)) }
@@ -199,6 +203,32 @@ public struct ConstructCard: Sendable {
                     + "from every figure above.")
         }
         lines.append("")
+
+        if let dna {
+            lines.append("Insert DNA, \(dna.dna.count) bases")
+            lines.append(String(repeating: "-", count: 22))
+            lines.append(String(format: "  GC content %.1f%%", dna.gcFraction * 100))
+            lines.append("  " + dna.provenance)
+            if !dna.substitutions.isEmpty {
+                lines.append(
+                    "  \(dna.substitutions.count) codons are not the most frequent "
+                        + "choice, to avoid a repeat or a cloning site:")
+                for change in dna.substitutions.prefix(8) {
+                    lines.append("    residue \(change.residue + 1): \(change.reason)")
+                }
+                if dna.substitutions.count > 8 {
+                    lines.append(
+                        "    and \(dna.substitutions.count - 8) more")
+                }
+            }
+            for site in dna.remainingSites {
+                lines.append(
+                    "  WARNING: a \(site.site.enzyme) site (\(site.site.site)) remains "
+                        + "at base \(site.position + 1) and could not be designed out.")
+            }
+            for chunk in dna.dna.chunked(60) { lines.append("  " + chunk) }
+            lines.append("")
+        }
 
         lines.append(">\(fastaHeader)")
         for chunk in letters.chunked(60) { lines.append(chunk) }

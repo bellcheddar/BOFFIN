@@ -601,3 +601,44 @@ excluded is the part most worth carrying with a construct that gets forwarded.
 148 BoffinCore tests, 8 UI tests. Still outstanding: primer-ready DNA, which
 needs a codon usage table fetched and checksummed rather than transcribed, and
 disulfide pairing, which needs the structure viewer.
+
+
+## Phase 6 (part 3): primer-ready DNA (2026-08-25)
+
+### The table is computed, not copied
+
+The obvious source for codon usage is a published table, and the obvious one of
+those is Kazusa. Its entry for *Escherichia coli* K-12 (species 83333) is built
+on **14 CDS and 5,122 codons**. That is a fine sample of fourteen genes and a
+poor description of the organism, and it is exactly the artefact that acquires
+authority by being quoted: an official name, a citable URL, and no visible N.
+
+`Tools/data/generate_codon_table.py` counts every codon in every annotated
+coding sequence of the reference genome instead: **4,317 sequences and 1,342,016
+codons**, 262 times the data, from a download and forty lines. One CDS was
+skipped for a length that is not a multiple of three, meaning it is annotated
+across a frameshift; counting it would slide every codon after the break by one.
+
+### Codon choice is the easy part
+
+Picking the most frequent codon per residue is three lines and produces a
+sequence that is difficult to synthesise and awkward to clone. Twelve lysines
+becomes thirty-six consecutive adenines. So the generator avoids what it can see
+itself creating: homopolymer runs over five bases, internal sites for eleven
+common cloning enzymes, and rare codons where a common alternative exists. Every
+substitution is recorded, because a silent deviation from "codon optimised" is
+what gets noticed at sequencing.
+
+**One residue of lookahead, which a failing test taught.** A legal codon can
+leave the NEXT residue with none. `ATG` then `CAT` is fine, and the methionine
+that follows has only `ATG`, which completes the NdeI site `CATATG` and cannot be
+designed around after the fact. Rejecting a codon that strands its successor
+costs nothing and removes the whole class; without it, a histidine-methionine
+run left an NdeI site in the insert.
+
+The output does not claim to optimise expression. Codon adaptation is a
+contested subject and this is a frequency table with three avoidance rules, so
+the provenance line says exactly that.
+
+160 BoffinCore tests and 8 UI tests. Phase 6's remaining gap is disulfide
+pairing, which cannot be read off a sequence and needs the structure viewer.

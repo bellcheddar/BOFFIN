@@ -123,4 +123,25 @@ struct ConstructCardTests {
         #expect("ABCDEFG".chunked(3) == ["ABC", "DEF", "G"])
         #expect("ABC".chunked(0) == ["ABC"])
     }
+
+    @Test("The DNA and everything worked around for it appear on the card")
+    func dnaSection() {
+        let acids = residues("MHMHMHMHMHKKKKKKKKKKKK")
+        let dna = ReverseTranslator.translate(acids)
+        let withDNA = ConstructCard(
+            proteinName: "test", range: 1...22, residues: acids,
+            rationale: [], tagPlan: nil, linker: nil,
+            properties: SequenceProperties(
+                residues: acids.enumerated().map {
+                    Residue(index: $0.offset, identity: .canonical($0.element))
+                }, pKaScale: .bjellqvist),
+            pKaScale: .bjellqvist, precedentCount: 0, constraints: [], dna: dna)
+        let text = withDNA.text()
+        #expect(text.contains("Insert DNA"))
+        #expect(text.contains("GC content"))
+        #expect(text.contains("U00096.3"))
+        // The lysine run forces codon substitutions, and the card must say so
+        // rather than presenting the result as straightforwardly optimal.
+        #expect(text.contains("not the most frequent choice"))
+    }
 }

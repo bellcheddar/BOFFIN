@@ -324,7 +324,8 @@ final class SequenceStore {
                     residues: Array(sequence.residues[best.range]), pKaScale: pKaScale),
                 pKaScale: pKaScale,
                 precedentCount: best.precedentCount,
-                constraints: constructConstraints)
+                constraints: constructConstraints,
+                dna: ReverseTranslator.translate(residues))
         }
     }
 

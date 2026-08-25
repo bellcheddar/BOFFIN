@@ -11,8 +11,8 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3, 5 and 6 complete bar disulfides; **7 in progress** (Mol\* vendored, BinaryCIF parsed, bridge and track painting done)
-- **Last completed:** Phase 7's viewer bridge and track painting on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 3, 5, 6 and 7 substantially complete; **8 in progress** (selection language parses and evaluates; builder, scenes and `.pml` outstanding)
+- **Last completed:** Phase 8's selection language on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
 ### Phase 7 findings

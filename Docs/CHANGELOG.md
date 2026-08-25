@@ -775,3 +775,48 @@ command name has a handler is the only reason this surfaced at all, which is a
 better argument for that test than the one it was written for.
 
 10 UI tests, 10 BoffinViewer tests.
+
+
+## Phase 8 (part): the selection language (2026-08-25)
+
+A PyMOL-like selection language: tokeniser, recursive-descent parser, and an
+evaluator over `AtomStore`.
+
+**A real parser, not keyword matching.** The temptation is to look for keywords
+and split on spaces, and it survives exactly as long as nobody writes a nested
+expression. The build plan's acceptance case is
+`byres (polymer within 5 of organic)`, which has an operator taking a whole
+sub-expression as its right operand, inside a call taking one as its only
+argument. `or` binds loosest, as in PyMOL, so `a and b or c` is `(a and b) or c`
+and a test pins it.
+
+**Selecting the wrong atoms is worse than failing to select.** A selection is
+used to colour, measure and cut, so an over-broad one produces a figure that is
+wrong in a way nobody can see. An unknown keyword is an error naming the keyword,
+never an empty set and never everything.
+
+`50-120` is deliberately one token. Splitting on the minus in the lexer would
+make a range indistinguishable from a subtraction nobody wrote, and would break
+the negative residue numbers the PDB uses for expression tags.
+
+**`within` uses a uniform grid**, and the test that matters is that it agrees
+with brute force on the kinase fixture rather than that it is fast. Naively it is
+every candidate against every target, which on the ribosome is 127,000 times a
+few thousand.
+
+### Accepted
+
+`byres (polymer within 5 of organic)` on 1HCK, CDK2 with ATP bound, returns a
+pocket of between ten and forty residues that includes the hinge (Glu81 to Leu83)
+and the glycine-rich loop, contains no heteroatoms, and in which every selected
+residue is confirmed to have an atom within 5 A of the ligand. Those are
+structural facts about CDK2 rather than the evaluator's own output.
+
+### One bug, on the most ordinary input imaginable
+
+`resi 50` lexes the number as a `Double`, and the range parser rendered it back
+out as "50.0", which is not an integer: `badNumber("50.0")` on a selection anyone
+would type first. Tokens now carry the characters as written alongside the parsed
+value.
+
+33 BoffinStructure tests.

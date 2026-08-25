@@ -1792,3 +1792,41 @@ is what says the bootstrap is measuring the shipped head.
 The roadmap item changes from "improve on novel folds" to "improve on CB513",
 and the on-screen wording no longer generalises from 21 proteins to a class of
 sequence.
+
+---
+
+## Solvent accessibility as an auxiliary task: measured, and it does not help (2026-08-25)
+
+The roadmap listed three candidates for the disorder head's deficit: RSA as an
+auxiliary task, more capacity, and PDB-derived negatives. This measures the
+first, on CB513, which the chain bootstrap established is the only benchmark
+large enough to see a change.
+
+Both arms used the shipped trunk unchanged, the same seed, bit-identical
+initialisation, the same batches in the same order, and thresholds tuned on the
+same 1,085 validation chains and applied blind. 9,762 training chains, 6 epochs,
+the only difference being the auxiliary loss.
+
+**The control reproduces the shipped head**: CB513 0.426 against the recorded
+0.430, TS115 0.643 against 0.628, CASP12 0.515 against 0.501, and it
+independently tuned to a threshold of 0.90, the shipped value. Without that,
+none of the rest would be worth reading.
+
+| Benchmark | Baseline | With RSA | Paired 95% | Verdict |
+|---|---|---|---|---|
+| CB513 | 0.426 | 0.428 | [-0.007, +0.013] | No effect |
+| TS115 | 0.643 | 0.641 | [-0.012, +0.008] | No effect |
+| CASP12 | 0.515 | 0.517 | [-0.025, +0.028] | No effect |
+
+**The tightness is the result.** On CB513 the effect is bounded within ±0.013
+MCC. That is not "we could not detect an effect", which is what an underpowered
+test says. It is "the effect is smaller than 0.013", against a deficit of 0.076,
+which rules the hypothesis out at any size worth shipping a second head for.
+
+An avenue closed cheaply, on labels already on disk, with a benchmark that could
+have confirmed a fix. The other two candidates remain.
+
+Offered as hypothesis rather than finding: the embedding is frozen, so the
+auxiliary task can only reshape a 128-wide trunk sitting on representations it
+cannot alter. NetSurfP trains its backbone, and an auxiliary signal that cannot
+reach the representation has much less to give.

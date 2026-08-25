@@ -621,3 +621,58 @@ generalises to, because the data does not support the generalisation.
 
 None of this makes the head better. It says which number to chase, and stops
 the app asserting something 21 proteins cannot support.
+
+## Solvent accessibility as an auxiliary task: no effect (2026-08-25)
+
+### The hypothesis
+
+NetSurfP predicts relative solvent accessibility jointly with everything else,
+and RSA and disorder are arguably the same physical fact seen twice: a residue
+nobody can see in a crystal is usually one with nothing packed against it. A
+shared trunk should give the rare binary disorder label a denser training
+signal. The RSA labels were already in the cached embeddings.
+
+### The control
+
+Both arms use the shipped `ConvHead` trunk unchanged, the same seed, bit
+identical initialisation, the same batches in the same order, the same class
+weight, and thresholds tuned on the same 1,085 validation chains and applied
+blind. 9,762 training chains, 6 epochs. The only difference is the auxiliary
+loss.
+
+**The control arm reproduces the shipped head**, which is what makes the rest of
+this worth reading: CB513 0.426 against the recorded 0.430, TS115 0.643 against
+0.628, CASP12 0.515 against 0.501, and it independently tuned to a threshold of
+0.90, which is the shipped value.
+
+### Result
+
+| Benchmark | Baseline | With RSA | Paired 95% interval | Verdict |
+|---|---|---|---|---|
+| CB513 | 0.426 | 0.428 | [-0.007, +0.013] | No effect |
+| TS115 | 0.643 | 0.641 | [-0.012, +0.008] | No effect |
+| CASP12 | 0.515 | 0.517 | [-0.025, +0.028] | No effect |
+
+Paired over bootstrap draws: both arms resampled with the same chain draws, so
+the difference is measured on the same proteins and the shared chain-to-chain
+variation cancels. Comparing two independent intervals would mostly have
+measured which chains each happened to draw.
+
+### Why this is a useful answer and not a failed experiment
+
+**The interval is tight.** On CB513 the effect is bounded within ±0.013 MCC.
+That is not "we could not detect an effect", which is what an underpowered test
+says; it is "the effect, if any, is smaller than 0.013", which rules the
+hypothesis out at any size worth shipping a second head for. The deficit against
+the no-language-model floor on CB513 is 0.076, and auxiliary RSA closes at most
+a sixth of that in the most optimistic corner of its interval.
+
+**It closes an avenue cheaply.** The roadmap listed three candidates for this
+head: RSA as an auxiliary task, more capacity, and PDB-derived negatives. One is
+now measured and dead, on the benchmark that can actually see a change, using
+labels that were already on disk. The other two remain.
+
+**The likely reason, stated as a hypothesis rather than a finding**: the
+embedding is frozen, so the auxiliary task can only reshape a 128-wide trunk
+sitting on top of representations it cannot alter. NetSurfP trains its backbone.
+An auxiliary signal that cannot reach the representation has much less to give.

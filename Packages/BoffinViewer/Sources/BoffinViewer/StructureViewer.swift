@@ -218,6 +218,63 @@ public final class StructureViewerModel {
             "The structure was released to free memory. Load it again to carry on."
     }
 
+    /// Render the current view as a PNG at an arbitrary size.
+    ///
+    /// Returns the decoded bytes and the size the renderer actually produced,
+    /// which is not necessarily the size requested: the helper clamps to its
+    /// own bounds, and a caller that assumes otherwise writes a figure caption
+    /// claiming a resolution the file does not have.
+    ///
+    /// - Throws: whatever the bridge throws, including the explicit error the
+    ///   handler raises when this build has no screenshot helper. That is
+    ///   deliberate: an export that silently returns nothing looks exactly like
+    ///   one that rendered an empty scene.
+    public func exportImage(
+        width: Int, height: Int, transparent: Bool
+    ) async throws -> ExportedImage {
+        struct Payload: Decodable {
+            let base64: String
+            let width: Int
+            let height: Int
+        }
+        let payload = try await bridge.send(
+            ExportImageCommand(width: width, height: height, transparent: transparent),
+            expecting: Payload.self)
+        guard let data = Data(base64Encoded: payload.base64) else {
+            throw ViewerBridgeError.decoding("the exported image was not valid base64")
+        }
+        return ExportedImage(data: data, width: payload.width, height: payload.height)
+    }
+
+    public struct ExportedImage: Sendable, Hashable {
+        public let data: Data
+        /// The size the renderer produced, read back rather than assumed.
+        public let width: Int
+        public let height: Int
+
+        public init(data: Data, width: Int, height: Int) {
+            self.data = data
+            self.width = width
+            self.height = height
+        }
+
+        /// The dimensions written in the PNG's own header.
+        ///
+        /// Read from the bytes rather than taken from the renderer's report,
+        /// because those are two different claims and only one of them is in
+        /// the file the user will send to a journal. A PNG's IHDR chunk starts
+        /// at byte 16 with width then height, each a big-endian UInt32.
+        public var declaredSize: (width: Int, height: Int)? {
+            let signature: [UInt8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+            guard data.count >= 24, Array(data.prefix(8)) == signature else { return nil }
+            func word(at offset: Int) -> Int {
+                let bytes = Array(data[data.startIndex + offset..<data.startIndex + offset + 4])
+                return bytes.reduce(0) { $0 << 8 | Int($1) }
+            }
+            return (word(at: 16), word(at: 20))
+        }
+    }
+
     public func resetCamera() async {
         try? await bridge.send(ResetCameraCommand())
     }

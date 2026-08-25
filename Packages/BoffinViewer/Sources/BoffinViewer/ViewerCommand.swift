@@ -189,6 +189,43 @@ public struct ListAssembliesCommand: ViewerCommand {
     public init() {}
 }
 
+/// Render the current view as a PNG, at a size the viewport does not have.
+///
+/// This is the command that turns the viewer into something a figure comes out
+/// of. A screenshot of a phone screen is 1179 pixels across and no journal will
+/// take it; Mol* can render the same scene offscreen at an arbitrary size, so
+/// a 300 dpi figure comes off a phone.
+///
+/// `transparent` is not a nicety either. A structure on an opaque white ground
+/// cannot be composited onto a coloured panel or a poster without cutting it
+/// out by hand, and cutting out antialiased edges by hand is how a figure
+/// acquires a halo.
+public struct ExportImageCommand: ViewerCommand {
+    public let name = "exportImage"
+    public let width: Int
+    public let height: Int
+    public let transparent: Bool
+
+    /// The largest edge that will be attempted.
+    ///
+    /// Not a guess: Mol* renders offscreen through a WebGL framebuffer, and the
+    /// ceiling on a mobile GPU is a hardware limit rather than a memory one, so
+    /// exceeding it fails inside the driver where the error is unhelpful. 4096
+    /// is the floor guaranteed by every device this app supports, and asking
+    /// for more is refused here with a sentence rather than there with a
+    /// context-lost.
+    public static let maximumEdge = 4096
+
+    /// The smallest, below which the request is a mistake rather than a choice.
+    public static let minimumEdge = 128
+
+    public init(width: Int, height: Int, transparent: Bool) {
+        self.width = min(max(width, Self.minimumEdge), Self.maximumEdge)
+        self.height = min(max(height, Self.minimumEdge), Self.maximumEdge)
+        self.transparent = transparent
+    }
+}
+
 /// Build a biological assembly, or return to the deposited coordinates.
 public struct SetAssemblyCommand: ViewerCommand {
     public let name = "setAssembly"

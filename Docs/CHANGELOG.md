@@ -1394,3 +1394,56 @@ real bond that says something about the assembly rather than about where this
 chain may be cut.
 
 BoffinStructure 81 tests, 17 UI tests.
+
+---
+
+## Phase 7 (rest): figure export (2026-08-25)
+
+The command that turns the viewer into something a figure comes out of.
+
+**Offscreen, at an arbitrary size.** A screenshot of this phone is 1179 pixels
+across and no journal will take it. Mol* renders the same scene through a
+WebGL framebuffer at whatever resolution is asked for, so the figure that comes
+off a phone is the one that would come off a workstation. Sizes are offered by
+purpose (one column, two column, poster) rather than by pixel count, because
+"2x column" is a decision a person makes and "2126 x 1594" is arithmetic they
+should not have to do.
+
+**Transparent by default**, which is not a nicety: a structure on an opaque
+white ground cannot be composited onto a coloured panel or a poster without
+cutting it out by hand, and cutting out antialiased edges by hand is how a
+figure acquires a halo.
+
+**Written against what the vendored build exposes, not what the docs say.**
+`plugin.helpers.viewportScreenshot` was confirmed present in the bundle on
+disk, along with the fact that its parameters are set by pushing a complete
+value object into `behaviors.values` and that `getImageDataUri` returns a data
+URI. The UMD build has caught this project out once already by exporting fewer
+names at the top level than its source suggests, and the failure was not an
+exception: it was `undefined` taking a fallback branch. The helper's absence is
+therefore an explicit throw naming the missing path.
+
+**The size shown is read out of the PNG's own IHDR header.** Not taken from
+what was requested, and not from what the renderer reports. Those are three
+different claims and only one of them is in the file the user sends to a
+journal: a caption reading 3840 over an image that is 1179 wide because the
+helper clamped is a figure that comes back from review.
+
+**The test is shaped by the 3D overlay.** That was built twice and removed
+twice, and its tests passed throughout because they asserted a command had been
+DISPATCHED. It was, every time, and it drew nothing. So this test asserts none
+of: the button exists, the command returned, no error appeared. It reads the
+size parsed out of the PNG header and compares it against the size requested,
+which can only match if Mol* really rendered offscreen at that resolution and
+really handed back PNG bytes.
+
+**One real bug fell out of it.** Interpolating an `Int` into a SwiftUI `Text`
+localises it, so the caption for a 1016-pixel figure read "1,016 x 762". A
+pixel count is not a quantity that takes a thousands separator, and in a figure
+caption it reads as a typo in the app. The UI test caught it because it
+compares the whole label rather than parsing a number out of it.
+
+Still open in Phase 7: symmetry mates and altloc selection. Surfaces already
+shipped as a representation.
+
+BoffinViewer 13 tests, 18 UI tests.

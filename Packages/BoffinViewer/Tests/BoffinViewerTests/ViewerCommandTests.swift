@@ -81,6 +81,7 @@ struct ViewerCommandTests {
             PaintTrackCommand(title: "", residues: []).name,
             ListAssembliesCommand().name,
             SetAssemblyCommand(assemblyId: nil).name,
+            ExportImageCommand(width: 1920, height: 1080, transparent: false).name,
             ResetCameraCommand().name,
             ClearCommand().name,
         ]
@@ -188,5 +189,68 @@ struct StructureFetcherTests {
         let bundled = StructureSource.bundled("1ubq.bcif")
         #expect(!bundled.isPrediction)
         #expect(bundled.caveat == nil)
+    }
+}
+
+@Suite("Image export")
+struct ExportImageTests {
+
+    @Test("Requested sizes are clamped to what a mobile GPU will render")
+    func sizesAreClamped() {
+        // Mol* renders offscreen through a WebGL framebuffer, so the ceiling is
+        // a hardware limit rather than a memory one. Exceeding it fails inside
+        // the driver, where the error is a lost context and says nothing about
+        // what asked for it. Refusing here costs a sentence; refusing there
+        // costs the viewer.
+        let huge = ExportImageCommand(width: 20_000, height: 9_000, transparent: false)
+        #expect(huge.width == ExportImageCommand.maximumEdge)
+        #expect(huge.height == ExportImageCommand.maximumEdge)
+
+        let tiny = ExportImageCommand(width: 1, height: 0, transparent: true)
+        #expect(tiny.width == ExportImageCommand.minimumEdge)
+        #expect(tiny.height == ExportImageCommand.minimumEdge)
+
+        let reasonable = ExportImageCommand(width: 1920, height: 1080, transparent: false)
+        #expect(reasonable.width == 1920)
+        #expect(reasonable.height == 1080)
+    }
+
+    @Test("A PNG's size is read from its own header, not from the renderer's report")
+    func declaredSizeComesFromTheBytes() {
+        // Those are two different claims and only one of them is in the file
+        // the user sends to a journal. A caption saying 3840 wide, over a file
+        // that is 1179 wide because the helper clamped, is a figure that will
+        // come back from review.
+        //
+        // A minimal PNG header: the 8-byte signature, a length and "IHDR",
+        // then width and height as big-endian UInt32.
+        var bytes: [UInt8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+        bytes += [0x00, 0x00, 0x00, 0x0D]
+        bytes += Array("IHDR".utf8)
+        bytes += [0x00, 0x00, 0x0F, 0x00]  // 3840
+        bytes += [0x00, 0x00, 0x08, 0x70]  // 2160
+
+        let image = StructureViewerModel.ExportedImage(
+            data: Data(bytes), width: 1, height: 1)
+        let declared = try? #require(image.declaredSize)
+        #expect(declared?.width == 3840)
+        #expect(declared?.height == 2160)
+    }
+
+    @Test("Bytes that are not a PNG declare no size at all")
+    func nonPNGDeclaresNothing() {
+        // Nil rather than a plausible number. A zero would be indistinguishable
+        // from a real answer at a glance, and this value exists precisely to be
+        // checked against a claim.
+        let notAnImage = StructureViewerModel.ExportedImage(
+            data: Data("this is not a png".utf8), width: 3840, height: 2160)
+        #expect(notAnImage.declaredSize == nil)
+
+        // A correct signature with the file cut short is the case that a naive
+        // length check would let through into an index out of range.
+        let truncated = StructureViewerModel.ExportedImage(
+            data: Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00]),
+            width: 0, height: 0)
+        #expect(truncated.declaredSize == nil)
     }
 }

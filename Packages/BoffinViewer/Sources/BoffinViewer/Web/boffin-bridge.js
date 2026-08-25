@@ -304,6 +304,61 @@
       return { atomCount: count };
     },
 
+    // Render offscreen at an arbitrary size, so a figure can come off a phone.
+    //
+    // Written against what this vendored build actually exposes rather than
+    // against the documented API: `plugin.helpers.viewportScreenshot` is real
+    // here, its parameters are set by pushing a complete value object into
+    // `behaviors.values`, and `getImageDataUri` returns a data URI. The UMD
+    // build has already caught this project out once by exporting fewer names
+    // at the top level than its source suggests, and the failure mode was not
+    // an exception: it was `undefined` taking a fallback branch and a command
+    // that appeared to work while drawing nothing.
+    //
+    // So the helper's absence is an explicit throw naming the path that was
+    // missing, and the size actually rendered is returned alongside the image
+    // so the caller can check it got what it asked for instead of trusting it.
+    async exportImage(payload) {
+      const viewer = await ensurePlugin();
+      const helper = viewer.plugin.helpers && viewer.plugin.helpers.viewportScreenshot;
+      if (!helper || typeof helper.getImageDataUri !== 'function') {
+        throw new Error(
+          'plugin.helpers.viewportScreenshot.getImageDataUri is not available in this build'
+        );
+      }
+
+      const width = payload.width;
+      const height = payload.height;
+
+      // Merge over the current values rather than replacing them: the
+      // parameter object carries fields this command has no opinion about
+      // (axes, illumination), and pushing a partial object drops them.
+      const current = helper.values;
+      helper.behaviors.values.next({
+        ...current,
+        format: { name: 'png', params: {} },
+        transparent: !!payload.transparent,
+        resolution: { name: 'custom', params: { width: width, height: height } },
+      });
+
+      const uri = await helper.getImageDataUri();
+      if (typeof uri !== 'string' || uri.indexOf('data:image/png;base64,') !== 0) {
+        throw new Error('screenshot did not return a PNG data URI');
+      }
+
+      // What was actually rendered, which is not necessarily what was asked
+      // for: the helper clamps to its own parameter bounds.
+      const size = typeof helper.getSize === 'function'
+        ? helper.getSize()
+        : { width: width, height: height };
+
+      return {
+        base64: uri.slice('data:image/png;base64,'.length),
+        width: size.width,
+        height: size.height,
+      };
+    },
+
     async resetCamera() {
       const viewer = await ensurePlugin();
       viewer.plugin.managers.camera.reset();

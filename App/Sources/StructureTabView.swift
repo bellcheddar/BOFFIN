@@ -29,6 +29,11 @@ struct StructureTabView: View {
     /// bytes.
     @State private var loadedViewerStore: AtomStore?
     @State private var deck = SceneDeckModel()
+    /// The last rendered figure, held so it can be shared and described.
+    @State private var exported: StructureViewerModel.ExportedImage?
+    @State private var exportError: UserFacingError?
+    @State private var isExporting = false
+    @State private var wantsTransparentBackground = true
 
     var body: some View {
         NavigationStack {
@@ -283,6 +288,8 @@ struct StructureTabView: View {
     @ViewBuilder
     private func interactionControls(_ model: StructureViewerModel) -> some View {
         if case .loaded = model.state {
+            figureExport(model)
+
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 HStack {
                     Button("Profile interactions") {
@@ -392,6 +399,122 @@ struct StructureTabView: View {
         self.store.noteStructure(store)
         let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
         profile = InteractionProfiler.profile(store, ligand: ligand)
+    }
+
+    // MARK: - Figure export
+
+    /// Render the current view at a size a journal will accept.
+    ///
+    /// A screenshot of this phone is 1179 pixels across. Mol* renders the same
+    /// scene offscreen at an arbitrary size, so the figure that comes off a
+    /// phone here is the same one that would come off a workstation.
+    ///
+    /// Transparent by default. A structure on an opaque white ground cannot be
+    /// composited onto a coloured panel without cutting it out by hand, and
+    /// cutting out antialiased edges by hand is how a figure acquires a halo.
+    @ViewBuilder
+    private func figureExport(_ model: StructureViewerModel) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            HStack {
+                Text("Figure").font(.headline)
+                Spacer()
+                if isExporting {
+                    ProgressView().controlSize(.small)
+                }
+            }
+
+            Toggle("Transparent background", isOn: $wantsTransparentBackground)
+                .font(.caption)
+                .accessibilityIdentifier("boffin.export.transparent")
+
+            HStack(spacing: Spacing.s) {
+                ForEach(Self.figureSizes, id: \.label) { size in
+                    Button(size.label) {
+                        Task { await export(model, width: size.width, height: size.height) }
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.caption2)
+                    .disabled(isExporting)
+                    .accessibilityIdentifier("boffin.export.\(size.label)")
+                }
+            }
+
+            if let exportError {
+                FailureView(exportError)
+            }
+
+            if let exported {
+                // The size is read out of the PNG's own header rather than
+                // taken from what was asked for. Those are two different
+                // claims, and the one that matters is the one inside the file
+                // the user is about to send somewhere: a caption reading 3840
+                // over a 1179-pixel image is a figure that comes back from
+                // review.
+                let declared = exported.declaredSize
+                HStack {
+                    if let declared {
+                        // Not "\(width) x \(height)": interpolating an Int
+                        // into a Text localises it, so a 1016-pixel figure
+                        // renders as "1,016". A pixel count is not a quantity
+                        // that takes a thousands separator, and in a figure
+                        // caption it reads as a typo in the app.
+                        Text(
+                            "\(String(declared.width)) x \(String(declared.height)) PNG"
+                        )
+                        .font(.system(.caption2, design: .monospaced))
+                        .accessibilityIdentifier("boffin.export.size")
+                    } else {
+                        Text("The exported bytes are not a PNG")
+                            .font(.caption2)
+                            .foregroundStyle(ScientificPalette.warning)
+                            .accessibilityIdentifier("boffin.export.size")
+                    }
+                    Text("read from the file")
+                        .font(.caption2).foregroundStyle(.tertiary)
+                    Spacer()
+                    ShareLink(
+                        item: Image(uiImage: uiImage(exported)),
+                        preview: SharePreview(
+                            "BOFFIN figure", image: Image(uiImage: uiImage(exported)))
+                    ) {
+                        Label("Share", systemImage: "square.and.arrow.up").font(.caption2)
+                    }
+                    .accessibilityIdentifier("boffin.export.share")
+                }
+            }
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Brand.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    /// The offered sizes.
+    ///
+    /// Named for what they are for rather than by pixel count, because "2x
+    /// column" is a decision a person makes and "1720 x 1000" is arithmetic
+    /// they should not have to do. The single-column width is the common
+    /// journal measure of 86 mm at 300 dpi, near enough.
+    private static let figureSizes: [(label: String, width: Int, height: Int)] = [
+        ("1 column", 1016, 762),
+        ("2 column", 2126, 1594),
+        ("Poster", 4096, 3072),
+    ]
+
+    private func uiImage(_ exported: StructureViewerModel.ExportedImage) -> UIImage {
+        UIImage(data: exported.data) ?? UIImage()
+    }
+
+    private func export(_ model: StructureViewerModel, width: Int, height: Int) async {
+        isExporting = true
+        defer { isExporting = false }
+        do {
+            exported = try await model.exportImage(
+                width: width, height: height, transparent: wantsTransparentBackground)
+            exportError = nil
+        } catch {
+            exported = nil
+            exportError = UserFacingError(error, whileDoing: "rendering the figure")
+        }
     }
 
     /// Biological assembly and NMR model.

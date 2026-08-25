@@ -240,3 +240,61 @@ final class StructureTabUITests: XCTestCase {
         }
     }
 }
+
+// MARK: - Figure export
+
+extension StructureTabUITests {
+
+    /// Phase 7's export acceptance: a real PNG, at the size that was asked for.
+    ///
+    /// This test exists in the shape it does because of the 3D interaction
+    /// overlay, which was built twice and removed twice, and whose tests passed
+    /// throughout. They asserted that a command was DISPATCHED. It was, every
+    /// time, and it drew nothing.
+    ///
+    /// So this asserts none of the following: that the button exists, that the
+    /// command returned, that no error appeared. It reads the size the app
+    /// parsed out of the PNG's own IHDR header and compares it with the size
+    /// requested. That number can only be right if Mol* really rendered
+    /// offscreen at that resolution and really handed back PNG bytes, which is
+    /// the entire claim.
+    func testFigureExportProducesAPNGAtTheRequestedSize() throws {
+        let app = XCUIApplication()
+        app.launchSkippingOnboarding()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            "the structure never loaded, so there is nothing to render")
+
+        let export = app.buttons["boffin.export.1 column"]
+        XCTAssertTrue(
+            export.waitForExistence(timeout: 20), "the figure export control is missing")
+        export.tap()
+
+        // Rendering offscreen at 1016 x 762 takes a moment on a simulator.
+        let size = app.staticTexts["boffin.export.size"]
+        XCTAssertTrue(
+            size.waitForExistence(timeout: 90),
+            "no figure came back, and no error was shown either")
+
+        // 1016 x 762 is the single-column size the button asks for. Reading it
+        // back out of the file is the whole point: a renderer that silently
+        // clamped to the viewport would show the viewport's size here, and a
+        // handler that returned something that is not a PNG would show the
+        // "not a PNG" message instead.
+        XCTAssertEqual(
+            size.label, "1016 x 762 PNG",
+            "the exported file is not the figure that was requested")
+
+        // And it is shareable, which is the only reason a user pressed the
+        // button. A figure that renders and cannot leave the device is not a
+        // figure.
+        XCTAssertTrue(
+            app.buttons["boffin.export.share"].exists,
+            "the rendered figure cannot be shared anywhere")
+    }
+}

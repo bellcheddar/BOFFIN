@@ -51,6 +51,18 @@ structure with a language model*, Science 379:1123 (2023).
 
 ---
 
+## Mol\*, vendored 2026-08-25
+
+The structure viewer. **MIT licensed**, verified in the npm registry metadata for
+version 5.11.0 and vendored alongside the code as `molstar-LICENSE.txt`. MIT
+permits redistribution in a closed-source application with the notice retained,
+which is what `Packages/BoffinViewer/VENDOR.md` records along with the checksums.
+
+Cite: Sehnal et al., *Mol\* Viewer: modern web app for 3D visualization and
+analysis of large biomolecular structures*, Nucleic Acids Res 49:W431 (2021).
+
+---
+
 ## To verify before the phase that first uses them
 
 | Source | Expected terms | First needed | Status |

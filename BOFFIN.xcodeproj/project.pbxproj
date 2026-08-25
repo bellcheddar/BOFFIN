@@ -27,6 +27,8 @@
 		F473D03A5B86076AE4353C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C4B37771FD3FEA80B21D072 /* Assets.xcassets */; };
 		E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */; };
 		123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */; };
+		E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F6704AD6431E78767C846 /* StructureTabView.swift */; };
+		40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +79,8 @@
 		F92CF2D37BBBC032A7551686 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = App/Resources/Info.plist; sourceTree = "<group>"; };
 		C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabView.swift; path = App/Sources/BoundaryTabView.swift; sourceTree = "<group>"; };
 		1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabUITests.swift; path = App/UITests/BoundaryTabUITests.swift; sourceTree = "<group>"; };
+		063F6704AD6431E78767C846 /* StructureTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabView.swift; path = App/Sources/StructureTabView.swift; sourceTree = "<group>"; };
+		467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabUITests.swift; path = App/UITests/StructureTabUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +160,7 @@
 				CF3222BCE24F65F84CA0580A /* ProbeTests.swift */,
 				95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */,
 				1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */,
+				467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */,
 			);
 			name = UITests;
 			sourceTree = SOURCE_ROOT;
@@ -173,6 +178,7 @@
 			isa = PBXGroup;
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
+				063F6704AD6431E78767C846 /* StructureTabView.swift */,
 				C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */,
 				B748EDB595BF571562A511B3 /* RootView.swift */,
 				D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */,
@@ -355,6 +361,7 @@
 				86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */,
 				892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */,
 				123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */,
+				40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
+				E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */,
 				E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */,
 				020C6F596C66196959ADA1D1 /* RootView.swift in Sources */,
 				093D59258C5D2CE1395D0464 /* BrandRulerStyle.swift in Sources */,

@@ -27,9 +27,7 @@ struct RootView: View {
                 BoundaryTabView(store: store)
             }
             Tab("Structure", systemImage: "atom") {
-                PlaceholderTab(
-                    name: "Structure", phase: "Phase 7",
-                    detail: "Interactive viewer with ResidueTrack painting.")
+                StructureTabView(store: store)
             }
         }
     }

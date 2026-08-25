@@ -26,10 +26,17 @@ let package = Package(
                 .product(name: "BoffinCore", package: "BoffinCore"),
                 .product(name: "BoffinStructure", package: "BoffinStructure"),
             ],
-            // Phase 7 vendors the Mol* UMD build here and flips this to
-            // resources: [.copy("Resources")]. Excluded until then so SPM does
-            // not warn about unhandled files.
-            exclude: ["Resources"],
+            // The vendored Mol* build, copied verbatim: `.copy` rather than
+            // `.process` because the JavaScript and CSS must reach the bundle
+            // byte for byte, and because their relative paths inside the page
+            // are what `loadFileURL` resolves against.
+            //
+            // The directory is `Web`, not `Resources`. A resource bundle whose
+            // root contains a folder called `Resources` is read as a macOS-style
+            // bundle and codesign refuses it outright: "bundle format
+            // unrecognized, invalid, or unsuitable", at link time, with no clue
+            // that a directory name caused it.
+            resources: [.copy("Web")],
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .testTarget(

@@ -28,6 +28,9 @@ venv/
 *.pth
 *.safetensors
 
+# The vendored Mol* build is committed on purpose. It is five megabytes and it
+# is what makes the viewer work in aeroplane mode; see Packages/BoffinViewer/VENDOR.md.
+
 # Downloaded assets and caches
 Tools/coreml/.cache/
 Tools/data/.cache/

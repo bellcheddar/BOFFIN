@@ -642,3 +642,62 @@ the provenance line says exactly that.
 
 160 BoffinCore tests and 8 UI tests. Phase 6's remaining gap is disulfide
 pairing, which cannot be read off a sequence and needs the structure viewer.
+
+
+## Phase 7 (part): the structure viewer (2026-08-25)
+
+Mol\* 5.11.0 vendored, the typed bridge in both directions, and the demo the
+build plan calls the most compelling thing in the app: a `ResidueTrack` painted
+onto the structure.
+
+**Vendored, not linked to a CDN.** Five megabytes of committed JavaScript is a
+real cost and it is the smaller one; the alternative is an app that shows a blank
+viewer on a plane. MIT, verified in the npm metadata, with the licence text and
+SHA-256 of both files in `Packages/BoffinViewer/VENDOR.md`. A test asserts the
+page itself contains no `http://` or `https://`, and the navigation delegate
+cancels anything that is not a file URL, so a future version of the vendored
+build cannot quietly acquire a network dependency.
+
+**Nothing is interpolated into JavaScript.** Every command is a value, JSON
+encoded, handed to `callAsyncJavaScript` as an argument. A test passes a chain
+identifier of `A'); window.evil=1; ('` and asserts it survives as a string: a
+chain with a quote in it should be a chain that does not exist, not an
+injection. Structures travel as base64 rather than as file URLs, because a URL
+means granting the web view read access to a directory and the app has the bytes
+in hand either way.
+
+**The two halves are checked against each other.** A test reads
+`boffin-bridge.js` out of the bundle and asserts every Swift command name has a
+handler in it. A command whose name has no handler is a silent no-op at runtime,
+which is the failure a typed envelope is supposed to make impossible and does
+not, by itself, prevent.
+
+### Two things that failed usefully
+
+`.copy("Resources")` produces a resource bundle whose root contains a folder
+called `Resources`, which is read as a macOS-style bundle. Codesign refuses it:
+"bundle format unrecognized, invalid, or unsuitable", at link time, with nothing
+to suggest a directory name caused it. The directory is now `Web`.
+
+BinaryCIF is **not a separate format name to Mol\***: it is mmCIF with the binary
+flag set, and passing `'bcif'` returns "unknown data format name". The app
+surfaced that error in its own status line rather than hanging, which is how it
+was found in seconds rather than by reading the vendored source.
+
+### Accepted
+
+1UBQ loads from the bundle, offline, and Mol\* reports **660 atoms**, which is
+what BoffinStructure's own BinaryCIF parser reads from the same file. Those are
+two independent implementations agreeing on a number, which is worth more than
+either agreeing with itself.
+
+Hydropathy paints onto it without putting the viewer into an error state. That
+assertion exists because the failure mode here is silence: if Mol\* rejects a
+custom colour theme the structure simply stays as it was, which looks exactly
+like a track whose values happen to be flat.
+
+The large-assembly guardrail coarsens to a backbone trace above 100,000 atoms
+and says why, rather than asking first: asking would mean rendering the
+expensive thing to find out it was expensive.
+
+10 UI tests, 7 BoffinViewer tests, 18 BoffinStructure tests.

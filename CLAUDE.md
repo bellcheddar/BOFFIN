@@ -11,9 +11,23 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3 and 5 complete; **6 nearly complete** (solver, precedent, tag planning, construct card and primer-ready DNA done; disulfide pairing needs Phase 7)
-- **Last completed:** Phase 6's primer-ready DNA on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 3, 5 and 6 complete bar disulfides; **7 in progress** (Mol\* vendored, BinaryCIF parsed, bridge and track painting done)
+- **Last completed:** Phase 7's viewer bridge and track painting on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
+
+### Phase 7 findings
+
+- **A resource bundle must not contain a folder called `Resources`.** SPM's
+  `.copy("Resources")` produces one, it is read as a macOS-style bundle, and
+  codesign refuses it with "bundle format unrecognized, invalid, or unsuitable"
+  at link time. The directory is `Web`.
+- **BinaryCIF is not a format name to Mol\***: it is `mmcif` with the binary
+  flag set. `'bcif'` returns "unknown data format name".
+- **Integer packing continues across several elements.** Stopping at the first
+  extreme value truncates every large coordinate, and delta encoding makes the
+  error accumulate down the column, so test the LAST atom and not only the first.
+- **Take `auth_seq_id`, never `label_seq_id`.** The latter counts from one along
+  the entity and is not what any paper quotes.
 
 ### Phase 5 findings
 

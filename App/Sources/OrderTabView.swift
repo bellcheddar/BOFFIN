@@ -162,9 +162,17 @@ struct OrderTabView: View {
                 )
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+                // Reworded 2026-08-25 after bootstrapping the benchmarks by
+                // CHAIN rather than by residue. The previous wording followed
+                // the CASP12 result, where the head scores below the
+                // no-language-model floor: 21 chains, and the 95% interval is
+                // [0.337, 0.662] against a floor of 0.573, so that comparison
+                // decides nothing. The deficit that IS established is on
+                // CB513, where the interval sits wholly below its floor.
                 Text(
-                    "Disorder is less reliable on sequences without close relatives "
-                        + "in the PDB. Research use only."
+                    "Disorder is the weakest of these tracks: on one benchmark it "
+                        + "measures below what the same head achieves with no language "
+                        + "model at all. Read it as a hint, not a call. Research use only."
                 )
                 .font(.caption2)
                 .foregroundStyle(.tertiary)

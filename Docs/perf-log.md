@@ -560,3 +560,64 @@ protein from outside the set is the failure this exists to prevent.
 an improvement, not a solution, and the on-screen statement that the classifier
 is closed set has to stay exactly as it is. What changes is that four out of
 five such proteins can now be flagged, instead of none.
+
+## How much does the disorder benchmark actually say? (2026-08-25)
+
+### The claim being checked
+
+The app told users that disorder is "less reliable on sequences without close
+relatives in the PDB", and the roadmap carried an item to fix a head that
+measures *below the no-language-model floor* on novel folds. Both followed from
+one number: CASP12 MCC 0.500 against a published one-hot baseline of 0.573.
+
+**CASP12 has 21 chains.**
+
+And its 7,256 residues are not 7,256 independent observations. Disorder is
+contiguous: a disordered forty-residue tail is one event, not forty. Treating
+residues as independent is what makes a small benchmark look decisive.
+
+### Method
+
+Resample **chains** with replacement, 2,000 draws, recomputing MCC over whatever
+residues the drawn chains contain. At the shipped threshold (0.90, read from
+`config.json` rather than assumed: the first run used 0.5 and put an interval
+around an operating point the app never uses).
+
+Point estimates reproduce `benchmarks.json` exactly, which is what says the
+bootstrap is measuring the shipped head and not a different one.
+
+### Results
+
+| Benchmark | Chains | MCC | 95% interval | One-hot floor | Verdict |
+|---|---|---|---|---|---|
+| CB513 | 513 | 0.430 | [0.372, 0.492] | 0.502 | **Below the floor** (99.2% of resamples) |
+| TS115 | 115 | 0.628 | [0.568, 0.681] | 0.594 | Indistinguishable (12.8% below) |
+| CASP12 | 21 | 0.501 | [0.337, 0.662] | 0.573 | **Indistinguishable** (80.8% below) |
+
+### What this changes
+
+**The CASP12 claim is not established.** The interval spans the floor from well
+below to well above it. 80.8% of resamples land below, which is suggestive and
+is not evidence; on 21 chains it could hardly be anything else. Chasing that
+number with more capacity or an auxiliary task would have been optimising
+against noise, and any improvement would have been unfalsifiable on the same
+benchmark.
+
+**The real deficit is on CB513**, where the interval sits wholly below the
+floor across 513 chains. That is the one solid version of "the language model is
+not helping here", and it is the benchmark the project had been quoting *least*.
+
+**The TS115 claim also needs softening.** "Beats NetSurfP-2.0" sits close enough
+to its own floor that 12.8% of resamples fall below it. Still the best of the
+three, still not the clean win the phrasing implied.
+
+### Consequence
+
+The roadmap item changes from "improve the head on novel folds" (a target the
+benchmark cannot see) to "improve it on CB513" (a target 513 chains can). The
+on-screen wording now says the head measures below its no-language-model
+baseline on **one** benchmark, without claiming which kind of sequence that
+generalises to, because the data does not support the generalisation.
+
+None of this makes the head better. It says which number to chase, and stops
+the app asserting something 21 proteins cannot support.

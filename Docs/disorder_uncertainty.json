@@ -1,0 +1,32 @@
+{
+  "cb513": {
+    "chains": 513,
+    "disordered_residues": 3529,
+    "mcc": 0.42999908488419075,
+    "ci_low": 0.3717648732540887,
+    "ci_high": 0.4916144506582121,
+    "one_hot_floor": 0.502,
+    "fraction_below_floor": 0.992,
+    "verdict": "below the floor"
+  },
+  "ts115": {
+    "chains": 115,
+    "disordered_residues": 2203,
+    "mcc": 0.6278485987365281,
+    "ci_low": 0.5684454783263817,
+    "ci_high": 0.681493840148995,
+    "one_hot_floor": 0.594,
+    "fraction_below_floor": 0.128,
+    "verdict": "INDISTINGUISHABLE from the floor"
+  },
+  "casp12": {
+    "chains": 21,
+    "disordered_residues": 836,
+    "mcc": 0.5014027634729719,
+    "ci_low": 0.33738098295289415,
+    "ci_high": 0.6623397784559726,
+    "one_hot_floor": 0.573,
+    "fraction_below_floor": 0.808,
+    "verdict": "INDISTINGUISHABLE from the floor"
+  }
+}

@@ -1745,3 +1745,50 @@ with 7% of the PDB and no error at all, which redefined a result rather than
 failing, and a half-read whitener would do the same to every distance.
 
 BoffinML 49 tests, including four for the loader and the parity check.
+
+---
+
+## What the disorder benchmark can and cannot say (2026-08-25)
+
+The app told users disorder is "less reliable on sequences without close
+relatives in the PDB", and the roadmap carried an item to fix a head measuring
+below the no-language-model floor on novel folds. Both rested on one number:
+CASP12 MCC 0.500 against a published one-hot baseline of 0.573.
+
+**CASP12 has 21 chains**, and its 7,256 residues are not 7,256 independent
+observations: disorder is contiguous, so a forty-residue tail is one event, not
+forty. Treating residues as independent is what makes a small benchmark look
+decisive.
+
+Bootstrapping by chain, 2,000 draws, at the shipped threshold:
+
+| Benchmark | Chains | MCC | 95% interval | Floor | Verdict |
+|---|---|---|---|---|---|
+| CB513 | 513 | 0.430 | [0.372, 0.492] | 0.502 | Below (99.2%) |
+| TS115 | 115 | 0.628 | [0.568, 0.681] | 0.594 | Indistinguishable (12.8% below) |
+| CASP12 | 21 | 0.501 | [0.337, 0.662] | 0.573 | Indistinguishable (80.8% below) |
+
+**The CASP12 claim is not established.** The interval spans the floor from well
+below to well above it. Chasing that number would have been optimising against
+noise on a benchmark that could not have confirmed the improvement afterwards.
+
+**The real deficit is CB513**, wholly below its floor across 513 chains: the
+one solid version of "the language model is not helping here", and the
+benchmark this project had been quoting least.
+
+**TS115 also needs softening.** "Beats NetSurfP-2.0" sits close enough to its
+own floor that 12.8% of resamples fall below it.
+
+Two mistakes made getting here, both worth recording because both produced
+plausible numbers. The head was first rebuilt as a stack of Linear layers from
+its state dict shapes: it loaded without complaint and scored MCC 0.000 on all
+three benchmarks, because the head is CONVOLUTIONAL and a per-residue MLP made
+of its weights is a different function. And the bootstrap first ran at a
+threshold of 0.5 rather than the shipped 0.90, putting an interval around an
+operating point the app never uses. The tell for both was the point estimate
+failing to reproduce `benchmarks.json`; it now matches to three decimals, which
+is what says the bootstrap is measuring the shipped head.
+
+The roadmap item changes from "improve on novel folds" to "improve on CB513",
+and the on-screen wording no longer generalises from 21 proteins to a class of
+sequence.

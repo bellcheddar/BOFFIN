@@ -180,3 +180,43 @@ Three "fixes" preceded the real one (data type, batch size, input fill) and all
 three produced byte-for-byte identical output. That identity was the actual
 diagnostic and should have been read sooner: unchanged results after a real code
 change mean the wrong code path is being examined.
+
+
+## Phase 5 (part): family motifs (2026-08-25)
+
+Canonical sequence motifs for protein kinases and class A GPCRs, annotated on
+the shared ruler and listed in a new Family tab. 169 package tests and 6 UI
+tests passing.
+
+- **Motifs are detected by published sequence patterns with ORDERING
+  CONSTRAINTS**, not by pattern alone. "HRD" occurs by chance about once per
+  8,000 residues, so an unconstrained search finds spurious hits on any large
+  protein and labels them confidently. HRD must precede DFG by 12 to 45
+  residues, and the GPCR micro-switches must appear in TM3, TM6, TM7 order.
+- **Validated against textbook numbering**: CDK2's glycine-rich loop at G11,
+  beta-3 lysine K33, catalytic HRD at H125 and DFG at D145 all land exactly.
+  Negative controls matter as much: ubiquitin, ADRB2 and PETase are all
+  correctly refused as kinases.
+- **Variants are handled because they were measured.** Across the 521 human
+  kinases in KLIFS, the HRD histidine is Y in 45 of them and the DFG
+  phenylalanine is L in 51. A strict HRD/DFG search silently misses about a
+  tenth of the kinome.
+- **Numbering tables are bundled, not derived.** KLIFS and GPCRdb assign numbers
+  by structure-based alignment against curated references; a number that is off
+  by one through a helix bulge is invisible and would be believed.
+  `Tools/data/fetch_family_tables.py` fetches 12 receptors' per-residue GPCRdb
+  and Ballesteros-Weinstein numbers and 521 kinase pockets.
+
+Licences verified at source: **GPCRdb is CC BY 4.0**; **KLIFS states its data is
+freely available for academia and industry** but names no formal licence, and
+that distinction is recorded rather than rounded up.
+
+One correction during development: the beta-3 lysine was first found as "the
+first lysine after the glycine-rich loop", which returned CDK2's K24 instead of
+K33. Positional heuristics are not definitions. It now matches the published
+VAIK motif.
+
+Still outstanding for Phase 5: the Pfam classifier over the pooled embedding,
+mapping a pasted sequence onto the bundled numbering tables (needs alignment),
+SIFTS mapping, and the embedding index for homolog search. The Family tab says
+so on screen rather than leaving the absence to be read as a negative result.

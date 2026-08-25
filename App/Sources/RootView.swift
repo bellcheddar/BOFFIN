@@ -21,9 +21,7 @@ struct RootView: View {
                 FitnessTabView(store: store)
             }
             Tab("Family", systemImage: "point.3.connected.trianglepath.dotted") {
-                PlaceholderTab(
-                    name: "Family", phase: "Phase 5",
-                    detail: "Family classification, KLIFS and GPCRdb numbering, motifs.")
+                FamilyTabView(store: store)
             }
             Tab("Boundary", systemImage: "scissors") {
                 PlaceholderTab(

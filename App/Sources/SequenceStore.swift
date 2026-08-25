@@ -25,6 +25,10 @@ final class SequenceStore {
     private(set) var modelTracks: [AnyResidueTrack] = []
     private(set) var predictions: HeadPredictions?
 
+    // MARK: - Family
+
+    private(set) var motifs: [MotifFamily: [Motif]] = [:]
+
     // MARK: - Fitness
 
     private(set) var llr: LLRMatrix?
@@ -71,8 +75,14 @@ final class SequenceStore {
     /// Properties over the current selection, or `nil` when nothing is selected.
     private(set) var selectionProperties: SequenceProperties?
 
-    /// All tracks for the ruler: analytical first, then model-derived.
-    var allTracks: [AnyResidueTrack] { tracks + modelTracks }
+    /// All tracks for the ruler: analytical, then motifs, then model-derived.
+    var allTracks: [AnyResidueTrack] {
+        var all = tracks
+        if let motifTrack = FamilyMotifs.track(motifs.values.flatMap { $0 }) {
+            all.append(motifTrack)
+        }
+        return all + modelTracks
+    }
 
     func load(text: String, fileName: String? = nil) {
         do {
@@ -88,6 +98,7 @@ final class SequenceStore {
             modelTracks = []
             predictions = nil
             modelState = .idle
+            motifs = [:]
             llr = nil
             llrMode = nil
             mutations = []
@@ -241,6 +252,9 @@ final class SequenceStore {
 
     private func recompute() {
         guard let sequence else { return }
+        // Motifs are pure sequence pattern matching: no model, no network, and
+        // available the instant a sequence is pasted.
+        motifs = FamilyMotifs.all(in: sequence)
         tracks = AnalyticalTracks.all(
             for: sequence, hydropathyWindow: hydropathyWindow, scale: pKaScale)
         properties = SequenceProperties(sequence, pKaScale: pKaScale)

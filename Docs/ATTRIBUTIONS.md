@@ -58,8 +58,8 @@ structure with a language model*, Science 379:1123 (2023).
 | RCSB PDB data | CC0 | Phase 0 (fixtures) | assumed, attribute regardless |
 | UniProt | CC BY 4.0 | Phase 0 (fixtures) | assumed |
 | Pfam / InterPro | CC0 | Phase 5 | assumed |
-| KLIFS | check current terms | Phase 5 | **unverified: confirm redistribution of derived numbering tables** |
-| GPCRdb | CC BY 4.0 | Phase 5 | assumed, attribution required |
+| KLIFS | see below | Phase 5 | **VERIFIED 2026-08-25** |
+| GPCRdb | CC BY 4.0 | Phase 5 | **VERIFIED 2026-08-25** |
 | AlphaFold DB | CC BY 4.0 | Phase 7 | assumed, predicted models must be labelled as such |
 | DisProt, CB513, TOPCONS, DeepTMHMM | various | Phase 3 | **unverified, and gated on open question 1** |
 
@@ -106,6 +106,32 @@ Note on the EMBOSS entry: EMBOSS itself is GPL. Only the numeric pKa values
 from a data file are used, which are the published constants of the `iep`
 method rather than expressive code, and no EMBOSS code is linked or ported.
 The same discipline applied to PLIP applies here.
+
+---
+
+## Family numbering tables (Phase 5, verified 2026-08-25)
+
+### GPCRdb: CC BY 4.0 (verified)
+
+Data is CC BY 4.0; their source code is Apache 2.0. Commercial use is permitted
+with attribution, so BOFFIN may bundle the generic numbering tables provided the
+attribution below is carried and surfaced in the Acknowledgements screen.
+
+Cite: Kooistra AJ et al. GPCRdb in 2021: integrating GPCR sequence, structure
+and function. Nucleic Acids Res 49:D335 (2021).
+
+### KLIFS: stated open, no named licence (verified as stated)
+
+The KLIFS FAQ says plainly: "both for academia and industry all data in KLIFS is
+freely available/open". That is a clear permission covering commercial use.
+
+**It is not a named licence**, and that distinction is kept rather than rounded
+up to "CC BY" or "open source". If a formal licence is later required for App
+Store distribution, this is the entry to revisit, and the KLIFS team should be
+asked directly rather than the FAQ being treated as a licence grant.
+
+Cite: Kanev GK et al. KLIFS: an overhaul after the first 5 years of supporting
+kinase research. Nucleic Acids Res 49:D562 (2021).
 
 ---
 

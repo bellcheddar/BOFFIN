@@ -11,9 +11,28 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 4 (Fitness tab) **complete**. Phase 5 (Family tab) is next, gated on open questions 2 and 3
-- **Last completed:** Phase 4 on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 5 (Family tab) **in progress**: motifs done, classifier and homolog index outstanding
+- **Last completed:** Phase 5 family motifs on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
+
+### Phase 5 findings
+
+- **Motif patterns need ORDERING CONSTRAINTS, not just patterns.** "HRD" occurs
+  by chance about once per 8,000 residues. Requiring HRD before DFG at 12 to 45
+  residues' separation is what turns a pattern match into evidence.
+- **Motif variants must be measured, not recalled.** Across the 521 human KLIFS
+  kinases, the HRD histidine is Y in 45 and the DFG phenylalanine is L in 51, so
+  a strict HRD/DFG search misses about a tenth of the kinome.
+- **Positional heuristics are not definitions.** "The first lysine after the
+  glycine-rich loop" found CDK2's K24 rather than K33; the published VAIK motif
+  finds the right one.
+- **KLIFS pockets are DISCONTINUOUS in sequence.** The 85 residues are a
+  structural pocket, so they cannot be located by substring search and mapping a
+  pasted sequence onto them needs real alignment. That is why the numbering
+  tables are bundled and the mapping is still outstanding.
+- Licences verified at source: **GPCRdb CC BY 4.0**; **KLIFS states open for
+  academia and industry but names no licence**, which is recorded as stated-open
+  rather than rounded up.
 
 ### Phase 4 findings
 

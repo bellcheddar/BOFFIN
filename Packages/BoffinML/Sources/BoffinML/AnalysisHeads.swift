@@ -730,10 +730,25 @@ public struct FamilyClassification: Sendable {
     ///
     /// It can only answer with one of the families it was trained on, so a
     /// protein from any other family is assigned the nearest one and reported
-    /// confidently. Measured: ubiquitin, whose family PF00240 is not in the
-    /// trained set, is called PF00076 at 79.7%. Confidence cannot detect this,
-    /// because the model genuinely is confident, so the limitation has to be
-    /// stated rather than scored around.
+    /// confidently.
+    ///
+    /// Two things this comment used to say are no longer true, and both are
+    /// worth keeping visible rather than quietly editing away.
+    ///
+    /// It cited ubiquitin as the example of an out-of-set protein. **PF00240 is
+    /// now among the 500 families**, so that example has stopped being one: an
+    /// illustration drawn from a specific model expires when the model changes.
+    ///
+    /// It also said confidence cannot detect this, because the model is
+    /// genuinely confident. That was inferred from the same single protein and
+    /// is wrong. Measured over roughly 1,500 genuinely unseen sequences by
+    /// holding out whole families, maximum softmax reaches AUROC 0.941 and
+    /// catches about 76% at a 5% false-rejection rate, and it is what the app
+    /// now uses.
+    ///
+    /// The limitation itself stands: roughly one unseen protein in four still
+    /// arrives with no warning, so the caveat states the catch rate rather than
+    /// letting silence read as an all-clear.
     public var caveat: String {
         if !isInDistribution {
             return "This sequence sits outside the range the classifier was trained on, "

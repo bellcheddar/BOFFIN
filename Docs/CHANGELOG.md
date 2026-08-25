@@ -1954,3 +1954,36 @@ different size fails loudly.
 The README's closed-set entry is also corrected: it claimed no threshold
 catches an out-of-set protein, inferred from one protein, where the measurement
 over ~1,500 unseen sequences gives AUROC 0.941 and a 76% catch rate.
+
+---
+
+## The classifier had never been tested end to end (2026-08-26)
+
+The Family tab's UI test asserts that "Protein kinase" appears for CDK2. That
+exercises the MOTIF detector: pure sequence pattern matching that never touches
+the classifier, the embedding or the Core ML model. `classifyFamily` could have
+returned anything at all and every suite would still have been green.
+
+That gap had already cost something. Retraining to 500 families left
+`family.mlpackage` at the previous day's conversion, pairing a 100-class model
+with 500 names, and `zip` truncating means every call would have been confident
+and wrong.
+
+The classifier now runs end to end in a test and asserts CDK2 lands on PF00069,
+the protein kinase domain. A fact about biology rather than a recorded output,
+so it does not drift when the model is retrained. Checked in the top five rather
+than the top one, because PF07714 is the tyrosine kinase domain and a defensible
+neighbouring answer, and a test that forbids a defensible answer gets deleted
+the first time it fires rather than investigated.
+
+Two more assertions cover the halves that fail quietly: a known protein must not
+be flagged as out of distribution (a threshold set too high flags everything,
+which reads as an appropriately humble app rather than a broken one), and the
+ranked calls must be ordered probabilities (a softmax read with the wrong
+strides still yields numbers in [0, 1], just not in order).
+
+Also corrected: `FamilyClassification.caveat`'s doc comment cited ubiquitin as
+the example of an out-of-set protein. **PF00240 is now among the 500 families**,
+so the example has stopped being one. An illustration drawn from a specific
+model expires when the model changes, and the comment now says so rather than
+being quietly edited.

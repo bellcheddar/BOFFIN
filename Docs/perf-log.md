@@ -731,3 +731,64 @@ is CB513.
 The on-screen wording is corrected. It had said this head "measures below what
 the same head achieves with no language model at all", which is exactly the
 error: the same head with no language model achieves 0.380, not 0.502.
+
+## Capacity does not close the disorder gap either (2026-08-25)
+
+### The sweep
+
+Four configurations, same seed, same chains, same batches in the same order,
+same class weight, thresholds tuned on the same validation chains and applied
+blind, compared paired over the same bootstrap draws. At width 128 with
+dilations 1, 2, 4 the sweep head is `ConvHead` exactly, and it reproduced the
+shipped baseline bit-identically, including the intervals.
+
+| Arm | CB513 | Delta | Paired 95% | Verdict | Parameters | fp16 | Field |
+|---|---|---|---|---|---|---|---|
+| w128 (shipped) | 0.426 | — | — | — | 308,738 | 0.62 MB | 29 |
+| w256 | 0.434 | +0.009 | [+0.000, +0.018] | Helps, barely | 1,108,994 | 2.22 MB | 29 |
+| d4 | 0.418 | -0.007 | [-0.017, +0.003] | No effect | 391,042 | 0.78 MB | 61 |
+| w256d4 | 0.414 | -0.012 | [-0.023, -0.002] | **Hurts** | 1,437,442 | 2.87 MB | 61 |
+
+### Width
+
+The only arm that clears zero does so with its lower bound AT zero: +0.009 MCC
+for 3.6x the parameters and 1.6 MB more asset. Against a deficit of 0.076
+against NetSurfP's one-hot baseline, that is a eighth of the gap for a head that
+has to ship on a phone and run on the Neural Engine. Not a trade worth making,
+and reported as "helps" only because the arithmetic says so.
+
+### Depth, and a refuted hypothesis
+
+The sweep was designed around an explicit prediction: disordered regions are
+long, the shipped head sees 29 residues, and a fourth dilated block seeing 61
+should help if disorder is a statement about a larger neighbourhood.
+
+**It does not.** `d4` is 0.007 worse and `w256d4`, which is both changes at
+once, is the only arm that measurably HURTS. More context is not what this head
+is missing. Whatever the extra block adds, it dilutes more than it contributes
+at this data budget.
+
+### Three experiments, one conclusion
+
+| Experiment | Result |
+|---|---|
+| RSA auxiliary task | Bounded within ±0.013. No effect |
+| One-hot control | Embeddings worth +0.046; gap to NetSurfP is architecture |
+| Capacity sweep | Width buys an eighth of the gap at 3.6x size; depth hurts |
+
+Better supervision does not help. More parameters do not help. More context
+hurts. **The head is close to what a frozen 480-dimensional embedding supports
+at this data budget**, and the residual gap to NetSurfP lives where BOFFIN
+cannot currently follow: a larger backbone, trained end to end, with the
+representation itself adapting to the task.
+
+### The decision this raises
+
+The only remaining route is to stop freezing the backbone: fine-tune ESM-2 for
+this task, or move to a larger one. Both conflict directly with the premises
+this app is built on. The 98.8% Neural Engine residency was achieved on a
+specific converted graph, the model is 67 MB before any of this, and a
+fine-tuned backbone is a second copy of it rather than an edit to the head.
+
+That is a project-direction question rather than an engineering one, and it is
+recorded here rather than answered.

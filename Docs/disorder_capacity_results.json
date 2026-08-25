@@ -1,0 +1,130 @@
+{
+  "w128": {
+    "parameters": 308738,
+    "megabytes_fp16": 0.617476,
+    "receptive_field": 29,
+    "cb513": {
+      "mcc": 0.4258962774380416,
+      "delta": 0.0,
+      "paired_ci": [
+        0.0,
+        0.0
+      ],
+      "verdict": "no effect detectable"
+    },
+    "ts115": {
+      "mcc": 0.64338247089441,
+      "delta": 0.0,
+      "paired_ci": [
+        0.0,
+        0.0
+      ],
+      "verdict": "no effect detectable"
+    },
+    "casp12": {
+      "mcc": 0.5152212717714284,
+      "delta": 0.0,
+      "paired_ci": [
+        0.0,
+        0.0
+      ],
+      "verdict": "no effect detectable"
+    }
+  },
+  "w256": {
+    "parameters": 1108994,
+    "megabytes_fp16": 2.217988,
+    "receptive_field": 29,
+    "cb513": {
+      "mcc": 0.434415594909477,
+      "delta": 0.008519317471435417,
+      "paired_ci": [
+        5.975687910214912e-05,
+        0.017773111699833328
+      ],
+      "verdict": "helps"
+    },
+    "ts115": {
+      "mcc": 0.6391297461137354,
+      "delta": -0.0042527247806746216,
+      "paired_ci": [
+        -0.017392671716800166,
+        0.008312452343126095
+      ],
+      "verdict": "no effect detectable"
+    },
+    "casp12": {
+      "mcc": 0.5101228055934526,
+      "delta": -0.0050984661779758245,
+      "paired_ci": [
+        -0.025005840342172396,
+        0.011008489565112946
+      ],
+      "verdict": "no effect detectable"
+    }
+  },
+  "d4": {
+    "parameters": 391042,
+    "megabytes_fp16": 0.782084,
+    "receptive_field": 61,
+    "cb513": {
+      "mcc": 0.4184490226871593,
+      "delta": -0.007447254750882315,
+      "paired_ci": [
+        -0.01735149210475068,
+        0.0028964416245943303
+      ],
+      "verdict": "no effect detectable"
+    },
+    "ts115": {
+      "mcc": 0.6310274225824901,
+      "delta": -0.012355048311919914,
+      "paired_ci": [
+        -0.028511469147942038,
+        0.005297944438908744
+      ],
+      "verdict": "no effect detectable"
+    },
+    "casp12": {
+      "mcc": 0.48285421420892854,
+      "delta": -0.03236705756249986,
+      "paired_ci": [
+        -0.06287202200470672,
+        0.006925941240840344
+      ],
+      "verdict": "no effect detectable"
+    }
+  },
+  "w256d4": {
+    "parameters": 1437442,
+    "megabytes_fp16": 2.874884,
+    "receptive_field": 61,
+    "cb513": {
+      "mcc": 0.4137531017451071,
+      "delta": -0.012143175692934494,
+      "paired_ci": [
+        -0.022772983180147283,
+        -0.0015470867845919607
+      ],
+      "verdict": "hurts"
+    },
+    "ts115": {
+      "mcc": 0.6276518689621158,
+      "delta": -0.015730601932294253,
+      "paired_ci": [
+        -0.03345061124221488,
+        0.003137027669393929
+      ],
+      "verdict": "no effect detectable"
+    },
+    "casp12": {
+      "mcc": 0.5059894634580403,
+      "delta": -0.009231808313388101,
+      "paired_ci": [
+        -0.028906359442163847,
+        0.018891585727698612
+      ],
+      "verdict": "no effect detectable"
+    }
+  }
+}

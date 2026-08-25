@@ -1872,3 +1872,38 @@ the same head achieves with no language model at all" — wording introduced
 earlier the same day while narrowing an even looser claim, and exactly wrong in
 the specific: the same head with no language model achieves 0.380, not 0.502.
 Narrowing a claim is not the same as checking it.
+
+---
+
+## Capacity does not close the disorder gap either (2026-08-25)
+
+Four arms, same seed, same chains, same batches, thresholds tuned on the same
+validation chains and applied blind, compared paired over the same bootstrap
+draws. The w128 arm reproduced the shipped baseline bit-identically, intervals
+included.
+
+| Arm | CB513 | Delta | Paired 95% | Verdict | fp16 | Field |
+|---|---|---|---|---|---|---|
+| w128 (shipped) | 0.426 | — | — | — | 0.62 MB | 29 |
+| w256 | 0.434 | +0.009 | [+0.000, +0.018] | Helps, barely | 2.22 MB | 29 |
+| d4 | 0.418 | -0.007 | [-0.017, +0.003] | No effect | 0.78 MB | 61 |
+| w256d4 | 0.414 | -0.012 | [-0.023, -0.002] | Hurts | 2.87 MB | 61 |
+
+The only arm that clears zero does so with its lower bound at zero: an eighth of
+the deficit for 3.6x the parameters, on a head that ships on a phone.
+
+**A hypothesis refuted, which was the point of separating depth from width.**
+The sweep was designed around an explicit prediction: disordered regions are
+long, the shipped head sees 29 residues, and a fourth dilated block seeing 61
+should help. It does not, and both changes together is the only arm that
+measurably hurts. More context is not what this head is missing.
+
+Three experiments now agree. Better supervision does nothing. More parameters
+buy almost nothing. More context hurts. And the one-hot control already showed
+the embeddings are contributing +0.046, so the input is not the problem either.
+The head is close to what a frozen 480-dimensional embedding supports at this
+data budget.
+
+The only route left is to stop freezing the backbone. That conflicts with the
+premises the app rests on, and is recorded as a question for Marc rather than
+answered here.

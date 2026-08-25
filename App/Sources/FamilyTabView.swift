@@ -12,6 +12,7 @@
 
 import BoffinCore
 import BoffinData
+import BoffinML
 import BoffinUI
 import SwiftUI
 
@@ -37,6 +38,7 @@ struct FamilyTabView: View {
     private var content: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.l) {
+                if let call = store.familyCall { classification(call) }
                 if store.motifs.isEmpty {
                     noFamilyRecognised
                 } else {
@@ -53,6 +55,55 @@ struct FamilyTabView: View {
             }
             .padding(Spacing.m)
         }
+    }
+
+    /// The classifier's ranked call, with its confidence presented honestly.
+    private func classification(_ call: FamilyClassification) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text("Pfam classification").font(.headline)
+
+            // The caveat is always shown, not only when confidence is low.
+            // A closed-set classifier reports the nearest of its trained
+            // families whatever it is given, so "confident" and "correct" are
+            // different claims and the difference has to be on screen.
+            Label(
+                call.caveat,
+                systemImage: call.isInDistribution && call.isConfident
+                    ? "info.circle" : "exclamationmark.triangle"
+            )
+            .font(.caption)
+            .foregroundStyle(
+                call.isInDistribution && call.isConfident ? Color.secondary : Color.orange
+            )
+            .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(call.ranked) { entry in
+                HStack {
+                    Text(entry.accession)
+                        .font(.system(.subheadline, design: .monospaced))
+                        .foregroundStyle(entry.id == call.top?.id ? Brand.accent : .secondary)
+                    Spacer()
+                    Text(String(format: "%.1f%%", entry.confidence * 100))
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Text(
+                String(
+                    format:
+                        "Confidence is calibrated: the model is right %.0f%% of the time "
+                        + "on held-out data, and its calibration error is under 1%%, so a "
+                        + "reported percentage means roughly what it says. "
+                        + "Trained on %d Pfam families.",
+                    call.top1Accuracy * 100, call.ranked.isEmpty ? 0 : 100)
+            )
+            .font(.caption2).foregroundStyle(.tertiary)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(Spacing.m)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 10))
     }
 
     private var noFamilyRecognised: some View {
@@ -135,8 +186,8 @@ struct FamilyTabView: View {
             Label("Not in this build", systemImage: "hammer")
                 .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             Text(
-                "Pfam classification from the pooled embedding, SIFTS mapping to PDB "
-                    + "author numbers, and homolog search over the bundled embedding index."
+                "SIFTS mapping to PDB author numbers, and homolog search over a bundled "
+                    + "embedding index."
             )
             .font(.caption2).foregroundStyle(.tertiary)
             .fixedSize(horizontal: false, vertical: true)

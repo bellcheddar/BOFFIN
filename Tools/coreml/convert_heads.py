@@ -176,6 +176,59 @@ def measure_residency(package: Path) -> tuple[float, dict]:
     return (counts["ANE"] / executable if executable else 0.0), dict(counts)
 
 
+def convert_family(width: int) -> None:
+    """Convert the family classifier: pooled embedding in, family logits out."""
+    import json as _json
+
+    from train_family_classifier import FamilyHead
+
+    weights = HEADS / "family.pt"
+    metadata = HEADS / "family_labels.json"
+    if not weights.exists() or not metadata.exists():
+        print("family classifier not trained, skipped\n")
+        return
+
+    config = _json.loads(metadata.read_text())
+    families = config["families"]
+    head = FamilyHead(classes=len(families))
+    head.load_state_dict(torch.load(weights, map_location="cpu"))
+    head.eval()
+
+    example = torch.zeros(1, EMBED_WIDTH_GLOBAL)
+    with torch.no_grad():
+        traced = torch.jit.trace(head, example)
+
+    mlmodel = ct.convert(
+        traced,
+        inputs=[ct.TensorType(
+            name="embedding", shape=(1, EMBED_WIDTH_GLOBAL), dtype=np.float16)],
+        outputs=[ct.TensorType(name="logits", dtype=np.float16)],
+        convert_to="mlprogram",
+        compute_precision=ct.precision.FLOAT16,
+        compute_units=ct.ComputeUnit.CPU_AND_NE,
+        minimum_deployment_target=ct.target.iOS18,
+    )
+    mlmodel.short_description = (
+        f"Pfam family logits over {len(families)} families, from the mean-pooled "
+        f"backbone embedding. Top-1 {config['top1']:.3f}, top-5 {config['top5']:.3f}, "
+        f"calibration error {config['calibration_error']:.4f} on held-out data.")
+    package = HEADS / "family.mlpackage"
+    mlmodel.save(str(package))
+
+    size = sum(f.stat().st_size for f in package.rglob("*") if f.is_file()) / 1e6
+    probe = torch.randn(1, EMBED_WIDTH_GLOBAL)
+    with torch.no_grad():
+        expected = head(probe).numpy().astype(np.float32)
+    actual = np.asarray(
+        mlmodel.predict({"embedding": probe.numpy().astype(np.float16)})["logits"],
+        dtype=np.float32)
+    agree = (expected.argmax(axis=1) == actual.argmax(axis=1)).mean()
+    print("family")
+    print(f"  size:      {size:.2f} MB, {len(families)} families")
+    print(f"  parity:    argmax agreement {agree:.4%}")
+    print()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     # 1024: one window covers any protein up to 1022 residues with no seams.
@@ -197,6 +250,11 @@ def main() -> int:
         ("secondary_structure", 8, "Per-residue Q8 secondary structure logits, order GHIBESTC."),
         ("disorder", 2, "Per-residue disorder logits: index 0 disordered, index 1 ordered."),
     ]
+
+    # The family classifier is a different shape: one vector in, one
+    # distribution out, so it is converted separately rather than forced through
+    # the per-residue path.
+    convert_family(width=width)
 
     failures = []
     for name, classes, description in specifications:

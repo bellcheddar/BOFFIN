@@ -11,11 +11,22 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 5 (Family tab) **in progress**: motifs and canonical numbering done; Pfam classifier, SIFTS and homolog index outstanding
+- **Phase:** 5 (Family tab) **in progress**: motifs, canonical numbering and the Pfam classifier done; SIFTS and homolog index outstanding
 - **Last completed:** Phase 5 family motifs on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
 
 ### Phase 5 findings
+
+- **A closed-set classifier reports the nearest trained class, confidently, for
+  anything outside its label set.** Ubiquitin (PF00240, not trained) is called
+  PF00076 at 79.7%. No confidence threshold catches it. State the limitation;
+  do not try to score around it.
+- **Cosine to the nearest class centroid is a weak OOD signal here**: correct
+  CDK2 sits at 0.829, wrong ubiquitin at 0.864. It separates in- from
+  out-of-distribution, not right from wrong, and is only used for that claim.
+- **Temperature scaling can make calibration worse.** Fitted 1.17, and the
+  calibration split said raw 0.013 beat scaled 0.015, so it is not applied.
+  Decide on the calibration split, never on test.
 
 - **Sequence identity over ALIGNED COLUMNS is a biased statistic.** It excludes
   gaps, so a short overlap that happens to match scores as highly as a full

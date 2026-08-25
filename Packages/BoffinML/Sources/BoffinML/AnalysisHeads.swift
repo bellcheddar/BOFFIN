@@ -127,6 +127,13 @@ public actor AnalysisHeads {
 
     private var secondaryStructureModel: MLModel?
     private var disorderModel: MLModel?
+    private var familyModel: MLModel?
+    private let familyURL: URL
+    private let familyLabels: [String]?
+    private let familyTemperature: Double
+    private let familyTop1: Double
+    private let familyCentroids: [[Double]]
+    private let familySimilarityFloor: Double
     private var compiled: [URL: URL] = [:]
 
     private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "AnalysisHeads")
@@ -138,6 +145,30 @@ public actor AnalysisHeads {
     public init(directory: URL) throws {
         self.secondaryStructureURL = directory.appending(path: "secondary_structure.mlpackage")
         self.disorderURL = directory.appending(path: "disorder.mlpackage")
+        self.familyURL = directory.appending(path: "family.mlpackage")
+
+        // The family classifier is optional: the Order tab works without it, so
+        // a missing one degrades rather than blocking.
+        struct FamilyMetadata: Decodable {
+            let families: [String]
+            let temperature: Double
+            let top1: Double
+            let centroids: [[Double]]?
+            let similarityFloor: Double?
+
+            enum CodingKeys: String, CodingKey {
+                case families, temperature, top1, centroids
+                case similarityFloor = "similarity_floor"
+            }
+        }
+        let metadata = try? JSONDecoder().decode(
+            FamilyMetadata.self,
+            from: Data(contentsOf: directory.appending(path: "family_labels.json")))
+        self.familyLabels = metadata?.families
+        self.familyTemperature = metadata?.temperature ?? 1.0
+        self.familyTop1 = metadata?.top1 ?? 0
+        self.familyCentroids = metadata?.centroids ?? []
+        self.familySimilarityFloor = metadata?.similarityFloor ?? 0
         do {
             let data = try Data(contentsOf: directory.appending(path: "config.json"))
             self.configuration = try JSONDecoder().decode(HeadConfiguration.self, from: data)
@@ -165,6 +196,25 @@ public actor AnalysisHeads {
         let loaded = try await load(url: disorderURL)
         disorderModel = loaded
         return loaded
+    }
+
+    private func familyHead() async throws -> MLModel {
+        if let familyModel { return familyModel }
+        let loaded = try await load(url: familyURL)
+        familyModel = loaded
+        return loaded
+    }
+
+    /// Force the synchronous prediction overload.
+    ///
+    /// In an async context Swift prefers `prediction(from:) async`, which wants
+    /// to send the model across an isolation boundary and is refused under
+    /// strict concurrency. The actor already serialises access, which is the
+    /// guarantee Core ML actually needs.
+    private nonisolated func predictSynchronously(
+        model: MLModel, features: MLFeatureProvider
+    ) throws -> MLFeatureProvider {
+        try model.prediction(from: features)
     }
 
     private func load(url: URL) async throws -> MLModel {
@@ -359,5 +409,165 @@ extension HeadPredictions {
         var result = [secondaryStructureTrack(), disorderTrack()]
         if let spans = disorderSpansTrack() { result.append(spans) }
         return result
+    }
+}
+
+// MARK: - Family classification
+
+/// A ranked family call with its calibrated confidence.
+public struct FamilyCall: Sendable, Hashable, Identifiable {
+    public let accession: String
+    public let confidence: Double
+    public var id: String { accession }
+}
+
+/// What the classifier concluded.
+public struct FamilyClassification: Sendable {
+    /// Ranked calls, most confident first.
+    public let ranked: [FamilyCall]
+    /// Whether the top call clears the confidence floor.
+    public let isConfident: Bool
+    /// Held-out accuracy of the model that produced this, so the number on
+    /// screen can be read against how often the model is right.
+    public let top1Accuracy: Double
+
+    /// Cosine similarity to the nearest training family's centroid.
+    public let similarityToNearestFamily: Double
+
+    /// Whether that similarity sits inside the range the model was trained on.
+    public let isInDistribution: Bool
+
+    /// How many families the classifier can answer with.
+    public let familyCount: Int
+
+    /// Below this, the call is presented as uncertain rather than as an answer.
+    ///
+    /// The risk register names classifier over-confidence explicitly. The
+    /// model's calibration error is measured at under 0.01, so a reported 0.5
+    /// really is about a coin flip, and presenting it as a family assignment
+    /// would be the failure the register describes.
+    public static let confidenceFloor = 0.50
+
+    public var top: FamilyCall? { ranked.first }
+
+    /// The classifier is CLOSED SET and this is the honest consequence.
+    ///
+    /// It can only answer with one of the families it was trained on, so a
+    /// protein from any other family is assigned the nearest one and reported
+    /// confidently. Measured: ubiquitin, whose family PF00240 is not in the
+    /// trained set, is called PF00076 at 79.7%. Confidence cannot detect this,
+    /// because the model genuinely is confident, so the limitation has to be
+    /// stated rather than scored around.
+    public var caveat: String {
+        if !isInDistribution {
+            return "This sequence sits outside the range the classifier was trained on, "
+                + "so the call above is the nearest of \(familyCount) families rather than "
+                + "an identification."
+        }
+        if !isConfident {
+            return "Low confidence. This is not a family assignment."
+        }
+        return "The classifier chooses among \(familyCount) Pfam families and cannot "
+            + "report one outside them, so treat a confident call as \"the closest of "
+            + "those\" rather than as an exhaustive answer."
+    }
+}
+
+extension AnalysisHeads {
+
+    /// Cosine similarity between a pooled embedding and the nearest class
+    /// centroid.
+    ///
+    /// A weak signal, and labelled as such: correctly-classified CDK2 measures
+    /// 0.829 while misclassified ubiquitin measures 0.864, so this does not
+    /// separate right from wrong. It separates "inside the training
+    /// distribution" from "outside it", which is a different and still useful
+    /// question.
+    func nearestFamilySimilarity(to pooled: [Float]) -> Double {
+        guard !familyCentroids.isEmpty else { return 1 }
+        let vector = pooled.map(Double.init)
+        let norm = (vector.reduce(0) { $0 + $1 * $1 }).squareRoot()
+        guard norm > 0 else { return 0 }
+
+        var best = -1.0
+        for centroid in familyCentroids where centroid.count == vector.count {
+            var dot = 0.0
+            for index in vector.indices { dot += vector[index] * centroid[index] }
+            best = max(best, dot / norm)
+        }
+        return best
+    }
+
+    /// Classify the pooled embedding into a Pfam family.
+    ///
+    /// Invariant 1's third fan-out: this reads the same forward pass that
+    /// produced the per-residue tracks, rather than running the backbone again.
+    public func classifyFamily(
+        for embedding: EmbeddingResult
+    ) async throws
+        -> FamilyClassification
+    {
+        guard let families = familyLabels, !families.isEmpty else {
+            throw HeadError.unavailable("family labels not bundled")
+        }
+        let model = try await familyHead()
+
+        let input = try MLMultiArray(
+            shape: [1, NSNumber(value: embedding.width)], dataType: .float16)
+        // Float16 has no NSNumber initialiser: write through Float, which the
+        // array converts on assignment.
+        for (index, value) in embedding.pooled.enumerated() {
+            input[index] = NSNumber(value: value)
+        }
+
+        let features = try MLDictionaryFeatureProvider(dictionary: ["embedding": input])
+        // The synchronous overload: this is already inside the actor, and the
+        // async one requires the model to cross an isolation boundary.
+        let output = try predictSynchronously(model: model, features: features)
+        guard let logits = output.featureValue(for: "logits")?.multiArrayValue else {
+            throw HeadError.unexpectedOutputShape("family logits missing")
+        }
+
+        // Stride-aware, like every other read: Core ML pads rows.
+        let strides = logits.strides.map(\.intValue)
+        let valueStride = strides.last ?? 1
+        var raw = [Double](repeating: 0, count: families.count)
+        logits.withUnsafeBytes { rawBuffer in
+            switch logits.dataType {
+            case .float16:
+                let typed = rawBuffer.bindMemory(to: Float16.self)
+                for index in raw.indices { raw[index] = Double(typed[index * valueStride]) }
+            case .float32:
+                let typed = rawBuffer.bindMemory(to: Float.self)
+                for index in raw.indices { raw[index] = Double(typed[index * valueStride]) }
+            default:
+                break
+            }
+        }
+
+        // Temperature is applied as stored. It is 1.0 when the head was already
+        // well calibrated: scaling an already-calibrated head makes it worse,
+        // and that was measured rather than assumed.
+        let temperature = max(familyTemperature, 1e-6)
+        let scaled = raw.map { $0 / temperature }
+        let maximum = scaled.max() ?? 0
+        let exponentials = scaled.map { Foundation.exp($0 - maximum) }
+        let total = exponentials.reduce(0, +)
+        let probabilities = total > 0 ? exponentials.map { $0 / total } : exponentials
+
+        let ranked =
+            zip(families, probabilities)
+            .map { FamilyCall(accession: $0.0, confidence: $0.1) }
+            .sorted { $0.confidence > $1.confidence }
+            .prefix(5)
+
+        let similarity = nearestFamilySimilarity(to: embedding.pooled)
+        return FamilyClassification(
+            ranked: Array(ranked),
+            isConfident: (ranked.first?.confidence ?? 0) >= FamilyClassification.confidenceFloor,
+            top1Accuracy: familyTop1,
+            similarityToNearestFamily: similarity,
+            isInDistribution: similarity >= familySimilarityFloor,
+            familyCount: families.count)
     }
 }

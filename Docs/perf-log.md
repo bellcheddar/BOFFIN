@@ -215,3 +215,46 @@ The backbone was reconverted to add a `logits` output, which Phase 2 did not
 need. Residency and parity were re-measured rather than assumed to carry over:
 **98.8% ANE residency**, parity passing on all six buckets, delta-LLR Spearman
 rho 0.999975 against PyTorch.
+
+
+## Phase 5 (2026-08-25)
+
+### Family classifier
+
+| | |
+|---|---|
+| Families | 100 Pfam |
+| Training sequences | 8,178 (Swiss-Prot, single-domain only) |
+| Top-1 accuracy | **0.978** |
+| Top-5 accuracy | 0.998 |
+| Random baseline | 0.010 |
+| Calibration error | **0.0099** |
+| Head size | 0.81 MB |
+
+**Temperature scaling was fitted and then NOT applied.** The head measured an
+expected calibration error of 0.013 raw against 0.015 scaled on the calibration
+split, so scaling made it worse. Temperature scaling corrects over-confidence;
+it is not a ritual, and applying it unconditionally would have degraded exactly
+the number the risk register cares about. The decision is made on the
+calibration split, never on test.
+
+### The limitation that accuracy hides
+
+The classifier is **closed set**. It answers with one of its 100 families
+whatever it is given, so a protein from any other family is assigned the nearest
+one and reported confidently. Measured: **ubiquitin, whose family PF00240 is not
+in the trained set, is called PF00076 at 79.7%.**
+
+Confidence cannot detect this, because the model genuinely is confident.
+
+Cosine similarity to the nearest class centroid was evaluated as an
+out-of-distribution signal and is honestly weak: correctly-classified CDK2
+measures 0.829 while misclassified ubiquitin measures 0.864, so it does not
+separate right from wrong. It does separate inside-the-training-distribution
+from outside it (in-distribution 5th percentile 0.929), so it is reported and
+used only for that narrower claim. The limitation itself is stated on screen on
+every call rather than scored around.
+
+Spot checks where the trained set does contain the family, all correct:
+CDK2 to PF00069 (protein kinase), beta-2 adrenergic receptor to PF00001 (7TM
+rhodopsin family), PETase to PF00561 (alpha/beta hydrolase).

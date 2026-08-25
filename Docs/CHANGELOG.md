@@ -259,3 +259,36 @@ defining format is lost.
 Every mapped numbering carries the reference it came from and the identity that
 produced it, in the track title and on the Family tab. A residue number gets
 copied out of an app; a caveat in a footnote does not travel with it.
+
+
+## Phase 5 (part 3): family classifier (2026-08-25)
+
+Pfam classification over the pooled embedding: invariant 1's third fan-out, from
+the same forward pass that produces the tracks and the delta-LLR. 188 package
+tests and 6 UI tests passing.
+
+**97.8% top-1 across 100 Pfam families** (1% random baseline), 99.8% top-5,
+calibration error under 0.01, in a 0.81 MB head.
+
+Training data is deliberately narrowed: Swiss-Prot only, because TrEMBL's Pfam
+annotations are propagated automatically and training on them partly teaches the
+model to reproduce whatever assigned them; and single-domain entries only,
+because a multi-domain protein labelled with one of its domains teaches the
+classifier that the others are wrong. That excluded 28,914 of the entries seen
+and bought a label that means what it says.
+
+**Temperature scaling was fitted and then not applied.** On the calibration
+split the head measured 0.013 raw against 0.015 scaled, so scaling made it
+worse. It is a correction for over-confidence, not a ritual.
+
+**The failure worth recording is one accuracy cannot show.** The classifier is
+closed set: it answers with one of its 100 families whatever it is given.
+Ubiquitin, whose family PF00240 is not in the trained set, is called PF00076 at
+79.7% confidence. No confidence threshold catches that, because the model is
+genuinely confident.
+
+Cosine similarity to the nearest class centroid was tried as an
+out-of-distribution detector and is weak: correctly-classified CDK2 sits at
+0.829, below misclassified ubiquitin at 0.864. It is kept for the narrower claim
+it can support ("outside the training distribution", 5th percentile 0.929) and
+the closed-set limitation is stated on screen on every call instead.

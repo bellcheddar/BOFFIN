@@ -31,6 +31,7 @@ final class SequenceStore {
     private(set) var motifs: [MotifFamily: [Motif]] = [:]
     private(set) var numbering: NumberingResult?
     private(set) var numberingScheme: String?
+    private(set) var familyCall: FamilyClassification?
 
     // MARK: - Fitness
 
@@ -110,6 +111,7 @@ final class SequenceStore {
             motifs = [:]
             numbering = nil
             numberingScheme = nil
+            familyCall = nil
             llr = nil
             llrMode = nil
             mutations = []
@@ -167,6 +169,8 @@ final class SequenceStore {
 
             predictions = result
             modelTracks = candidates
+            // The third fan-out from the same pass.
+            familyCall = try? await heads.classifyFamily(for: embedding)
             modelState = .ready(passes: embedding.passes)
         } catch {
             modelTracks = []

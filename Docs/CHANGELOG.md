@@ -292,3 +292,92 @@ out-of-distribution detector and is weak: correctly-classified CDK2 sits at
 0.829, below misclassified ubiquitin at 0.864. It is kept for the narrower claim
 it can support ("outside the training distribution", 5th percentile 0.929) and
 the closed-set limitation is stated on screen on every call instead.
+
+## Phase 5 (part 4): SIFTS mapping and homolog search (2026-08-25)
+
+The fourth fan-out from the same forward pass: the pooled embedding that already
+drives family classification now also searches the PDB, and SIFTS turns a hit
+into the residue numbers a paper would use.
+
+### The index
+
+One entry per **UniProt accession**, 72,421 of them, covering the PDB. The unit
+is deliberate. RCSB's 30% sequence clusters are the obvious choice and the wrong
+one: they merge every crystal form and point mutant of a protein, which is right
+for a redundancy filter and wrong for both things this index feeds. Homolog
+search wants distinct proteins, and the Boundary tab wants every construct ever
+deposited for one protein.
+
+Vectors are L2-normalised and stored as int8, searched exhaustively with
+Accelerate. **An approximate nearest-neighbour structure was considered and
+rejected**: at 72,421 by 480 a query is a 34.8 M multiply-and-add, so ANN would
+buy latency the app does not need and pay for it in recall that is silently
+imperfect and a failure mode nobody can see. Exhaustive search returns the
+actual nearest neighbours.
+
+### Three things that were wrong first, and none of which raised an error
+
+**A truncated download does not look truncated.** `entries.idx` is 57 MB;
+`curl --max-time` left 3 MB of it on disk and the `|| echo` in the fetch loop
+swallowed the non-zero exit. The build then ran happily on 19,151 of 258,224
+PDB entries, because every missing entry simply fell to a default rank. That
+silently redefined "the best structure of this protein" as "the alphabetically
+first PDB ID". The builder now refuses a short file and asserts coverage.
+
+**Ranking candidate chains by resolution selects fragments.** The
+highest-resolution chain for the beta-2 adrenergic receptor is 1GQ4_A, a ninety
+-residue C-terminal peptide bound to NHERF at 1.9 A; 2RH1, the receptor, is
+2.4 A and loses. A fragment nearly always out-resolves its parent. Since the
+index holds one vector per accession, ADRB2's vector would have been a
+disordered tail and no GPCR search would ever have found it. Chains are now
+ranked by UniProt coverage first, with method and resolution deciding only among
+chains of comparable coverage.
+
+**A 1,022-residue ceiling removes exactly the proteins people search for.** EGFR
+is 1,210 residues and was absent entirely, with 3,533 others. The app already
+tiles long queries and mean-pools the stitched result, so an untiled index would
+have compared two different statistics. The index now tiles identically:
+capacity 1022, overlap 128, overlapping positions averaged, and the embedder
+handles tiled sequences one at a time so the overlap is averaged rather than
+double-counted.
+
+### SIFTS
+
+PDB author numbering is whatever the depositor chose: not 1-based, not
+contiguous, negative where an expression tag is numbered backwards, and carrying
+insertion codes where a scheme is preserved across homologues. So the residue a
+paper calls Asp145 is not the 145th of anything BOFFIN computes.
+
+The bundled table carries all three coordinate systems per segment (SEQRES,
+UniProt, author), which lets a query reach an author number in one hop. Between
+segments there is no mapping, because those residues were not observed, and
+interpolating across the gap is precisely how a residue number ends up plausible
+and wrong. **1.87% of segments are marked non-arithmetic** and refused, either
+for insertion codes or because the three systems do not advance together.
+
+Each way of failing is reported as itself: not aligned, not observed, or
+insertion-coded. "Not observed in the crystal" is a fact a structural biologist
+wants; "we could not work it out" is an apology.
+
+### Two numbers that are easy to confuse
+
+Embedding **similarity** is a cosine between pooled representations.
+**Identity** is from an alignment. They disagree exactly where the index earns
+its keep, on remote homologues sharing a fold at low identity, and a cosine
+reads as a percentage identity to anyone who has run BLAST. Both are shown, and
+identity is shown with **coverage** beside it, because identity denominated on
+the reference reads 100% for a query carrying a large insertion.
+
+### CI had been red for four commits
+
+Not from any of the above. `try #require(modelIsAvailable)` inside a test does
+not skip it: `#require(false)` records an issue and marks the test FAILED. On a
+runner with no 67 MB converted model, thirteen BoffinML tests went red for a
+reason that was not a defect, and every local run stayed green because the
+artefacts exist here. The suites are now gated with `.enabled(if:)`, which
+reports skipped.
+
+The simulator job was failing for a related reason: tapping "Fast preview"
+without a model returned silently, so the UI test saw no heatmap and no
+explanation. The app now says why, and the test accepts either the heatmap or
+the explanation while insisting on exactly one of them.

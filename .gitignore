@@ -42,7 +42,18 @@ scratch/
 # cannot tokenise without first running a 4 GB toolchain is not much use.
 Models/*.reference.npz
 
+# Class centroids are an intermediate: the values that ship are embedded in
+# Models/heads/family_labels.json, which IS committed.
+Models/heads/*.npy
+
 # Head training datasets. Hundreds of megabytes, reproducible from
 # Tools/data/fetch_head_datasets.py; provenance in Datasets/MANIFEST.md.
 Datasets/*.npz
 Datasets/*.json
+
+# PDB bulk downloads and the built index. Around 500 MB of inputs and 105 MB of
+# packed assets, all reproducible from Tools/data/build_pdb_index.py; provenance
+# and the exact commands are in Datasets/pdb/MANIFEST.md.
+Datasets/pdb/*
+!Datasets/pdb/MANIFEST.md
+Assets/

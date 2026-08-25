@@ -29,7 +29,15 @@ let package = Package(
             // are also the artefact that must never drift from what the motif
             // and numbering code expects.
             resources: [.process("Resources")],
-            swiftSettings: [.swiftLanguageMode(.v6)]
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+                // Accelerate's legacy CBLAS declarations are deprecated in
+                // favour of the ILP64 interface, and the deprecation is only
+                // visible once you actually call one. Opting in here keeps the
+                // tree warning-free without suppressing anything.
+                .define("ACCELERATE_NEW_LAPACK"),
+                .define("ACCELERATE_LAPACK_ILP64"),
+            ]
         ),
         .testTarget(
             name: "BoffinDataTests",

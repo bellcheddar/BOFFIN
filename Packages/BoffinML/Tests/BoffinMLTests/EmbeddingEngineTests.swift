@@ -13,6 +13,13 @@
 //  `Tools/coreml/convert_backbone.py`). When it is absent these tests report
 //  why and skip, rather than silently passing and creating the impression the
 //  engine has been checked.
+//
+//  The gate is `.enabled(if:)` on the SUITE, not a `#require` inside each test.
+//  That distinction cost four consecutive red CI runs: `#require(false)` marks a
+//  test FAILED, so on a runner with no converted model the suite goes red for a
+//  reason that is not a defect, every local run stays green because the model
+//  exists here, and the red stops being read. `.enabled(if:)` reports SKIPPED,
+//  which is what actually happened.
 
 import BoffinCore
 import Foundation
@@ -73,12 +80,13 @@ private var modelIsAvailable: Bool {
 /// hardware can represent would be a test that fails for being right.
 private let relativeTolerance = 0.02
 
-@Suite("Tokeniser")
+@Suite(
+    "Tokeniser",
+    .enabled(if: modelIsAvailable, "converted model not present: run convert_backbone.py"))
 struct TokeniserTests {
 
     @Test("The exported alphabet round-trips residues to indices")
     func alphabetRoundTrips() throws {
-        try #require(modelIsAvailable, "converted model not present: run convert_backbone.py")
         let tokeniser = try Tokeniser(contentsOf: tokeniserURL)
 
         // ESM-2's alphabet is 33 tokens. If this changed, the model changed.
@@ -90,7 +98,6 @@ struct TokeniserTests {
 
     @Test("Non-canonical residues map to unknown, never to a neighbour")
     func nonCanonicalMapsToUnknown() throws {
-        try #require(modelIsAvailable, "converted model not present")
         let tokeniser = try Tokeniser(contentsOf: tokeniserURL)
         // Dropping them instead would shift every downstream residue by one and
         // silently misalign every track against the sequence.
@@ -100,7 +107,6 @@ struct TokeniserTests {
 
     @Test("Encoding wraps residues in the special tokens and pads the rest")
     func encodingWrapsAndPads() throws {
-        try #require(modelIsAvailable, "converted model not present")
         let tokeniser = try Tokeniser(contentsOf: tokeniserURL)
         let sequence = ProteinSequence(name: "t", letters: "MKVL", source: .pasted)
 
@@ -113,12 +119,13 @@ struct TokeniserTests {
     }
 }
 
-@Suite("Embedding engine, against the PyTorch golden")
+@Suite(
+    "Embedding engine, against the PyTorch golden",
+    .enabled(if: modelIsAvailable, "converted model not present: run convert_backbone.py"))
 struct EmbeddingEngineTests {
 
     @Test("Ubiquitin embeds to the reference vectors")
     func ubiquitinMatchesGolden() async throws {
-        try #require(modelIsAvailable, "converted model not present: run convert_backbone.py")
         let golden = try loadGolden()
 
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
@@ -149,7 +156,6 @@ struct EmbeddingEngineTests {
 
     @Test("The pooled embedding is the mean over real residues only")
     func pooledExcludesSpecialTokens() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let golden = try loadGolden()
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let sequence = ProteinSequence(
@@ -171,7 +177,6 @@ struct EmbeddingEngineTests {
 
     @Test("Embedding is deterministic across engine instances")
     func embeddingIsDeterministic() async throws {
-        try #require(modelIsAvailable, "converted model not present")
 
         // Two engines, so the cache cannot be what makes these agree. Core ML
         // reusing a stale compiled model, or the tokeniser depending on
@@ -201,7 +206,6 @@ struct EmbeddingEngineTests {
 
     @Test("Repeating a sequence is served from cache")
     func repeatIsCached() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let sequence = ProteinSequence(name: "t", letters: "MQIFVKTLTGKTITLE", source: .pasted)
 
@@ -212,7 +216,6 @@ struct EmbeddingEngineTests {
 
     @Test("An empty sequence is refused rather than embedded")
     func emptySequenceIsRefused() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let empty = ProteinSequence(name: "t", letters: "", source: .pasted)
         await #expect(throws: EmbeddingError.self) { try await engine.embed(empty) }

@@ -31,7 +31,26 @@ final class SequenceStore {
     private(set) var motifs: [MotifFamily: [Motif]] = [:]
     private(set) var numbering: NumberingResult?
     private(set) var numberingScheme: String?
+    /// Named kinase pocket landmarks: gatekeeper, hinge, DFG, beta-3 lysine.
+    private(set) var pocketAnchors: [PocketAnchor] = []
     private(set) var familyCall: FamilyClassification?
+
+    /// Homolog hits, aligned to the query so each carries a real identity and
+    /// residue-level PDB numbering rather than only a cosine.
+    private(set) var homologs: [HomologAlignment] = []
+    private(set) var homologState: HomologState = .idle
+    /// Deposited constructs for the best hit: the crystallisation precedent
+    /// Phase 6 plans against.
+    private(set) var precedent: [ObservedConstruct] = []
+
+    enum HomologState: Equatable {
+        case idle
+        case searching
+        case ready(count: Int)
+        /// The index is a downloadable asset, so its absence is an ordinary
+        /// state and never an error the user has to act on.
+        case unavailable(String)
+    }
 
     // MARK: - Fitness
 
@@ -112,6 +131,9 @@ final class SequenceStore {
             numbering = nil
             numberingScheme = nil
             familyCall = nil
+            homologs = []
+            precedent = []
+            homologState = .idle
             llr = nil
             llrMode = nil
             mutations = []
@@ -126,6 +148,9 @@ final class SequenceStore {
             parseError = "Headers were found but none had any residues under them."
             clear()
         } catch {
+            // Swift 6.2 warns that this is unreachable and then refuses to
+            // compile without it ("the enclosing catch is not exhaustive").
+            // Both cannot be true; the warning is the wrong half. Leave it.
             parseError = "That input could not be read."
             clear()
         }
@@ -147,8 +172,7 @@ final class SequenceStore {
     private func runModel() async {
         guard let sequence else { return }
         guard let bundle = Self.modelDirectory else {
-            modelState = .unavailable(
-                "Analysis models are not bundled in this build.")
+            modelState = .unavailable(Self.modelsMissingMessage)
             return
         }
 
@@ -172,12 +196,101 @@ final class SequenceStore {
             // The third fan-out from the same pass.
             familyCall = try? await heads.classifyFamily(for: embedding)
             modelState = .ready(passes: embedding.passes)
+            // The fourth, off the same vector: no extra inference at all.
+            await searchHomologs(pooled: embedding.pooled, sequence: sequence)
         } catch {
             modelTracks = []
             predictions = nil
             modelState = .unavailable(String(describing: error))
         }
     }
+
+    /// Search the bundled index for proteins whose pooled embedding is close.
+    ///
+    /// The alignment of each hit runs off the main actor: it is a few million
+    /// dynamic-programming cells and would be visible as a stutter otherwise.
+    private func searchHomologs(pooled: [Float], sequence: ProteinSequence) async {
+        guard let assets = Self.assetDirectory else {
+            homologState = .unavailable("The homolog index has not been downloaded.")
+            return
+        }
+        homologState = .searching
+        let query = sequence.residues.compactMap { residue -> AminoAcid? in
+            if case .canonical(let acid) = residue.identity { return acid }
+            return nil
+        }
+
+        let limit = Self.homologLimit
+        let outcome = await Task.detached(priority: .userInitiated) {
+            () -> Result<[HomologAlignment], any Error> in
+            do {
+                let index = try HomologIndex(
+                    vectors: assets.appending(path: "homolog_vectors.bin"),
+                    metadata: assets.appending(path: "homolog_meta.bin"))
+                let hits = try index.search(pooled, limit: limit)
+                let sifts = try? SIFTSStore(url: assets.appending(path: "sifts_segments.bin"))
+                let aligned = hits.map { hit in
+                    HomologAlignment(
+                        hit: hit,
+                        query: query,
+                        reference: hit.sequence.compactMap { AminoAcid(rawValue: $0) },
+                        segments: sifts?.segments(for: hit.accession) ?? [])
+                }
+                return .success(aligned)
+            } catch {
+                return .failure(error)
+            }
+        }.value
+
+        switch outcome {
+        case .success(let aligned):
+            homologs = aligned
+            homologState = .ready(count: aligned.count)
+            if let best = aligned.first,
+                let sifts = try? SIFTSStore(
+                    url: assets.appending(path: "sifts_segments.bin"))
+            {
+                precedent = Array(sifts.constructs(for: best.hit.accession).prefix(20))
+            }
+        case .failure(let error):
+            homologs = []
+            precedent = []
+            homologState = .unavailable(String(describing: error))
+        }
+    }
+
+    /// How many hits to align and show.
+    ///
+    /// The search itself is exhaustive and costs the same whatever this is; the
+    /// limit is on how many alignments are computed, since each is a full
+    /// Needleman-Wunsch matrix against the hit.
+    private static let homologLimit = 12
+
+    /// Where the downloadable assets live.
+    ///
+    /// The index and SIFTS tables are about 110 MB, so they ship through
+    /// Background Assets rather than inside the app. During development they
+    /// are read straight out of the repository's `Assets/` folder.
+    private static var assetDirectory: URL? {
+        if let bundled = Bundle.main.url(forResource: "Assets", withExtension: nil) {
+            return bundled
+        }
+        #if DEBUG
+        let development = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Assets")
+        if FileManager.default.fileExists(atPath: development.path) { return development }
+        #endif
+        return nil
+    }
+
+    /// Shown wherever the absence of the converted model stops something.
+    ///
+    /// One string, so the UI test can look for it and so the two places that
+    /// report it cannot drift apart.
+    static let modelsMissingMessage = "Analysis models are not bundled in this build."
 
     /// Where the bundled models live.
     ///
@@ -203,7 +316,15 @@ final class SequenceStore {
     /// The fast mode is one forward pass and returns almost immediately; the
     /// masked-marginal mode is one pass per position and is cancellable.
     func scan(mode: ScoringMode) {
-        guard let sequence, let bundle = Self.modelDirectory else { return }
+        guard let sequence else { return }
+        // Returning silently here is what this used to do, and it meant that on
+        // a build without the converted model the button did nothing at all: no
+        // heatmap, no error, no explanation. It also made a UI test fail on CI
+        // with "heatmap did not render", which is true and unhelpful. Say why.
+        guard let bundle = Self.modelDirectory else {
+            scanState = .failed(Self.modelsMissingMessage)
+            return
+        }
         scanTask?.cancel()
         scanState = .running(fraction: 0)
 
@@ -275,10 +396,12 @@ final class SequenceStore {
         // sequence already identified as a family member.
         numbering = nil
         numberingScheme = nil
+        pocketAnchors = []
         if let store = try? FamilyStore() {
             if let result = try? store.klifsNumbering(for: sequence) {
                 numbering = result
                 numberingScheme = "KLIFS"
+                pocketAnchors = store.pocketAnchors(result, in: sequence)
             } else if let result = try? store.gpcrdbNumbering(for: sequence) {
                 numbering = result
                 numberingScheme = "GPCRdb"

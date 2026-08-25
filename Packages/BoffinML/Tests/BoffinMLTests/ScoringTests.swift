@@ -31,12 +31,13 @@ private var modelIsAvailable: Bool {
 private let ubiquitin =
     "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"
 
-@Suite("Delta-LLR scoring")
+@Suite(
+    "Delta-LLR scoring",
+    .enabled(if: modelIsAvailable, "converted model not present: run convert_backbone.py"))
 struct ScoringTests {
 
     @Test("Ubiquitin scores as a highly conserved protein")
     func ubiquitinIsConserved() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let sequence = ProteinSequence(name: "ubq", letters: ubiquitin, source: .pasted)
         let matrix = try await engine.maskedMarginals(sequence, mode: .wildTypeMarginal)
@@ -54,7 +55,6 @@ struct ScoringTests {
 
     @Test("The wild type scores exactly zero at every position")
     func wildTypeIsZero() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let sequence = ProteinSequence(name: "ubq", letters: ubiquitin, source: .pasted)
         let matrix = try await engine.maskedMarginals(sequence, mode: .wildTypeMarginal)
@@ -67,7 +67,6 @@ struct ScoringTests {
 
     @Test("Lysine 48 prefers arginine, the conservative substitution")
     func k48PrefersArginine() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         let sequence = ProteinSequence(name: "ubq", letters: ubiquitin, source: .pasted)
         let matrix = try await engine.maskedMarginals(sequence, mode: .wildTypeMarginal)
@@ -84,7 +83,6 @@ struct ScoringTests {
 
     @Test("The fast mode and the accurate mode disagree, as they should")
     func modesDiffer() async throws {
-        try #require(modelIsAvailable, "converted model not present")
         let engine = try EmbeddingEngine(modelURL: modelURL, tokeniserURL: tokeniserURL)
         // Short sequence: the masked mode is one pass per position.
         let sequence = ProteinSequence(

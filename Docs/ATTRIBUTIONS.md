@@ -55,13 +55,29 @@ structure with a language model*, Science 379:1123 (2023).
 
 | Source | Expected terms | First needed | Status |
 |---|---|---|---|
-| RCSB PDB data | CC0 | Phase 0 (fixtures) | assumed, attribute regardless |
+| RCSB PDB data | CC0 | Phase 0 (fixtures) | **VERIFIED 2026-08-25** |
+| SIFTS (EMBL-EBI / PDBe) | expected CC0 | Phase 5 | **checked and NOT stated**, see below |
 | UniProt | CC BY 4.0 | Phase 0 (fixtures) | assumed |
 | Pfam / InterPro | CC0 | Phase 5 | assumed |
 | KLIFS | see below | Phase 5 | **VERIFIED 2026-08-25** |
 | GPCRdb | CC BY 4.0 | Phase 5 | **VERIFIED 2026-08-25** |
 | AlphaFold DB | CC BY 4.0 | Phase 7 | assumed, predicted models must be labelled as such |
 | DisProt, CB513, TOPCONS, DeepTMHMM | various | Phase 3 | **unverified, and gated on open question 1** |
+
+### SIFTS, checked at source 2026-08-25
+
+`uniprot_segments_observed.tsv.gz` is the residue-level correspondence between
+UniProt, PDB SEQRES and PDB author numbering, and BOFFIN ships a compacted form
+of it. It has **no licence statement**. The SIFTS documentation carries only an
+EMBL-EBI copyright line, `ebi.ac.uk/pdbe/about/licence` does not resolve, and
+`ebi.ac.uk/licencing` states a five-year *commitment* to adopt Creative Commons
+across EMBL-EBI resources with CC0 preferred: an intention, not a grant.
+
+The inputs are clear (PDB is CC0, verified at `rcsb.org/pages/policies`; UniProt
+is CC BY 4.0), but the SIFTS *mapping* is EBI's own curated work and is what is
+being redistributed here. Recorded as unstated rather than rounded up to CC0.
+**Confirm with PDBe before release.** This blocks shipping, not development, and
+is the same posture taken for the DTU head-training datasets.
 
 KLIFS is the one to check early: it is the only entry where redistribution of
 derived tables inside a shipped app is genuinely in question, and it gates

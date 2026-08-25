@@ -13,6 +13,70 @@
 import BoffinCore
 import Foundation
 
+/// The 85 KLIFS pocket positions, with the structural region each belongs to.
+///
+/// Bundled rather than derived. The region boundaries are quoted differently in
+/// different papers, and a hand-typed set of them would put the gatekeeper
+/// annotation on the wrong residue in a way that looks entirely convincing.
+/// `Tools/data/fetch_family_tables.py` reads the labels KLIFS itself serves and
+/// asserts they are identical across four unrelated structures.
+public struct KLIFSRegions: Sendable {
+    /// KLIFS labels in pocket order: `I.1`, `g.l.4`, `GK.45`, `xDFG.81`.
+    public let labels: [String]
+    /// Where the table came from and when it was checked.
+    public let provenance: String
+
+    /// The region name for a one-based KLIFS position.
+    public func region(at position: Int) -> String? {
+        guard position >= 1, position <= labels.count else { return nil }
+        return String(labels[position - 1].split(separator: ".").dropLast().joined(separator: "."))
+    }
+
+    /// One-based KLIFS positions belonging to a named region.
+    public func positions(in region: String) -> [Int] {
+        labels.indices.compactMap { self.region(at: $0 + 1) == region ? $0 + 1 : nil }
+    }
+
+    /// The gatekeeper, KLIFS position 45.
+    public static let gatekeeperPosition = 45
+    /// The hinge, KLIFS positions 46 to 48.
+    public static let hingePositions = 46...48
+    /// `xDFG`: the DFG motif and the residue before it, positions 80 to 83.
+    ///
+    /// KLIFS labels four positions, not three. The `x` is the residue preceding
+    /// the aspartate, which is why "the DFG is KLIFS 81 to 83" is right about
+    /// the motif and wrong about the label.
+    public static let xDFGPositions = 80...83
+}
+
+/// A named landmark in the kinase pocket, with the residues it landed on.
+///
+/// The build plan's Phase 5 acceptance asks for the DFG, HRD, gatekeeper and
+/// hinge to "annotate at the correct KLIFS positions". A ruler labelled `GK.45`
+/// satisfies the letter of that and not the point: the reader has to know that
+/// 45 is the gatekeeper. These carry the name.
+public struct PocketAnchor: Sendable, Hashable, Identifiable {
+    /// What a medicinal chemist calls it.
+    public let name: String
+    /// KLIFS's own label for the first position, `GK.45`.
+    public let label: String
+    /// One-based positions in the user's sequence.
+    public let positions: [Int]
+    /// The residues found there, in order.
+    public let residues: String
+
+    public var id: String { label }
+
+    /// `F80` or `D145 to G147`, the way a paper writes it.
+    public var description: String {
+        guard let first = positions.first, let last = positions.last else { return "" }
+        guard let firstCode = residues.first else { return "" }
+        if positions.count == 1 { return "\(firstCode)\(first)" }
+        guard let lastCode = residues.last else { return "" }
+        return "\(firstCode)\(first) to \(lastCode)\(last)"
+    }
+}
+
 /// A residue's position in a family's canonical numbering.
 public struct CanonicalNumber: Sendable, Hashable {
     /// Index in the user's sequence, zero-based.
@@ -85,8 +149,16 @@ public struct FamilyStore: Sendable {
         }
     }
 
+    private struct RegionTable: Decodable {
+        let source: String
+        let labels: [String]
+    }
+
     private let receptors: [String: [GPCRResidue]]
     private let kinases: [String: KinaseEntry]
+    /// The KLIFS position labels, exposed so callers can name a region rather
+    /// than quoting a number nobody can interpret.
+    public let klifsRegions: KLIFSRegions
 
     /// Load from the package bundle.
     ///
@@ -106,6 +178,13 @@ public struct FamilyStore: Sendable {
         }
         self.receptors = try load("gpcrdb_numbering", as: [String: [GPCRResidue]].self)
         self.kinases = try load("klifs_pockets", as: [String: KinaseEntry].self)
+        let regions = try load("klifs_regions", as: RegionTable.self)
+        guard regions.labels.count == 85 else {
+            throw FamilyStoreError.tablesUnavailable(
+                "klifs_regions.json holds \(regions.labels.count) labels, not 85")
+        }
+        self.klifsRegions = KLIFSRegions(
+            labels: regions.labels, provenance: regions.source)
     }
 
     public var receptorCount: Int { receptors.count }
@@ -132,7 +211,7 @@ public struct FamilyStore: Sendable {
         guard !FamilyMotifs.classAGPCR(in: sequence).isEmpty else {
             throw FamilyStoreError.notInFamily("no class A GPCR micro-switches found")
         }
-        let query = canonical(sequence)
+        let (query, originalIndex) = canonical(sequence)
         guard !query.isEmpty else { throw FamilyStoreError.noReferenceMatched(bestIdentity: 0) }
 
         var best: (name: String, identity: Double, numbers: [CanonicalNumber])?
@@ -149,7 +228,9 @@ public struct FamilyStore: Sendable {
 
             let map = alignment.queryIndexByReference()
             let numbers = residues.enumerated().compactMap { index, residue -> CanonicalNumber? in
-                guard let queryIndex = map[index] else { return nil }
+                guard let queryIndex = map[index],
+                    originalIndex.indices.contains(queryIndex)
+                else { return nil }
                 // GPCRdb writes `3x50`. The API returns `3.50x50`, which
                 // splits into Ballesteros-Weinstein `3.50` and the GPCRdb
                 // suffix `50`; the helix number has to be carried across from
@@ -158,7 +239,7 @@ public struct FamilyStore: Sendable {
                 let gpcrdbLabel =
                     helix.map { "\($0)x\(residue.gpcrdb)" } ?? residue.gpcrdb
                 return CanonicalNumber(
-                    residue: queryIndex,
+                    residue: originalIndex[queryIndex],
                     label: "\(gpcrdbLabel) (BW \(residue.ballesterosWeinstein))",
                     segment: residue.segment)
             }
@@ -184,7 +265,7 @@ public struct FamilyStore: Sendable {
         guard !FamilyMotifs.proteinKinase(in: sequence).isEmpty else {
             throw FamilyStoreError.notInFamily("no protein kinase catalytic motifs found")
         }
-        let query = canonical(sequence)
+        let (query, originalIndex) = canonical(sequence)
         guard !query.isEmpty else { throw FamilyStoreError.noReferenceMatched(bestIdentity: 0) }
 
         var best: (name: String, identity: Double, numbers: [CanonicalNumber])?
@@ -208,9 +289,20 @@ public struct FamilyStore: Sendable {
             let map = alignment.queryIndexByReference()
             let numbers = klifsPositions.enumerated().compactMap {
                 index, position -> CanonicalNumber? in
-                guard let queryIndex = map[index] else { return nil }
+                guard let queryIndex = map[index],
+                    originalIndex.indices.contains(queryIndex)
+                else { return nil }
+                // KLIFS's own label, which names the region as well as the
+                // position: "GK.45" says gatekeeper where "KLIFS 45" says
+                // nothing a reader can act on.
+                let label =
+                    klifsRegions.labels.indices.contains(position - 1)
+                    ? klifsRegions.labels[position - 1]
+                    : "KLIFS \(position)"
                 return CanonicalNumber(
-                    residue: queryIndex, label: "KLIFS \(position)", segment: nil)
+                    residue: originalIndex[queryIndex],
+                    label: label,
+                    segment: klifsRegions.region(at: position))
             }
             best = (name, identity, numbers)
         }
@@ -243,10 +335,70 @@ public struct FamilyStore: Sendable {
             colourScheme: .categorical)
     }
 
-    private func canonical(_ sequence: ProteinSequence) -> [AminoAcid] {
-        sequence.residues.compactMap {
-            if case .canonical(let acid) = $0.identity { return acid }
-            return nil
+    /// The named pocket landmarks in a KLIFS numbering result.
+    ///
+    /// Only landmarks whose positions ALL mapped are returned. A partial hinge
+    /// would be worse than none: three residues are quoted as a unit, and a
+    /// two-residue hinge silently renumbers the third.
+    public func pocketAnchors(
+        _ result: NumberingResult, in sequence: ProteinSequence
+    ) -> [PocketAnchor] {
+        let byLabel = Dictionary(
+            result.numbers.map { ($0.label, $0.residue) },
+            uniquingKeysWith: { first, _ in first })
+
+        func anchor(_ name: String, _ positions: [Int]) -> PocketAnchor? {
+            var indices: [Int] = []
+            for position in positions {
+                guard klifsRegions.labels.indices.contains(position - 1),
+                    let index = byLabel[klifsRegions.labels[position - 1]],
+                    sequence.residues.indices.contains(index)
+                else { return nil }
+                indices.append(index)
+            }
+            guard let first = positions.first,
+                klifsRegions.labels.indices.contains(first - 1)
+            else { return nil }
+            return PocketAnchor(
+                name: name,
+                label: klifsRegions.labels[first - 1],
+                positions: indices.map { $0 + 1 },
+                residues: String(indices.map { sequence.residues[$0].code }))
         }
+
+        return [
+            anchor("Beta-3 lysine", [17]),
+            anchor("Gatekeeper", [KLIFSRegions.gatekeeperPosition]),
+            anchor("Hinge", Array(KLIFSRegions.hingePositions)),
+            // The DFG itself, not the four-position xDFG region: the extra x is
+            // a KLIFS labelling convention, and quoting four residues as "the
+            // DFG" would be wrong in a way a kinase person notices at once.
+            anchor("DFG", [81, 82, 83]),
+        ].compactMap { $0 }
+    }
+
+    /// The canonical residues, and where each one sat in the original sequence.
+    ///
+    /// Alignment can only run over canonical residues, so a sequence containing
+    /// an X or a selenomethionine yields a SHORTER array, and an index into it
+    /// is not an index into the sequence. Returning both halves is what stops a
+    /// `CanonicalNumber.residue` from silently pointing one residue to the left
+    /// of the one it names for every position after the first non-canonical
+    /// character. `FamilyStore.track` then writes those labels into the wrong
+    /// cells of a ruler that is exactly the right length, which validates
+    /// cleanly and draws a convincing picture of the wrong protein.
+    private func canonical(
+        _ sequence: ProteinSequence
+    ) -> (
+        residues: [AminoAcid], originalIndex: [Int]
+    ) {
+        var residues: [AminoAcid] = []
+        var originalIndex: [Int] = []
+        for (index, residue) in sequence.residues.enumerated() {
+            guard case .canonical(let acid) = residue.identity else { continue }
+            residues.append(acid)
+            originalIndex.append(index)
+        }
+        return (residues, originalIndex)
     }
 }

@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Measure what the index costs in accuracy before shipping it.
+
+    Tools/coreml/.venv/bin/python Tools/data/validate_index.py
+
+Two questions, neither of which should be answered by assertion:
+
+1. **What does int8 quantisation cost?** Storing the index quantised is a 4x
+   saving and it is only free if the ranking it produces is the same ranking.
+   This measures recall at 1, 5 and 10 against exhaustive float search, and the
+   rank correlation of the scores, over real queries drawn from the index.
+
+2. **Does the index return biologically sensible neighbours?** A recall figure
+   only says the quantised search agrees with the float search; both could agree
+   on nonsense. So a handful of proteins with known relatives are looked up by
+   name and their top hits printed for inspection.
+
+3. **Does a query computed by the SHIPPING implementation still find them?**
+   The index is embedded here in PyTorch at fp32. The app embeds in Core ML at
+   fp16 on the Neural Engine. Those are two implementations of one function, and
+   Phase 2 measured them agreeing to a cosine of 0.99997 on hidden states, which
+   is close but is not the same number. An index built with one and queried with
+   the other is the sort of mismatch that degrades a ranking slightly and
+   forever, so the last stage runs the real Core ML model over a fixture and
+   searches with its vector.
+"""
+
+from __future__ import annotations
+
+import json
+import time
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+DATA = ROOT / "Datasets/pdb"
+
+PROBES = [
+    ("P24941", "CDK2, expect other CMGC kinases"),
+    ("P07550", "beta-2 adrenergic receptor, expect class A GPCRs"),
+    ("A0A0K8P6T7", "PETase, expect alpha/beta hydrolases and cutinases"),
+    ("P0CG48", "ubiquitin, expect ubiquitin-like folds"),
+    ("P00698", "lysozyme C, expect other lysozymes"),
+]
+
+
+def main() -> int:
+    index = json.loads((DATA / "index_entries.json").read_text())
+    vectors = np.load(DATA / "vectors.npy")
+    assert len(vectors) == len(index), "vectors and entries are from different builds"
+    print(f"{len(index):,} entries, {vectors.shape[1]} dimensions")
+
+    exact = vectors / np.maximum(np.linalg.norm(vectors, axis=1, keepdims=True), 1e-12)
+    quantised = np.clip(np.rint(exact * 127.0), -127, 127).astype(np.int8).astype(np.float32)
+
+    rng = np.random.default_rng(0)
+    sample = rng.choice(len(index), size=500, replace=False)
+
+    started = time.time()
+    exactScores = exact[sample] @ exact.T
+    elapsed = (time.time() - started) / len(sample)
+    quantisedScores = quantised[sample] @ quantised.T
+
+    print(f"\nexhaustive float search: {elapsed * 1000:.1f} ms per query in numpy "
+          f"(indicative only; the app uses Accelerate)")
+
+    print("\n--- what int8 quantisation costs ---")
+    for k in (1, 5, 10, 20):
+        # Rank 0 is the query itself; comparing the sets below it is the
+        # question that matters.
+        exactTop = np.argsort(-exactScores, axis=1)[:, 1 : k + 1]
+        quantisedTop = np.argsort(-quantisedScores, axis=1)[:, 1 : k + 1]
+        recall = np.mean([
+            len(set(a) & set(b)) / k for a, b in zip(exactTop, quantisedTop)
+        ])
+        print(f"  recall@{k:<3}: {recall:.4f}")
+
+    differences = np.abs(exactScores - quantisedScores / (127.0 * 127.0))
+    print(f"  cosine error: mean {differences.mean():.5f}, max {differences.max():.5f}")
+
+    print("\n--- nearest neighbours for known proteins ---")
+    position = {entry["accession"]: row for row, entry in enumerate(index)}
+    for accession, expectation in PROBES:
+        row = position.get(accession)
+        if row is None:
+            print(f"\n{accession} is not in the index")
+            continue
+        scores = exact @ exact[row]
+        order = np.argsort(-scores)[:6]
+        print(f"\n{accession}  ({expectation})")
+        for rank, hit in enumerate(order):
+            entry = index[hit]
+            marker = "  <- query" if hit == row else ""
+            print(f"  {rank}. {scores[hit]:.3f}  {entry['pdb']}_{entry['chain']}  "
+                  f"{entry['accession']:<12} {entry['title'][:46]}{marker}")
+    return crossImplementationCheck(index, exact)
+
+
+def crossImplementationCheck(index: list[dict], exact: np.ndarray) -> int:
+    """Query the index with a vector the SHIPPING code path would produce."""
+    package = ROOT / "Models/esm2_t12_35M_UR50D.mlpackage"
+    if not package.exists():
+        print("\n--- Core ML cross-check SKIPPED: no converted model present ---")
+        print("    Run Tools/coreml/convert_backbone.py first. This is the one stage")
+        print("    that would catch the index and the app disagreeing.")
+        return 0
+
+    import coremltools as ct
+
+    golden = json.loads(
+        (ROOT / "Fixtures/expected/esm2_t12_35M_UR50D.golden.json").read_text())
+    sequence = golden["sequence"]
+
+    import esm
+
+    _, alphabet = esm.pretrained.esm2_t12_35M_UR50D()
+    converter = alphabet.get_batch_converter()
+    _, _, tokens = converter([("query", sequence)])
+    bucket = 128
+    while bucket < tokens.shape[1]:
+        bucket *= 2
+    padded = np.full((1, bucket), alphabet.padding_idx, dtype=np.int32)
+    padded[0, : tokens.shape[1]] = tokens.numpy()[0]
+
+    model = ct.models.MLModel(str(package), compute_units=ct.ComputeUnit.CPU_AND_NE)
+    hidden = np.asarray(
+        model.predict({"tokens": padded})["hidden_states"], dtype=np.float32)
+    pooled = hidden[0, 1 : 1 + len(sequence), :].mean(axis=0)
+
+    reference = np.asarray(golden["pooled"], dtype=np.float32)
+    cosine = float(
+        pooled @ reference
+        / (np.linalg.norm(pooled) * np.linalg.norm(reference) + 1e-12))
+    print(f"\n--- Core ML cross-check ({golden['note'][:40]}) ---")
+    print(f"  pooled cosine, Core ML fp16 against PyTorch fp32: {cosine:.6f}")
+
+    query = pooled / np.linalg.norm(pooled)
+    scores = exact @ query
+    order = np.argsort(-scores)[:5]
+    print("  top hits from the Core ML vector:")
+    for rank, hit in enumerate(order):
+        entry = index[hit]
+        print(f"    {rank}. {scores[hit]:.3f}  {entry['pdb']}_{entry['chain']}  "
+              f"{entry['accession']:<12} {entry['title'][:44]}")
+
+    # Same query through the PyTorch vector, to see whether the two orderings
+    # agree. Disagreement at the top is the failure this stage exists to find.
+    referenceOrder = np.argsort(-(exact @ (reference / np.linalg.norm(reference))))[:5]
+    agreement = len(set(order) & set(referenceOrder)) / 5
+    print(f"  top-5 agreement with the PyTorch query: {agreement:.2f}")
+    if agreement < 1.0:
+        print("  the two implementations rank differently: investigate before shipping")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

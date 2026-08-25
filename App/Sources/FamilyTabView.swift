@@ -5,10 +5,15 @@
 //  interpretable: a delta-LLR at the DFG aspartate means something a
 //  delta-LLR at an arbitrary surface residue does not.
 //
-//  What is here is motif annotation from published sequence definitions,
-//  validated against proteins whose residue numbers are in textbooks. What is
-//  NOT here yet is the embedding classifier and homolog search, and the tab
-//  says so rather than implying the absence is a negative result.
+//  Motif annotation from published sequence definitions, canonical numbering,
+//  the Pfam classifier, and homolog search over the PDB with SIFTS mapping to
+//  author residue numbers.
+//
+//  Two numbers on this screen are easy to confuse and are deliberately never
+//  shown without each other: the EMBEDDING SIMILARITY is a cosine between
+//  pooled representations, and the IDENTITY is from an actual alignment. They
+//  disagree exactly where the index earns its keep, on remote homologues that
+//  share a fold at low identity.
 
 import BoffinCore
 import BoffinData
@@ -51,7 +56,8 @@ struct FamilyTabView: View {
                 if let numbering = store.numbering, let scheme = store.numberingScheme {
                     numberingSection(numbering, scheme: scheme)
                 }
-                pending
+                homologSection
+                if !store.precedent.isEmpty { precedentSection }
             }
             .padding(Spacing.m)
         }
@@ -174,23 +180,146 @@ struct FamilyTabView: View {
             )
             .font(.caption).foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
+
+            // The landmarks by name. A ruler cell reading "GK.45" is correct
+            // and useless to anyone who does not already know that 45 is the
+            // gatekeeper.
+            if !store.pocketAnchors.isEmpty {
+                ForEach(store.pocketAnchors) { anchor in
+                    HStack {
+                        Text(anchor.name).font(.caption.weight(.semibold))
+                        Text(anchor.label)
+                            .font(.system(size: 9, design: .monospaced))
+                            .foregroundStyle(.tertiary)
+                        Spacer()
+                        Text(anchor.description)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(Brand.accent)
+                    }
+                }
+            }
         }
         .padding(Spacing.s)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
     }
 
-    /// State plainly what this tab does not do yet.
-    private var pending: some View {
+    // MARK: - Homologs
+
+    @ViewBuilder
+    private var homologSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.s) {
+            Text("Homologs in the PDB").font(.headline)
+
+            switch store.homologState {
+            case .idle:
+                EmptyView()
+            case .searching:
+                HStack(spacing: Spacing.xs) {
+                    ProgressView().controlSize(.small)
+                    Text("Searching").font(.caption).foregroundStyle(.secondary)
+                }
+            case .unavailable(let reason):
+                Label(reason, systemImage: "arrow.down.circle")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            case .ready(let count) where count == 0:
+                Text(
+                    "Nothing in the index is close to this sequence. The index holds one "
+                        + "representative chain per UniProt accession in the PDB, so this "
+                        + "means no solved structure resembles it, not that none exists."
+                )
+                .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            case .ready:
+                ForEach(store.homologs, id: \.hit.id) { homolog in
+                    homologRow(homolog)
+                }
+                Text(
+                    "Similarity is a cosine between pooled embeddings and is NOT a "
+                        + "percentage identity: two proteins with the same fold and 15% "
+                        + "identity can score highly, which is the point of searching this "
+                        + "way. Identity and coverage come from an alignment against the "
+                        + "entry's SEQRES."
+                )
+                .font(.caption2).foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func homologRow(_ homolog: HomologAlignment) -> some View {
+        let hit = homolog.hit
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack {
+                Text("\(hit.pdb)_\(hit.chain)")
+                    .font(.system(.subheadline, design: .monospaced).weight(.semibold))
+                    .foregroundStyle(Brand.accent)
+                Text(hit.accession)
+                    .font(.system(.caption2, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                Spacer()
+                if let resolution = hit.resolution {
+                    Text(String(format: "%.2f A", resolution))
+                        .font(.system(.caption2, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Text(hit.title)
+                .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: Spacing.s) {
+                measure("similarity", String(format: "%.3f", hit.similarity))
+                measure("identity", String(format: "%.0f%%", homolog.identity * 100))
+                measure("coverage", String(format: "%.0f%%", homolog.coverage * 100))
+                measure("entries", String(hit.structureCount))
+            }
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func measure(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(value).font(.system(.caption, design: .monospaced))
+            Text(label).font(.system(size: 9)).foregroundStyle(.tertiary)
+        }
+    }
+
+    // MARK: - Crystallisation precedent
+
+    /// What people actually got to order, for the closest homolog.
+    ///
+    /// The disordered count is the interesting column: it is the part of the
+    /// construct that was present in the crystal and invisible in the map, which
+    /// is the evidence the Boundary tab needs and the opposite of what a
+    /// sequence-only prediction can tell you.
+    private var precedentSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            Label("Not in this build", systemImage: "hammer")
-                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            Text(
-                "SIFTS mapping to PDB author numbers, and homolog search over a bundled "
-                    + "embedding index."
-            )
-            .font(.caption2).foregroundStyle(.tertiary)
-            .fixedSize(horizontal: false, vertical: true)
+            Text("Deposited constructs").font(.headline)
+            if let best = store.homologs.first {
+                Text("Observed spans for \(best.hit.accession), UniProt numbering.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            ForEach(store.precedent.prefix(8)) { construct in
+                HStack {
+                    Text(construct.pdb)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Brand.accent)
+                    Text("\(construct.first) to \(construct.last)")
+                        .font(.system(.caption, design: .monospaced))
+                    Spacer()
+                    Text("\(construct.observedCount) observed")
+                        .font(.system(.caption2, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                    if construct.disorderedCount > 0 {
+                        Text("\(construct.disorderedCount) disordered")
+                            .font(.system(.caption2, design: .monospaced))
+                            .foregroundStyle(.orange)
+                    }
+                }
+            }
         }
         .padding(Spacing.s)
         .frame(maxWidth: .infinity, alignment: .leading)

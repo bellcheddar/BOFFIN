@@ -27,10 +27,30 @@ final class FitnessTabUITests: XCTestCase {
         XCTAssertTrue(fast.waitForExistence(timeout: 10), "scan controls did not appear")
         fast.tap()
 
-        // The fast mode is a single forward pass, so this should be quick.
+        // The converted Core ML model is a 67 MB build artefact and is not
+        // committed, so on a clean checkout (CI, most notably) there is nothing
+        // to score with. That is not a defect and must not be reported as one:
+        // the app is required to SAY so, and this test accepts either outcome
+        // while insisting on exactly one of them. Asserting only the heatmap is
+        // what turned a missing artefact into four red CI runs.
         let heatmap = app.descendants(matching: .any)
             .matching(identifier: "boffin.llr-heatmap").firstMatch
-        XCTAssertTrue(heatmap.waitForExistence(timeout: 60), "heatmap did not render")
+        let missing = app.descendants(matching: .any)
+            .matching(identifier: "boffin.models-missing").firstMatch
+
+        let deadline = Date().addingTimeInterval(60)
+        while Date() < deadline, !heatmap.exists, !missing.exists {
+            usleep(200_000)
+        }
+
+        if missing.exists {
+            XCTAssertFalse(
+                heatmap.exists,
+                "the app both reported the models as missing and drew a heatmap")
+            return
+        }
+
+        XCTAssertTrue(heatmap.exists, "neither a heatmap nor an explanation appeared")
 
         let logo = app.descendants(matching: .any)
             .matching(identifier: "boffin.sequence-logo").firstMatch

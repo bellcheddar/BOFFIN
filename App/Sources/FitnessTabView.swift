@@ -78,6 +78,9 @@ struct FitnessTabView: View {
                     Label(reason, systemImage: "exclamationmark.triangle")
                         .font(.caption2).foregroundStyle(.orange)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier(
+                            reason == SequenceStore.modelsMissingMessage
+                                ? "boffin.models-missing" : "boffin.scan-failed")
                 }
                 if case .cancelled = store.scanState {
                     Text("Scan cancelled.").font(.caption2).foregroundStyle(.secondary)

@@ -16,6 +16,20 @@ struct SequenceInputView: View {
         ">1UBQ ubiquitin\n"
         + "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"
 
+    /// A kinase, so the Family tab has something to recognise.
+    ///
+    /// Ubiquitin is the right default (small, fast, and the honest "no family"
+    /// answer), but it means the family features have nothing to show on a
+    /// first run. P24941, human CDK2, is the protein every KLIFS number in this
+    /// app was checked against.
+    private static let kinaseExample =
+        ">sp|P24941|CDK2_HUMAN cyclin-dependent kinase 2\n"
+        + "MENFQKVEKIGEGTYGVVYKARNKLTGEVVALKKIRLDTETEGVPSTAIREISLLKELNH"
+        + "PNIVKLLDVIHTENKLYLVFEFLHQDLKKFMDASALTGIPLPLIKSYLFQLLQGLAFCHS"
+        + "HRVLHRDLKPQNLLINTEGAIKLADFGLARAFGVPVRTYTHEVVTLWYRAPEILLGCKYY"
+        + "STAVDIWSLGCIFAEMVTRRALFPGDSEIDQLFRIFRTLGTPDEVVWPGVTSMPDYKPSF"
+        + "PKWARQDFSKVVPPLDEDGRSLLSQMLHYDPNKRISAKAALAHPFFQDVTKPVPHLRL"
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: Spacing.s) {
@@ -36,8 +50,11 @@ struct SequenceInputView: View {
                         .foregroundStyle(.red)
                 }
 
-                Button("Use the ubiquitin example") { text = Self.example }
-                    .font(.caption)
+                HStack(spacing: Spacing.m) {
+                    Button("Use the ubiquitin example") { text = Self.example }
+                    Button("Use the CDK2 example") { text = Self.kinaseExample }
+                }
+                .font(.caption)
             }
             .padding(Spacing.m)
             .navigationTitle("Sequence")

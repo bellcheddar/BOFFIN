@@ -169,3 +169,36 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def klifs_regions() -> list[str]:
+    """The 85 KLIFS position labels, with their structural region names.
+
+    DERIVED, not transcribed. The region boundaries are quoted differently in
+    different papers and a hand-typed version of them is exactly the
+    plausible-but-silently-wrong artefact that would make a gatekeeper
+    annotation land on the wrong residue. `interactions_match_residues` returns
+    the labels KLIFS itself uses (`GK.45`, `hinge.46`, `xDFG.81`), so they are
+    read from the API and checked to be identical across several unrelated
+    structures, which they must be for a fixed scheme.
+
+    Checking that mattered: recalling the boundaries from memory put the alphaC
+    helix at 17-24 when KLIFS places it at 20-30, and made the DFG motif
+    positions 81-83 when KLIFS labels 80-83 as `xDFG`, the x being the residue
+    before the aspartate.
+    """
+    reference = None
+    for structure in (3878, 1, 100, 5000):
+        rows = get(
+            "https://klifs.net/api/interactions_match_residues"
+            f"?structure_ID={structure}")
+        labels = [row["KLIFS_position"] for row in rows]
+        if len(labels) != 85:
+            raise SystemExit(f"structure {structure} returned {len(labels)} positions, not 85")
+        if reference is None:
+            reference = labels
+        elif labels != reference:
+            raise SystemExit(
+                f"structure {structure} labels the pocket differently from 3878: "
+                "the scheme is supposed to be fixed, so something has changed")
+    return reference or []

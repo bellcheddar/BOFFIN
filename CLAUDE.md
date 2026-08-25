@@ -11,11 +11,41 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 5 (Family tab) **in progress**: motifs, canonical numbering and the Pfam classifier done; SIFTS and homolog index outstanding
+- **Phase:** 5 (Family tab) **complete**: motifs, canonical numbering, the Pfam classifier, SIFTS mapping and the homolog index
 - **Last completed:** Phase 5 family motifs on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
 
 ### Phase 5 findings
+
+- **A `#require` inside a test is not a skip: it is a FAILURE.** Artefact-gated
+  suites written that way turned a missing build artefact into four consecutive
+  red CI runs while every local run stayed green, because the artefacts exist on
+  this machine. Gate the SUITE with `.enabled(if:)`, which reports skipped.
+  BoffinML and BoffinData both use that now.
+- **A truncated `curl` download does not look truncated.** `--max-time` leaves
+  the partial file on disk and `|| echo` swallows the exit code, so
+  `entries.idx` arrived with 19,151 of its 258,224 entries and the build did not
+  error: every absent entry simply fell to a default rank, turning "best
+  resolution structure of this protein" into "alphabetically first PDB ID".
+  Check byte counts against `Content-Length` and assert coverage in the builder.
+- **Best-resolution-wins picks FRAGMENTS.** The highest-resolution chain for
+  ADRB2 is a ninety-residue C-terminal peptide at 1.9 A; the receptor itself
+  (2RH1) is 2.4 A and loses. Since the index stores one embedding per accession,
+  that would have put a disordered tail in the index in place of a GPCR. Rank on
+  UniProt coverage first, resolution only among comparable coverage.
+- **Refusing to tile the index would have removed every large protein**,
+  including EGFR at 1,210 residues. The app already tiles long queries, so the
+  index tiles identically: capacity 1022, overlap 128, overlapping positions
+  averaged. Both sides must change together.
+- **PDB author numbering cannot be derived by offset from the first observed
+  residue.** It is whatever the depositor chose: not 1-based, not contiguous,
+  sometimes negative for expression tags, sometimes carrying insertion codes.
+  SIFTS segments give the offset per contiguous run; 1.87% are non-arithmetic
+  and are refused rather than interpolated.
+- **Embedding cosine is not sequence identity** and reads as one to anyone who
+  has run BLAST. Every hit carries a real alignment identity AND a coverage,
+  because identity denominated on the reference reads 100% for a query with a
+  large insertion.
 
 - **A closed-set classifier reports the nearest trained class, confidently, for
   anything outside its label set.** Ubiquitin (PF00240, not trained) is called

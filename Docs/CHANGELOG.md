@@ -820,3 +820,33 @@ would type first. Tokens now carry the characters as written alongside the parse
 value.
 
 33 BoffinStructure tests.
+
+
+## Phase 8 (part 2): measurement (2026-08-25)
+
+Distances, angles and dihedrals. Small enough to look obvious and worth writing
+carefully anyway.
+
+**The dihedral sign is the point.** A viewer that reports the wrong sign for a
+torsion is reporting the wrong conformation, and both signs look equally
+plausible on screen. IUPAC convention throughout, computed with the `atan2` form
+rather than from the cosine, which loses the sign entirely.
+
+**Clamping before `acos` is not defensive programming.** Three nearly collinear
+atoms can put the cosine a hair outside [-1, 1] in floating point, and `acos` of
+1.0000000001 is NaN, which reaches a label as "nan degrees". A test builds that
+case deliberately.
+
+Checked against constructed geometry where the answer is not a matter of opinion,
+and then against 1UBQ where it is in the literature: the peptide bond measures
+1.33 A, the backbone N-CA-C angle 111 degrees, and omega is trans.
+
+### A test fixture that was wrong
+
+The "trans" case used atoms at (-1, 1, 0) and (2, 1, 0), which looks like
+opposite sides and is not: the dihedral does not care where along the axis an
+atom sits, only which way it points away from it. Both perpendicular components
+were on +y, making it a second cis case. The real-structure test passing while
+that one failed is what said the code was right and the fixture was not.
+
+38 BoffinStructure tests.

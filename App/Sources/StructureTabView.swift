@@ -19,7 +19,7 @@ import SwiftUI
 struct StructureTabView: View {
     @Bindable var store: SequenceStore
     @State private var model: StructureViewerModel?
-    @State private var setupError: String?
+    @State private var setupError: UserFacingError?
     @State private var paintedTrack: TrackID?
     @State private var identifier: String = ""
     @State private var profile: InteractionProfile?
@@ -34,9 +34,13 @@ struct StructureTabView: View {
         NavigationStack {
             Group {
                 if let setupError {
-                    ContentUnavailableView(
-                        "Viewer unavailable", systemImage: "exclamationmark.triangle",
-                        description: Text(setupError))
+                    ContentUnavailableView {
+                        Label("Viewer unavailable", systemImage: "exclamationmark.triangle")
+                    } description: {
+                        FailureView(setupError) {
+                            self.setupError = nil; start()
+                        }
+                    }
                 } else if let model {
                     viewer(model)
                 } else {
@@ -51,7 +55,7 @@ struct StructureTabView: View {
         do {
             model = try StructureViewerModel()
         } catch {
-            setupError = String(describing: error)
+            setupError = UserFacingError(error, whileDoing: "starting the structure viewer")
         }
     }
 

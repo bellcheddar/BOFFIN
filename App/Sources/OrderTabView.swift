@@ -170,11 +170,16 @@ struct OrderTabView: View {
                 .foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)
             }
-        case .unavailable(let reason):
-            Label(reason, systemImage: "exclamationmark.triangle")
+        case .notBundled:
+            // Not a failure: a clean checkout has no 67 MB backbone in it, and
+            // every analytical track on this ruler still works without one.
+            Label(SequenceStore.modelsMissingMessage, systemImage: "cube.box")
                 .font(.caption2)
-                .foregroundStyle(.orange)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("boffin.models-missing")
+        case .failed(let failure):
+            FailureView(failure)
         }
     }
 

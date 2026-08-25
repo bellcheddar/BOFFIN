@@ -56,7 +56,7 @@ struct FitnessTabView: View {
     private var controls: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             switch store.scanState {
-            case .idle, .cancelled, .failed:
+            case .idle, .cancelled, .failed, .notBundled:
                 Text("Score every substitution at every position.")
                     .font(.subheadline).foregroundStyle(.secondary)
                 HStack(spacing: Spacing.s) {
@@ -76,13 +76,18 @@ struct FitnessTabView: View {
                     Toggle("Skip predicted disordered positions", isOn: $store.maskDisordered)
                         .font(.caption)
                 }
-                if case .failed(let reason) = store.scanState {
-                    Label(reason, systemImage: "exclamationmark.triangle")
-                        .font(.caption2).foregroundStyle(.orange)
+                // Two cases, not one string compared against a constant to
+                // work out which of two things happened. The comparison was
+                // standing in for a type distinction the enum now makes.
+                if case .notBundled = store.scanState {
+                    Label(SequenceStore.modelsMissingMessage, systemImage: "cube.box")
+                        .font(.caption2).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityIdentifier(
-                            reason == SequenceStore.modelsMissingMessage
-                                ? "boffin.models-missing" : "boffin.scan-failed")
+                        .accessibilityIdentifier("boffin.models-missing")
+                }
+                if case .failed(let failure) = store.scanState {
+                    FailureView(failure) { store.scan(mode: .maskedMarginal) }
+                        .accessibilityIdentifier("boffin.scan-failed")
                 }
                 if case .cancelled = store.scanState {
                     Text("Scan cancelled.").font(.caption2).foregroundStyle(.secondary)

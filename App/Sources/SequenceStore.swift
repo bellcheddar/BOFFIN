@@ -49,7 +49,14 @@ final class SequenceStore {
         case ready(count: Int)
         /// The index is a downloadable asset, so its absence is an ordinary
         /// state and never an error the user has to act on.
-        case unavailable(String)
+        ///
+        /// Split from `failed` rather than sharing it. One case carrying both
+        /// meant "your 110 MB download has not arrived yet" and "the index is
+        /// corrupt" were the same value, so the UI could only ever style them
+        /// the same way, and it chose the reassuring one. A genuinely broken
+        /// index therefore appeared as a download-in-progress notice.
+        case notDownloaded
+        case failed(UserFacingError)
     }
 
     // MARK: - Boundary
@@ -83,7 +90,10 @@ final class SequenceStore {
         case idle
         case running(fraction: Double)
         case ready
-        case failed(String)
+        /// The 67 MB backbone is a build artefact and is not committed, so a
+        /// clean checkout runs without it. An ordinary state, not a fault.
+        case notBundled
+        case failed(UserFacingError)
         case cancelled
     }
     private(set) var modelState: ModelState = .idle
@@ -92,9 +102,12 @@ final class SequenceStore {
         case idle
         case running
         case ready(passes: Int)
-        /// The model is optional: the app is fully usable without it, so a
-        /// failure downgrades rather than blocking.
-        case unavailable(String)
+        /// The model is optional: the app is fully usable without it, so its
+        /// absence downgrades rather than blocking.
+        case notBundled
+        /// It was there and it did not work, which is a different sentence and
+        /// deserves a different one on screen.
+        case failed(UserFacingError)
     }
     private(set) var properties: SequenceProperties?
     private(set) var diagnostics: [FASTADiagnostic] = []
@@ -193,7 +206,7 @@ final class SequenceStore {
     private func runModel() async {
         guard let sequence else { return }
         guard let bundle = Self.modelDirectory else {
-            modelState = .unavailable(Self.modelsMissingMessage)
+            modelState = .notBundled
             return
         }
 
@@ -225,7 +238,7 @@ final class SequenceStore {
         } catch {
             modelTracks = []
             predictions = nil
-            modelState = .unavailable(String(describing: error))
+            modelState = .failed(UserFacingError(error, whileDoing: "analysing the sequence"))
         }
     }
 
@@ -355,7 +368,7 @@ final class SequenceStore {
     /// dynamic-programming cells and would be visible as a stutter otherwise.
     private func searchHomologs(pooled: [Float], sequence: ProteinSequence) async {
         guard let assets = Self.assetDirectory else {
-            homologState = .unavailable("The homolog index has not been downloaded.")
+            homologState = .notDownloaded
             return
         }
         homologState = .searching
@@ -399,7 +412,8 @@ final class SequenceStore {
         case .failure(let error):
             homologs = []
             precedent = []
-            homologState = .unavailable(String(describing: error))
+            homologState = .failed(
+                UserFacingError(error, whileDoing: "searching for relatives"))
         }
     }
 
@@ -484,7 +498,7 @@ final class SequenceStore {
         // heatmap, no error, no explanation. It also made a UI test fail on CI
         // with "heatmap did not render", which is true and unhelpful. Say why.
         guard let bundle = Self.modelDirectory else {
-            scanState = .failed(Self.modelsMissingMessage)
+            scanState = .notBundled
             return
         }
         scanTask?.cancel()
@@ -521,7 +535,8 @@ final class SequenceStore {
             } catch is CancellationError {
                 self.scanState = .cancelled
             } catch {
-                self.scanState = .failed(String(describing: error))
+                self.scanState = .failed(
+                    UserFacingError(error, whileDoing: "scanning mutations"))
             }
         }
     }

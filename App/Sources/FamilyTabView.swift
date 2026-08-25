@@ -222,10 +222,15 @@ struct FamilyTabView: View {
                     ProgressView().controlSize(.small)
                     Text("Searching").font(.caption).foregroundStyle(.secondary)
                 }
-            case .unavailable(let reason):
-                Label(reason, systemImage: "arrow.down.circle")
-                    .font(.caption).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            case .notDownloaded:
+                Label(
+                    "The homolog index has not been downloaded.",
+                    systemImage: "arrow.down.circle"
+                )
+                .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            case .failed(let failure):
+                FailureView(failure, icon: "exclamationmark.triangle")
             case .ready(let count) where count == 0:
                 Text(
                     "Nothing in the index is close to this sequence. The index holds one "

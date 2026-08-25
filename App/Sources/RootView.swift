@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     @State private var store = SequenceStore()
-    @State private var openError: String?
+    @State private var openError: UserFacingError?
 
     /// Whether the welcome sheet has been seen.
     ///
@@ -61,15 +61,19 @@ struct RootView: View {
                 store.load(text: text, fileName: url.lastPathComponent)
                 openError = nil
             } catch let failure as OpenedDocument.Failure {
-                openError = failure.message
+                // Already written for a person: it names the file and what was
+                // wrong with it, so it is not re-classified into something
+                // vaguer.
+                openError = UserFacingError(
+                    summary: failure.message, detail: String(describing: failure))
             } catch {
-                openError = String(describing: error)
+                openError = UserFacingError(error, whileDoing: "opening that file")
             }
         }
         .alert(
             "Could not open that file", isPresented: openAlert,
             actions: { Button("OK") { openError = nil } },
-            message: { Text(openError ?? "") }
+            message: { Text(openError?.summary ?? "") }
         )
         // Shown once. Not blocking: it is a sheet over a working app rather
         // than a gate in front of one, so a returning user who has cleared

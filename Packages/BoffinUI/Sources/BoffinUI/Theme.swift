@@ -37,6 +37,15 @@ public enum ScientificPalette {
     public static let llrNeutral = Color(hex: 0xF7_F7_F7)
     public static let llrPositive = Color(hex: 0x21_66_AC)
 
+    /// The colour a failure or a caveat is drawn in.
+    ///
+    /// Amber rather than red on purpose. Red in this app already means
+    /// "destabilising" on every heat map and structure overlay, and a failure
+    /// notice sharing that colour reads, for a moment, as a result. Amber is
+    /// also what the acknowledgements screen uses for "None stated", so the
+    /// two things the app is least certain about look alike.
+    public static let warning = Color(hex: 0xB2_6A_00)
+
     /// Sequential scale for bounded continuous tracks (disorder, pLDDT).
     /// Viridis-like: perceptually uniform and safe for the common forms of
     /// colour vision deficiency.

@@ -80,3 +80,64 @@ now use `ViewThatFits` to fall from a horizontal arrangement to a vertical one:
   side. A truncated button is a button whose purpose has been deleted.
 - `OnboardingView`'s icon-beside-paragraph rows, where `Label`'s own layout
   clips the icon once the text needs the full width.
+
+---
+
+# Error-state audit
+
+Same phase, same day. The other half of "empty and error states".
+
+## The finding
+
+Five places handed the user `String(describing: error)`. For a Core ML failure
+that reads:
+
+```
+Error Domain=com.apple.CoreML Code=0 "Failed to build the model execution plan
+using a model architecture file '/var/.../model.mil' with error code: -7."
+```
+
+That is a good diagnostic and not a message. A reader cannot tell from it
+whether they did something wrong, whether it is worth trying again, or what to
+do next, and those three are the only things they want to know.
+
+`UserFacingError` splits every failure into `summary` (what did not happen, in
+terms of what the user asked for rather than the layer that threw), `recovery`
+(what to do, or `nil`), and `detail` (the raw text, kept verbatim). `FailureView`
+renders that priority: message, advice, optional retry, then the diagnostic
+behind a disclosure that starts closed and is selectable, because the reason for
+keeping it is that somebody may need to paste it into a bug report.
+
+Three classification decisions carry their own tests:
+
+- **Cancellation is not a failure.** A user who changed the sequence mid-scan
+  did exactly what the app invited them to do. Reporting it as an error is the
+  app calling its own affordance a mistake, and it teaches people to ignore a
+  warning that is usually real.
+- **Being offline says what still works.** BOFFIN's whole premise is that it
+  runs with no network, so a connection error is a statement about one optional
+  feature, not about the app.
+- **`nil` recovery beats an invented one.** "Please try again" on a permanent
+  failure sends someone to repeat an action that cannot succeed, and spends the
+  app's credibility to do it.
+
+## The conflation underneath it
+
+Three state enums each had one case doing two jobs:
+
+| Enum | Was | Now |
+|---|---|---|
+| `ModelState` | `unavailable(String)` | `notBundled` and `failed(UserFacingError)` |
+| `HomologState` | `unavailable(String)` | `notDownloaded` and `failed(UserFacingError)` |
+| `ScanState` | `failed(String)` | `notBundled` and `failed(UserFacingError)` |
+
+"Your 110 MB index has not arrived yet" and "the index is corrupt" were the same
+value, so the UI could only style them the same way, and it chose the reassuring
+one. A genuinely broken index appeared as a download-in-progress notice.
+
+`FitnessTabView` had the tell: it compared the payload string against
+`SequenceStore.modelsMissingMessage` to work out which of the two had happened.
+A string comparison standing in for a type distinction is the enum asking to be
+split, and the comment above the constant ("one string, so the two places that
+report it cannot drift apart") was holding together something that should not
+have been one case.

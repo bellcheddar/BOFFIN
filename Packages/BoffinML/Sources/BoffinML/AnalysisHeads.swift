@@ -820,6 +820,27 @@ extension AnalysisHeads {
             throw HeadError.unexpectedOutputShape("family logits missing")
         }
 
+        // The model and the labels must describe the same classifier.
+        //
+        // They are two files with no link between them: `family.mlpackage` is
+        // converted from `family.pt`, and `family_labels.json` is written
+        // beside it, so retraining and forgetting to reconvert leaves a stale
+        // model paired with fresh names. That happened here on 2026-08-26,
+        // going from 100 families to 500.
+        //
+        // The failure is silent and total. `zip` truncates to the shorter
+        // sequence, so 100 logits against 500 names yields 100 pairs carrying
+        // the first 100 of the NEW names, which are different families from the
+        // ones the old model was trained on. Every call comes back confident,
+        // well formed, and wrong, with nothing to see in a log.
+        let classCount = logits.shape.last?.intValue ?? 0
+        guard classCount == families.count else {
+            throw HeadError.unexpectedOutputShape(
+                "the family model reports \(classCount) classes and the labels list "
+                    + "\(families.count). One of them is stale: reconvert with "
+                    + "Tools/coreml/convert_heads.py after retraining.")
+        }
+
         // Stride-aware, like every other read: Core ML pads rows.
         let strides = logits.strides.map(\.intValue)
         let valueStride = strides.last ?? 1

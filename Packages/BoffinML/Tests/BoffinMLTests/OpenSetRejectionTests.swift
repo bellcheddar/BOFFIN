@@ -105,3 +105,57 @@ struct OpenSetRejectionTests {
         #expect(call.caveat.contains("500"))
     }
 }
+
+@Suite("Model and labels agree")
+struct FamilyModelConsistencyTests {
+
+    private var headsDirectory: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Models/heads")
+    }
+
+    @Test("The converted model is not older than the labels beside it")
+    func modelIsNotStale() throws {
+        // The failure this catches happened: the classifier was retrained from
+        // 100 families to 500, `family_labels.json` was rewritten, and
+        // `family.mlpackage` was left at the previous day's conversion.
+        //
+        // Nothing errors at runtime without an explicit check, because `zip`
+        // truncates: 100 logits against 500 names gives 100 pairs carrying the
+        // first 100 of the NEW names, which are different families. Every call
+        // comes back confident and wrong.
+        //
+        // Compared by modification date rather than by loading the model,
+        // because Core ML is not available on the macOS test host for an iOS
+        // package and the useful signal is "these were not produced together".
+        let manager = FileManager.default
+        let labels = headsDirectory.appending(path: "family_labels.json")
+        let model = headsDirectory.appending(path: "family.mlpackage")
+        guard manager.fileExists(atPath: labels.path),
+            manager.fileExists(atPath: model.path)
+        else { return }
+
+        func modified(_ url: URL) throws -> Date {
+            let values = try url.resourceValues(forKeys: [.contentModificationDateKey])
+            return values.contentModificationDate ?? .distantPast
+        }
+
+        let labelsDate = try modified(labels)
+        let modelDate = try modified(model)
+        // A minute of slack: the two are written by the same pipeline moments
+        // apart, and the point is to catch a day, not a second.
+        // The message is built first: `Comment` is ExpressibleByStringLiteral,
+        // so a concatenation inline in `#expect` resolves as AttributedString
+        // instead and fails to compile.
+        let detail =
+            "family.mlpackage was converted before family_labels.json was"
+            + " written. Run Tools/coreml/convert_heads.py: a stale model paired with"
+            + " fresh labels reports confident wrong families and raises nothing."
+        #expect(modelDate.addingTimeInterval(60) >= labelsDate, "\(detail)")
+    }
+}

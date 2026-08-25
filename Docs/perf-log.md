@@ -863,3 +863,32 @@ family count changed and the measurement was repeated rather than inherited.
 A test now pins the family count the rate was measured at, so retraining at a
 different size fails loudly instead of quietly invalidating the sentence on
 screen.
+
+## A stale Core ML model paired with fresh labels (2026-08-26)
+
+Retraining the family classifier at 500 families rewrote `family.pt` and
+`family_labels.json`. It did **not** rewrite `family.mlpackage`, which is
+converted separately by `Tools/coreml/convert_heads.py`. The app loads the
+mlpackage and the labels, and for a few minutes those described different
+classifiers: a 100-class model and 500 names.
+
+**The failure is silent and total.** Swift's `zip` truncates to the shorter
+sequence, so 100 logits against 500 names yields 100 well-formed pairs carrying
+the first 100 of the NEW names. Those are different families from the ones the
+old model was trained on. Every classification would have come back confident,
+plausible and wrong, with nothing in a log and no exception anywhere.
+
+Two guards, because the two files have no link between them:
+
+**At runtime**, the class count reported by the model is compared against the
+label count before anything is read, and a mismatch throws with the fix in the
+message rather than proceeding.
+
+**At test time**, the mlpackage's modification date is compared against the
+labels'. Verified to discriminate rather than merely pass: touching the labels
+forward makes it fail with the reconversion instruction, and reconverting makes
+it pass again. A guard that has never been seen to fail is not a guard.
+
+Comparing dates rather than loading the model is deliberate: Core ML is not
+available on the macOS test host for an iOS package, and the signal that matters
+is "these two were not produced together", which a timestamp carries.

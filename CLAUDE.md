@@ -15,6 +15,23 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 - **Last completed:** Phase 10's document opening and App Intents on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
+### Licence findings
+
+- **You cannot launder a licence through a supplier.** RCSB is CC0 and
+  redistributes SIFTS, and its policy excludes data from integrated external
+  resources. The way out of an unlicensed dataset is a different SOURCE:
+  recompute it from something clear.
+- **Three mmCIF categories replace SIFTS for the core path**:
+  `_pdbx_poly_seq_scheme`, `_struct_ref_seq`, `_pdbx_struct_assembly`. What is
+  lost is accuracy, not correctness: `_struct_ref_seq` is the depositor's
+  alignment and SIFTS is EBI's correction of it.
+- **An unobserved residue does NOT have a missing author number.**
+  `pdb_seq_num` is populated for every residue of the construct; the marker is
+  `pdb_mon_id`.
+- **`(i + 3)..<(count - 1)` traps** when the chain is short: Swift requires
+  lowerBound <= upperBound and a four-residue peptide is enough to do it. Use
+  `stride`.
+
 ### Mol* API findings
 
 - **`StructureSelectionFromScript` with `language: 'pymol'` returns an EMPTY

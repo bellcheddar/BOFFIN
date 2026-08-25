@@ -51,6 +51,25 @@ structure with a language model*, Science 379:1123 (2023).
 
 ---
 
+## DSSP, and why nothing of it is here either
+
+`BoffinStructure/SecondaryStructure.swift` assigns eight-state secondary
+structure from coordinates. It is written from Kabsch and Sander's published
+description, not from any DSSP implementation: no source has been read, which is
+the same footing as the interaction profiler.
+
+Cite: Kabsch and Sander, *Dictionary of protein secondary structure: pattern
+recognition of hydrogen-bonded and geometrical features*, Biopolymers 22:2577
+(1983).
+
+This exists to unblock a licence. The Q8 head is trained on NetSurfP's
+distribution of CB513, whose terms are unstated; those labels are DSSP
+assignments over PDB structures, and the PDB is CC0. Computing the labels rather
+than redistributing somebody else's is the same move that unblocked the
+transmembrane head and the residue numbering.
+
+---
+
 ## PLIP, and why nothing of it is here
 
 The interaction profiler in `BoffinStructure/InteractionProfiler.swift` is a

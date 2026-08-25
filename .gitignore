@@ -59,5 +59,6 @@ Datasets/*.json
 # and the exact commands are in Datasets/pdb/MANIFEST.md.
 Datasets/pdb/*
 Datasets/codon/*.fna
+Datasets/pdblabels/
 !Datasets/pdb/MANIFEST.md
 Assets/

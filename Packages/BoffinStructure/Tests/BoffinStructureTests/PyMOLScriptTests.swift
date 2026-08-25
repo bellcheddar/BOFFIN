@@ -14,10 +14,10 @@ import Testing
 struct PyMOLScriptTests {
 
     private let deck = [
-        Scene(
+        ViewerScene(
             name: "Overview", selection: nil, representation: "cartoon",
             colourTheme: "chain-id", notes: "Start wide."),
-        Scene(
+        ViewerScene(
             name: "ATP site", selection: "byres (polymer within 5 of organic)",
             representation: "ball-and-stick", colourTheme: "element-symbol",
             notes: "The hinge is Glu81 to Leu83.\nMention the gatekeeper."),
@@ -49,7 +49,7 @@ struct PyMOLScriptTests {
         #expect(script.contains("# Mention the gatekeeper."))
     }
 
-    @Test("Scene names become valid PyMOL identifiers")
+    @Test("ViewerScene names become valid PyMOL identifiers")
     func nameSafety() {
         #expect(PyMOLScript.safeName("ATP site") == "ATP_site")
         #expect(PyMOLScript.safeName("2. the hinge") == "s_2__the_hinge")

@@ -12,7 +12,12 @@
 import Foundation
 
 /// One named scene: what is shown, how, and from where.
-public struct Scene: Sendable, Hashable, Identifiable {
+///
+/// `ViewerScene`, not `Scene`. SwiftUI has a protocol of that name, and an app
+/// that imports both gets "'Scene' is ambiguous for type lookup in this
+/// context" pointing at its own `App` conformance, several files away from the
+/// cause. `ProteinSequence` exists for the same reason.
+public struct ViewerScene: Sendable, Hashable, Identifiable {
     public let name: String
     /// The selection expression this scene highlights, if any.
     public let selection: String?
@@ -37,7 +42,7 @@ public struct Scene: Sendable, Hashable, Identifiable {
 
 /// What an import understood, and what it did not.
 public struct PyMOLImport: Sendable, Hashable {
-    public let scenes: [Scene]
+    public let scenes: [ViewerScene]
     /// Commands with no BOFFIN equivalent, verbatim and with their line number.
     ///
     /// Reported rather than dropped. A `.pml` file is a program, and a viewer
@@ -90,11 +95,11 @@ public enum PyMOLScript {
     ///   - scenes: the deck, in order.
     ///   - structureName: the object name to load and act on.
     /// - Returns: the script text.
-    public static func export(_ scenes: [Scene], structureName: String) -> String {
+    public static func export(_ scenes: [ViewerScene], structureName: String) -> String {
         var lines: [String] = []
         lines.append("# Written by BOFFIN")
         lines.append("#")
-        lines.append("# Scene notes are preserved as comments: PyMOL has no field for")
+        lines.append("# ViewerScene notes are preserved as comments: PyMOL has no field for")
         lines.append("# them, and dropping them would lose the half of a deck that")
         lines.append("# explains the other half.")
         lines.append("")
@@ -155,7 +160,7 @@ public enum PyMOLScript {
 
     /// Read a PyMOL script, reporting what could not be represented.
     public static func importScript(_ text: String) -> PyMOLImport {
-        var scenes: [Scene] = []
+        var scenes: [ViewerScene] = []
         var unsupported: [(line: Int, command: String)] = []
 
         var selection: String?
@@ -213,7 +218,7 @@ public enum PyMOLScript {
                 }
                 let name = pieces.first ?? "scene \(scenes.count + 1)"
                 scenes.append(
-                    Scene(
+                    ViewerScene(
                         name: name, selection: selection, representation: representation,
                         colourTheme: colourTheme,
                         notes: notes.joined(separator: "\n")))

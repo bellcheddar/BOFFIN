@@ -917,3 +917,48 @@ criterion that is read but never applied looks exactly like one that is applied
 and generous.
 
 53 BoffinStructure tests.
+
+
+## Phase 9 (part 2): the diagram, the table and the CSV (2026-08-25)
+
+**The assumptions are inside the CSV, not alongside it.** A CSV is the artefact
+opened six months later by somebody who was not there, and a table of distances
+with no statement of what was assumed about protonation is a table of numbers
+that cannot be checked. They go in as a leading comment block, which every
+spreadsheet skips or shows harmlessly.
+
+In the app the assumptions sit **above** the results rather than under them. A
+reader who stops after the numbers has to have seen what they rest on, and that
+is an argument about layout, not about wording.
+
+**The 2D diagram uses a circle, on purpose.** A force-directed layout would look
+more like the published figures and would move a residue between renders of the
+same structure, which makes two figures of one site impossible to compare. A
+circle is boring, stable and reproducible, and a test pins the determinism.
+Interaction kinds are distinguished by dash pattern as well as colour, so the
+figure survives being printed in grey, and VoiceOver reads every contact with its
+kinds and distance.
+
+### A field name that was wrong for one case in five
+
+`Interaction.proteinAtom` became `partnerAtom` because a test noticed author
+numbers above 300 in a 298-residue kinase. Nothing was broken: metal
+coordination is to the METAL, a heteroatom numbered in the ligand range, so the
+name was accurate for four kinds and quietly wrong for the fifth. A CSV column
+called `protein_number` holding a zinc's number is exactly the kind of thing that
+is never noticed.
+
+### A name collision the project has made before
+
+`Scene` in BoffinStructure collided with SwiftUI's `Scene`, and the error lands
+on the app's own `App` conformance several files from the cause. It is
+`ViewerScene` now, for the same reason `ProteinSequence` is not `Sequence`.
+
+### What was written and then deleted
+
+A 3D overlay command was drafted for the bridge and removed before committing: it
+built a list of shapes and did nothing with them, which is a command that appears
+to work and draws nothing. Shipping that would have been worse than not having
+it, so the overlay stays on the To Do and the 2D diagram is the figure for now.
+
+11 UI tests on iPhone and iPad, 58 BoffinStructure tests, 31 BoffinCharts tests.

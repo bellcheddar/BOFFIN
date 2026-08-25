@@ -94,4 +94,46 @@ final class StructureTabUITests: XCTestCase {
         shot.lifetime = .keepAlways
         add(shot)
     }
+
+    /// Phase 9's acceptance in the interface: a profile, with its assumptions
+    /// shown ABOVE the numbers rather than under them, and a way out to CSV.
+    ///
+    /// A reader who stops after the results has to have seen what they rest on,
+    /// which is an argument about layout and not about wording.
+    func testInteractionProfileShowsItsAssumptionsAndExports() throws {
+        let app = XCUIApplication()
+        app.launch()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30))
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            "the structure did not load")
+
+        let profile = app.buttons["boffin.profile-interactions"]
+        XCTAssertTrue(profile.waitForExistence(timeout: 20), "no profile control")
+        profile.tap()
+
+        let assumptions = app.staticTexts["boffin.interaction-assumptions"]
+        XCTAssertTrue(
+            assumptions.waitForExistence(timeout: 30),
+            "the profile appeared without stating its assumptions")
+        XCTAssertTrue(
+            assumptions.label.contains("pH"),
+            "the assumptions do not name the pH: \(assumptions.label)")
+        XCTAssertTrue(
+            assumptions.label.contains("hydrogens"),
+            "the assumptions do not say whether hydrogens were present")
+
+        XCTAssertTrue(
+            app.buttons["boffin.share-interactions"].waitForExistence(timeout: 10),
+            "the profile cannot be exported")
+
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "Structure tab, interaction profile"
+        shot.lifetime = .keepAlways
+        add(shot)
+    }
 }

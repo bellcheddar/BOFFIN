@@ -85,10 +85,17 @@ public struct Interaction: Sendable, Hashable, Identifiable {
 
     public let kind: Kind
     public let ligandAtom: Int
-    public let proteinAtom: Int
+    /// The atom at the other end.
+    ///
+    /// Named `partnerAtom` and not `proteinAtom`, which is what it was called
+    /// until a test noticed author numbers above 300 in a 298-residue kinase.
+    /// Metal coordination is to the METAL, which is a heteroatom numbered in the
+    /// ligand range, so a field called `proteinAtom` was accurate for four of
+    /// the five kinds and quietly wrong for the fifth.
+    public let partnerAtom: Int
     public let distance: Double
 
-    public var id: String { "\(kind.rawValue)-\(ligandAtom)-\(proteinAtom)" }
+    public var id: String { "\(kind.rawValue)-\(ligandAtom)-\(partnerAtom)" }
 }
 
 /// A profile, and what it assumed.
@@ -100,9 +107,12 @@ public struct InteractionProfile: Sendable, Hashable {
         interactions.filter { $0.kind == kind }
     }
 
-    /// Distinct protein residues contacted, as author numbers.
+    /// Distinct partner residues contacted, as author numbers.
+    ///
+    /// Includes coordinated metals, which are part of a binding site even though
+    /// they are not part of the protein.
     public func contactedResidues(in store: AtomStore) -> Set<Int> {
-        Set(interactions.map { store.authorNumber[$0.proteinAtom] })
+        Set(interactions.map { store.authorNumber[$0.partnerAtom] })
     }
 }
 
@@ -174,13 +184,13 @@ public enum InteractionProfiler {
             let neighbours = SelectionEvaluator.withinIndices(
                 distance: widest, candidates: protein, targets: [ligandAtom], store: store)
 
-            for proteinAtom in neighbours {
-                guard let separation = store.distance(ligandAtom, proteinAtom) else {
+            for partnerAtom in neighbours {
+                guard let separation = store.distance(ligandAtom, partnerAtom) else {
                     continue
                 }
-                let proteinElement = store.element[proteinAtom].uppercased()
-                let proteinResidue = store.residueName[proteinAtom].uppercased()
-                let proteinName = store.atomName[proteinAtom].uppercased()
+                let proteinElement = store.element[partnerAtom].uppercased()
+                let proteinResidue = store.residueName[partnerAtom].uppercased()
+                let proteinName = store.atomName[partnerAtom].uppercased()
 
                 // Hydrophobic: carbon to carbon, close.
                 if separation <= criteria.hydrophobicDistance,
@@ -189,7 +199,7 @@ public enum InteractionProfiler {
                     found.append(
                         Interaction(
                             kind: .hydrophobic, ligandAtom: ligandAtom,
-                            proteinAtom: proteinAtom, distance: separation))
+                            partnerAtom: partnerAtom, distance: separation))
                 }
 
                 // Hydrogen bond, by heavy-atom distance alone when the structure
@@ -202,7 +212,7 @@ public enum InteractionProfiler {
                     found.append(
                         Interaction(
                             kind: .hydrogenBond, ligandAtom: ligandAtom,
-                            proteinAtom: proteinAtom, distance: separation))
+                            partnerAtom: partnerAtom, distance: separation))
                 }
 
                 // Salt bridge: opposite formal charges at the assumed pH.
@@ -219,7 +229,7 @@ public enum InteractionProfiler {
                         found.append(
                             Interaction(
                                 kind: .saltBridge, ligandAtom: ligandAtom,
-                                proteinAtom: proteinAtom, distance: separation))
+                                partnerAtom: partnerAtom, distance: separation))
                     }
                 }
 
@@ -234,7 +244,7 @@ public enum InteractionProfiler {
                     found.append(
                         Interaction(
                             kind: .halogenBond, ligandAtom: ligandAtom,
-                            proteinAtom: proteinAtom, distance: separation))
+                            partnerAtom: partnerAtom, distance: separation))
                 }
             }
 
@@ -248,7 +258,7 @@ public enum InteractionProfiler {
                     found.append(
                         Interaction(
                             kind: .metalCoordination, ligandAtom: ligandAtom,
-                            proteinAtom: metal, distance: separation))
+                            partnerAtom: metal, distance: separation))
                 }
             }
         }

@@ -59,14 +59,14 @@ struct InteractionProfilerTests {
         #expect(!bonds.isEmpty)
 
         let hingeBonds = bonds.filter {
-            (81...83).contains(store.authorNumber[$0.proteinAtom])
+            (81...83).contains(store.authorNumber[$0.partnerAtom])
         }
         #expect(!hingeBonds.isEmpty, "no hydrogen bond to the hinge")
         for bond in bonds {
             #expect(bond.distance <= 4.1)
             #expect(
                 InteractionProfiler.polarElements.contains(
-                    store.element[bond.proteinAtom].uppercased()))
+                    store.element[bond.partnerAtom].uppercased()))
         }
     }
 
@@ -78,7 +78,7 @@ struct InteractionProfilerTests {
         #expect(!contacts.isEmpty)
         for contact in contacts {
             #expect(store.element[contact.ligandAtom].uppercased() == "C")
-            #expect(store.element[contact.proteinAtom].uppercased() == "C")
+            #expect(store.element[contact.partnerAtom].uppercased() == "C")
             #expect(contact.distance <= 4.0)
         }
     }
@@ -93,7 +93,7 @@ struct InteractionProfilerTests {
         #expect(!bridges.isEmpty, "no salt bridge to the triphosphate")
         for bridge in bridges {
             #expect(bridge.distance <= 5.5)
-            let residue = store.residueName[bridge.proteinAtom].uppercased()
+            let residue = store.residueName[bridge.partnerAtom].uppercased()
             #expect(["ARG", "LYS", "HIS", "ASP", "GLU"].contains(residue))
         }
     }
@@ -147,5 +147,91 @@ struct InteractionProfilerTests {
         let strict = InteractionProfiler.profile(store, ligand: ligand, criteria: tight)
         #expect(strict.interactions.count < loose.interactions.count)
         #expect(strict.ofKind(.hydrophobic).allSatisfy { $0.distance <= 3.5 })
+    }
+}
+
+@Suite("Interaction export")
+struct InteractionExportTests {
+
+    private func profileOfKinase() throws -> (AtomStore, InteractionProfile) {
+        let store = try kinase()
+        let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
+        return (store, InteractionProfiler.profile(store, ligand: ligand))
+    }
+
+    /// A CSV is the artefact that gets opened six months later by someone who
+    /// was not there. A table of distances with no statement of what was assumed
+    /// about protonation is a table of numbers that cannot be checked.
+    @Test("The assumptions are inside the CSV, not alongside it")
+    func assumptionsAreInTheFile() throws {
+        let (store, profile) = try profileOfKinase()
+        let csv = profile.csv(in: store, structureName: "1HCK")
+        #expect(csv.contains("# BOFFIN interaction profile"))
+        #expect(csv.contains("# Structure: 1HCK"))
+        #expect(csv.contains("pH 7.4"))
+        #expect(csv.contains("NO hydrogens"))
+        #expect(csv.contains("# Research use only."))
+    }
+
+    @Test("Every row has the same number of fields as the header")
+    func wellFormed() throws {
+        let (store, profile) = try profileOfKinase()
+        let csv = profile.csv(in: store, structureName: "1HCK")
+        let rows = csv.split(separator: "\n").filter { !$0.hasPrefix("#") }
+        let header = rows[0].split(separator: ",", omittingEmptySubsequences: false)
+        #expect(header.count == 8)
+        #expect(rows.count == profile.interactions.count + 1)
+        for row in rows.dropFirst() {
+            #expect(
+                row.split(separator: ",", omittingEmptySubsequences: false).count == 8,
+                "row has the wrong field count: \(row)")
+        }
+    }
+
+    /// This test is why the field is called `partnerAtom`. It was `proteinAtom`,
+    /// and CDK2 is 298 residues, so numbers above 300 said something was wrong.
+    /// Nothing was: metal coordination is to the METAL, a heteroatom numbered in
+    /// the ligand range, and the name was accurate for four kinds out of five.
+    @Test("Residue numbers in the CSV are author numbers, and metals are not protein")
+    func authorNumbering() throws {
+        let (store, profile) = try profileOfKinase()
+        let csv = profile.csv(in: store, structureName: "1HCK")
+        let rows = csv.split(separator: "\n").filter { !$0.hasPrefix("#") }.dropFirst()
+        for row in rows {
+            let fields = row.split(separator: ",", omittingEmptySubsequences: false)
+            let kind = String(fields[0])
+            let number = try #require(Int(fields[6]))
+            #expect(number > 0)
+            if kind != Interaction.Kind.metalCoordination.rawValue {
+                // A protein author number outside 1 to 300 would mean label
+                // numbering leaked in.
+                #expect(number <= 300, "\(kind) partner numbered \(number)")
+            }
+        }
+
+        // And the metals really are there to be distinguished, so the exception
+        // is exercised rather than merely allowed for.
+        let metals = profile.ofKind(.metalCoordination)
+        for interaction in metals {
+            #expect(store.isHeteroatom[interaction.partnerAtom])
+        }
+    }
+
+    @Test("The summary counts each kind and ends with the assumptions")
+    func summary() throws {
+        let (store, profile) = try profileOfKinase()
+        let text = profile.summary(in: store)
+        #expect(text.contains("hydrogen bond"))
+        #expect(text.contains("residues"))
+        #expect(text.contains("pH 7.4"))
+    }
+
+    @Test("An empty profile still states its assumptions rather than saying nothing")
+    func emptySummary() throws {
+        let store = try kinase()
+        let profile = InteractionProfiler.profile(store, ligand: [])
+        let text = profile.summary(in: store)
+        #expect(text.contains("No interactions were found"))
+        #expect(text.contains("pH 7.4"))
     }
 }

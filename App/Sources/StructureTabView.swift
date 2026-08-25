@@ -22,6 +22,8 @@ struct StructureTabView: View {
     @State private var setupError: String?
     @State private var paintedTrack: TrackID?
     @State private var identifier: String = ""
+    @State private var profile: InteractionProfile?
+    @State private var loadedStore: AtomStore?
 
     var body: some View {
         NavigationStack {
@@ -123,6 +125,7 @@ struct StructureTabView: View {
             .font(.caption)
 
             assemblyControls(model)
+            interactionControls(model)
             trackPainting(model)
             if let selection = model.selection { inspector(selection) }
         }
@@ -185,6 +188,113 @@ struct StructureTabView: View {
             .buttonStyle(.bordered).font(.caption2)
             .disabled(identifier.count < 6)
         }
+    }
+
+    /// Interaction profiling for the loaded structure.
+    ///
+    /// The profile is computed by BOFFIN's own parser over the same bytes the
+    /// viewer was handed, not by asking the viewer. Two sources of truth about
+    /// what an atom index means is one too many.
+    @ViewBuilder
+    private func interactionControls(_ model: StructureViewerModel) -> some View {
+        if case .loaded = model.state {
+            VStack(alignment: .leading, spacing: Spacing.xs) {
+                HStack {
+                    Button("Profile interactions") {
+                        Task { await profileInteractions() }
+                    }
+                    .buttonStyle(.bordered).font(.caption2)
+                    .accessibilityIdentifier("boffin.profile-interactions")
+                    Spacer()
+                    if let profile, let store = loadedStore {
+                        ShareLink(item: profile.csv(in: store, structureName: "structure")) {
+                            Label("CSV", systemImage: "tablecells")
+                                .font(.caption2)
+                        }
+                        .accessibilityIdentifier("boffin.share-interactions")
+                    }
+                }
+
+                if let profile, let store = loadedStore {
+                    // The assumptions are shown above the results, not below
+                    // them: a reader who stops after the numbers has to have
+                    // seen what they rest on.
+                    Label(profile.assumptions.statement, systemImage: "questionmark.circle")
+                        .font(.caption2).foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("boffin.interaction-assumptions")
+
+                    InteractionDiagram(
+                        ligandName: ligandName(store),
+                        contacts: Self.contacts(from: profile, in: store)
+                    )
+                    .frame(height: 220)
+
+                    Text(profile.summary(in: store))
+                        .font(.caption2).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    /// Group a profile by contacted residue, for the diagram.
+    ///
+    /// The kinds are ordered by the enum rather than by discovery, so two
+    /// diagrams of the same site put the same connector in the same place.
+    static func contacts(
+        from profile: InteractionProfile, in store: AtomStore
+    ) -> [DiagramContact] {
+        var byResidue: [Int: (kinds: Set<Interaction.Kind>, closest: Double, label: String)] = [:]
+        for interaction in profile.interactions {
+            let number = store.authorNumber[interaction.partnerAtom]
+            let label = "\(store.residueName[interaction.partnerAtom])\(number)"
+            var entry = byResidue[number] ?? ([], .greatestFiniteMagnitude, label)
+            entry.kinds.insert(interaction.kind)
+            entry.closest = min(entry.closest, interaction.distance)
+            byResidue[number] = entry
+        }
+        return byResidue.keys.sorted().compactMap { number in
+            guard let entry = byResidue[number] else { return nil }
+            return DiagramContact(
+                label: entry.label,
+                kinds: Interaction.Kind.allCases
+                    .filter { entry.kinds.contains($0) }
+                    .map { Self.diagramKind($0) },
+                distance: entry.closest)
+        }
+    }
+
+    /// Map BoffinStructure's kinds onto BoffinCharts's.
+    ///
+    /// Two enums rather than one, because BoffinCharts sees BoffinCore and
+    /// nothing else. The app is the only place that can see both, which is the
+    /// dependency rule working rather than duplication for its own sake.
+    static func diagramKind(_ kind: Interaction.Kind) -> DiagramKind {
+        switch kind {
+        case .hydrophobic: .hydrophobic
+        case .hydrogenBond: .hydrogenBond
+        case .saltBridge: .saltBridge
+        case .metalCoordination: .metalCoordination
+        case .halogenBond: .halogenBond
+        }
+    }
+
+    private func ligandName(_ store: AtomStore) -> String {
+        let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
+        guard let first = ligand.first else { return "ligand" }
+        return store.residueName[first]
+    }
+
+    private func profileInteractions() async {
+        guard let url = Self.fixture(named: "1hck.bcif"),
+            let data = try? Data(contentsOf: url),
+            let file = try? BinaryCIF.decode(data),
+            let store = try? AtomStore.from(file)
+        else { return }
+        loadedStore = store
+        let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
+        profile = InteractionProfiler.profile(store, ligand: ligand)
     }
 
     /// Biological assembly and NMR model.

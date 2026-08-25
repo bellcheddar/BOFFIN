@@ -48,14 +48,30 @@ struct OnboardingView: View {
                             + "relatives are four read-outs of that same pass rather than "
                             + "four separate waits.")
 
+                    // Deliberately states NO family count.
+                    //
+                    // It said "100 families" and went stale the moment the
+                    // classifier was retrained to 500, because a number that
+                    // has to be maintained in two places drifts in one of
+                    // them. The count lives in the model's metadata and is
+                    // shown on the Family tab, where it is read rather than
+                    // recited.
+                    //
+                    // The disorder sentence changed for a different reason: it
+                    // said the head is weakest on folds with no close relative
+                    // in the PDB, which came from CASP12, where 21 chains give
+                    // a 95% interval spanning the baseline. The claim was never
+                    // supported, and the honest version is that disorder is the
+                    // weakest track without asserting which sequences it fails
+                    // on.
                     point(
                         icon: "exclamationmark.triangle",
                         title: "It will tell you when it is guessing",
-                        detail: "The family classifier knows 100 families and must answer "
-                            + "with one of them, so it can be confidently wrong about a "
-                            + "protein outside that set. Disorder is weakest on folds with "
-                            + "no close relative in the PDB. Both say so on screen, and a "
-                            + "predicted structure is always labelled as one.")
+                        detail: "The family classifier answers from a fixed set of Pfam "
+                            + "families, so it can be confidently wrong about a protein "
+                            + "outside that set: it says how often that check catches one. "
+                            + "Disorder is the weakest track and is best read as a hint. "
+                            + "A predicted structure is always labelled as one.")
 
                     Text("Research use only. No clinical, diagnostic or therapeutic claims.")
                         .font(.footnote)

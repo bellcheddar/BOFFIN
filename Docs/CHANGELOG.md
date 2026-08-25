@@ -1987,3 +1987,26 @@ the example of an out-of-set protein. **PF00240 is now among the 500 families**,
 so the example has stopped being one. An illustration drawn from a specific
 model expires when the model changes, and the comment now says so rather than
 being quietly edited.
+
+---
+
+## Claims that expired when the model changed (2026-08-26)
+
+A sweep for statements that were true of the 100-family classifier and stopped
+being true at 500.
+
+**The onboarding sheet told every new user the classifier "knows 100
+families".** It now states no count at all. The number lives in the model's
+metadata and is shown on the Family tab, where it is read rather than recited:
+a number maintained in two places drifts in one of them, and the fix for that
+is to stop maintaining it twice rather than to update it faster.
+
+**The same paragraph said disorder is "weakest on folds with no close relative
+in the PDB".** That came from CASP12, where 21 chains give a 95% interval
+spanning the no-language-model baseline. The claim was never supported by the
+measurement, and the honest version names disorder as the weakest track without
+asserting which sequences it fails on.
+
+The `AnalysisHeads` comments that still mention 100 families and Mahalanobis are
+deliberate: they explain why the current choice differs from the previous one,
+and deleting them would leave the reversal unexplained.

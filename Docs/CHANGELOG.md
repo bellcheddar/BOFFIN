@@ -1215,3 +1215,54 @@ NetSurfP's curation of the same thing? Embedding and training are running; the
 numbers go in their own commit.
 
 36 BoffinCharts tests, 13 UI tests.
+
+
+## Phase 11: privacy manifest and acknowledgements (2026-08-25)
+
+**The privacy manifest says BOFFIN collects nothing.** Not "nothing
+identifiable", not "nothing without consent": nothing. Every analysis runs on
+device and the only network request the app can make is a structure the user
+asks for by name. Declaring a collected data type the app does not collect would
+be as wrong as omitting one it does.
+
+**Every source is credited whether or not its licence asks for it**, and the
+terms column is the honest one: several read "None stated", in orange. Rounding
+an unstated licence up to a permissive one on an acknowledgements screen would be
+misleading exactly where a reader is looking for the truth. The text lives in the
+binary rather than a bundled Markdown file, because a screen that silently shows
+nothing because a resource did not copy is worse than no screen.
+
+`Tools/add-file-to-target.py` learned about resources on the way. A file typed
+`sourcecode.swift` in the project lands in the Sources phase and never reaches
+the bundle, which builds cleanly and ships an app with no privacy manifest in it.
+
+## Heads trained on PDB-derived labels (2026-08-25)
+
+The question the licence discussion never asked: **does the curation matter?**
+
+5,012 chains and 1,476,209 residues, labelled from PDB entries directly, split by
+ACCESSION rather than by chain, because two chains of one protein in different
+entries are the same sequence and splitting by chain measures memorisation.
+
+**Disorder: accuracy 0.905, Matthews correlation 0.510.** Predicting "ordered"
+everywhere scores 0.9325 accuracy and zero MCC, which is why accuracy is not the
+headline. The shipped NetSurfP-trained head measured MCC 0.628 on TS115 and 0.500
+on CASP12, so this lands inside that range.
+
+**Three-state secondary structure: accuracy 0.819.** The shipped head collapsed
+to three states measured 0.808, 0.824 and 0.743 on CB513, TS115 and CASP12.
+Inside the range again.
+
+**Neither is a like-for-like comparison and neither should be quoted as one.**
+These are held-out splits of the same source, not CB513.
+
+The honest weakness is disorder precision at 0.396: the head calls disorder about
+two and a half times as often as it is there. Class weighting bought recall at
+that cost, and for the Boundary tab that trade is the right way round, since a
+missed disordered tail is a construct that will not crystallise and a false one
+is a boundary a user can overrule.
+
+**What it settles: the curation was not load-bearing.** Labels taken straight
+from PDB entries train heads that match the ones trained on NetSurfP's versions
+of the same underlying data. The licence question was never a question about
+quality.

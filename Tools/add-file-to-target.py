@@ -56,6 +56,18 @@ def main() -> int:
         print(f"{relative} is already in the project")
         return 0
 
+    # Resources go into the Resources phase, sources into Sources. The phase is
+    # not inferable from the target, so it comes from the extension: anything
+    # that is not Swift is a resource here, which covers the privacy manifest,
+    # asset catalogues and anything else that is copied rather than compiled.
+    isSource = path.suffix == ".swift"
+    phase = "Sources" if isSource else "Resources"
+    fileType = (
+        "sourcecode.swift" if isSource
+        else "folder.assetcatalog" if path.suffix == ".xcassets"
+        else "text.plist.xml" if path.suffix in (".plist", ".xcprivacy")
+        else "file")
+
     fileRef = identifier(f"fileRef:{relative}")
     buildFile = identifier(f"buildFile:{relative}:{target}")
 
@@ -63,24 +75,26 @@ def main() -> int:
     text = text.replace(
         "/* End PBXFileReference section */",
         f"\t\t{fileRef} /* {name} */ = {{isa = PBXFileReference; includeInIndex = 1; "
-        f"lastKnownFileType = sourcecode.swift; name = {name}; path = {relative}; "
+        f"lastKnownFileType = {fileType}; name = {name}; path = {relative}; "
         f"sourceTree = \"<group>\"; }};\n/* End PBXFileReference section */",
         1)
 
     # 2. PBXBuildFile.
     text = text.replace(
         "/* End PBXBuildFile section */",
-        f"\t\t{buildFile} /* {name} in Sources */ = {{isa = PBXBuildFile; "
+        f"\t\t{buildFile} /* {name} in {phase} */ = {{isa = PBXBuildFile; "
         f"fileRef = {fileRef} /* {name} */; }};\n/* End PBXBuildFile section */",
         1)
 
     # 3 and 4 are anchored on a file that is ALREADY in the same group and the
     # same build phase, which is how the script knows where they are without
     # parsing the whole project. The sibling is any other file in the same
-    # directory.
+    # directory that goes through the same phase.
+    pattern = "*.swift" if isSource else "*"
     siblings = sorted(
-        p.name for p in path.parent.glob("*.swift")
-        if p.name != name and f"path = {path.parent.relative_to(ROOT)}/{p.name};" in text)
+        p.name for p in path.parent.glob(pattern)
+        if p.name != name and (p.suffix == ".swift") == isSource
+        and f"path = {path.parent.relative_to(ROOT)}/{p.name};" in text)
     if not siblings:
         print(f"no sibling of {name} is in the project, so its group cannot be found")
         return 1
@@ -90,7 +104,7 @@ def main() -> int:
         rf"([0-9A-F]{{24}}) /\* {re.escape(sibling)} \*/ = \{{isa = PBXFileReference",
         text)
     siblingBuild = re.search(
-        rf"([0-9A-F]{{24}}) /\* {re.escape(sibling)} in Sources \*/ = \{{isa = PBXBuildFile",
+        rf"([0-9A-F]{{24}}) /\* {re.escape(sibling)} in {phase} \*/ = \{{isa = PBXBuildFile",
         text)
     if not siblingRef or not siblingBuild:
         print(f"could not locate {sibling} in the project")
@@ -100,9 +114,9 @@ def main() -> int:
     text = text.replace(
         groupLine, groupLine + f"\n\t\t\t\t{fileRef} /* {name} */,", 1)
 
-    phaseLine = f"\t\t\t\t{siblingBuild.group(1)} /* {sibling} in Sources */,"
+    phaseLine = f"\t\t\t\t{siblingBuild.group(1)} /* {sibling} in {phase} */,"
     text = text.replace(
-        phaseLine, phaseLine + f"\n\t\t\t\t{buildFile} /* {name} in Sources */,", 1)
+        phaseLine, phaseLine + f"\n\t\t\t\t{buildFile} /* {name} in {phase} */,", 1)
 
     PROJECT.write_text(text)
     print(f"added {relative} to {target} (fileRef {fileRef}, buildFile {buildFile})")

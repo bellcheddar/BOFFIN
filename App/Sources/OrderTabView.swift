@@ -29,6 +29,17 @@ struct OrderTabView: View {
             }
             .navigationTitle("Order")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        AcknowledgementsView()
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .accessibilityLabel("Acknowledgements")
+                    .accessibilityIdentifier("boffin.acknowledgements-link")
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Sequence", systemImage: "square.and.pencil") {
                         isShowingInput = true

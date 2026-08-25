@@ -65,4 +65,55 @@ final class OrderTabUITests: XCTestCase {
         // empty sequence or an error the user has to dismiss.
         XCTAssertFalse(app.buttons["Analyse"].isEnabled)
     }
+
+    /// Every source is credited whether or not its licence asks for it, and the
+    /// ones that state no terms say so on screen.
+    ///
+    /// Rounding an unstated licence up to a permissive one on an
+    /// acknowledgements screen would be misleading exactly where a reader is
+    /// looking for the truth.
+    func testAcknowledgementsCreditEverythingAndStateUnknownTerms() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let link = app.buttons["boffin.acknowledgements-link"]
+        XCTAssertTrue(link.waitForExistence(timeout: 20), "no acknowledgements link")
+        link.tap()
+
+        XCTAssertTrue(
+            app.navigationBars["Acknowledgements"].waitForExistence(timeout: 10),
+            "the acknowledgements screen did not open")
+
+        // Scrolled to, not just queried. A List cell below the fold does not
+        // exist in the accessibility tree, so asserting `.exists` on the last
+        // few entries tests the screen height rather than the content.
+        for source in ["ESM-2", "Mol*", "RCSB PDB", "UniProt", "SIFTS", "DSSP", "PLIP"] {
+            var attempts = 0
+            while !app.staticTexts[source].exists && attempts < 8 {
+                app.swipeUp()
+                attempts += 1
+            }
+            XCTAssertTrue(
+                app.staticTexts[source].exists, "\(source) is not credited")
+        }
+
+        // The honest column. If this ever reads as a permissive licence, the
+        // screen has started rounding up.
+        XCTAssertTrue(
+            app.staticTexts.containing(
+                NSPredicate(format: "label CONTAINS %@", "None stated")
+            ).count > 0,
+            "no source is shown as having unstated terms")
+
+        // By identifier rather than by label. `containing` matches elements
+        // that CONTAIN a match, which is a different query from "this
+        // element's own label contains", and on a leaf it can find nothing.
+        var attempts = 0
+        let researchUse = app.staticTexts["boffin.research-use-only"]
+        while !researchUse.exists && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(researchUse.exists, "the research-use statement is missing")
+    }
 }

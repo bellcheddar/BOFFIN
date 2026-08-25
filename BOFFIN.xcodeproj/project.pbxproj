@@ -32,6 +32,8 @@
 		0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */; };
 		F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */; };
 		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
+		B6A5CBEF672462525018F65D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */; };
+		F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +89,8 @@
 		C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDeck.swift; path = App/Sources/SceneDeck.swift; sourceTree = "<group>"; };
 		DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenedDocument.swift; path = App/Sources/OpenedDocument.swift; sourceTree = "<group>"; };
 		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
+		80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = App/Resources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AcknowledgementsView.swift; path = App/Sources/AcknowledgementsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				1C4B37771FD3FEA80B21D072 /* Assets.xcassets */,
+				80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */,
 				F92CF2D37BBBC032A7551686 /* Info.plist */,
 			);
 			name = Resources;
@@ -184,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
+				889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */,
 				07AB5915B686A16BF428E028 /* BoffinIntents.swift */,
 				DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */,
 				C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */,
@@ -355,6 +361,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F473D03A5B86076AE4353C1E /* Assets.xcassets in Resources */,
+				B6A5CBEF672462525018F65D /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,6 +386,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
+				F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */,
 				E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */,
 				F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */,
 				0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */,

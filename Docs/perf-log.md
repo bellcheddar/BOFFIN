@@ -420,3 +420,69 @@ scored twice, and on the experimental subset span recall falls from 0.811 to
 0.688. That subset is 26 chains, which is too few to call precisely, but it is
 the honest direction of travel and the reason the aggregate figure should not be
 quoted alone.
+
+
+## Heads trained on PDB-derived labels (2026-08-25)
+
+The disorder and secondary-structure heads ship trained on NetSurfP's
+distributions. These are trained on labels derived from the PDB directly, to
+answer a question the licence discussion never did: **does the curation matter?**
+
+| | |
+|---|---|
+| Chains | 5,012, one per UniProt accession |
+| Residues | 1,476,209 |
+| Selection | X-ray, 2.5 A or better |
+| Disorder | 7.1% of residues |
+| Structure | 41.3% helix, 19.9% strand, 38.8% coil |
+| Split | by ACCESSION, not by chain |
+
+Split by accession because two chains of one protein in different entries are
+the same sequence, and splitting by chain puts a protein in both halves: the
+test score then measures memorisation.
+
+### Disorder
+
+| | recall | precision | F1 |
+|---|---|---|---|
+| ordered | 0.915 | 0.982 | 0.947 |
+| disordered | 0.771 | 0.396 | 0.524 |
+
+**Accuracy 0.905, Matthews correlation 0.510.** Predicting "ordered" everywhere
+scores **0.9325 accuracy and zero MCC**, which is why accuracy is not the
+headline here.
+
+The shipped head, trained on NetSurfP, measured MCC 0.628 on TS115 and 0.500 on
+CASP12. This one lands inside that range. It is not a like-for-like comparison
+and must not be quoted as one: this is a held-out split of the SAME source, not
+CB513.
+
+The honest weakness is precision: 0.396 means the head calls disorder about two
+and a half times as often as it is there. Class weighting bought recall at that
+cost, and for the Boundary tab that trade is the right way round, since a
+missed disordered tail is a construct that will not crystallise while a false
+one is a boundary a user can overrule.
+
+### Secondary structure, three state
+
+| | recall | precision | F1 |
+|---|---|---|---|
+| helix | 0.847 | 0.874 | 0.860 |
+| strand | 0.782 | 0.807 | 0.794 |
+| coil | 0.807 | 0.770 | 0.788 |
+
+**Accuracy 0.819.** The shipped Q8 head collapsed to three states measured
+0.808, 0.824 and 0.743 on CB513, TS115 and CASP12. Again inside the range, again
+not the same benchmark.
+
+### What this settles
+
+**The curation was not load-bearing.** Labels taken straight from PDB entries
+train heads that match the ones trained on NetSurfP's versions of the same
+underlying data, within the uncertainty of comparing across benchmarks. The
+licence question, now decided separately, was never a question about quality.
+
+Eight-state is the exception: `_struct_conf` gives three, and Q8 needs DSSP over
+the coordinates. `SecondaryStructureAssigner` now computes that, so the labels
+can be produced, but running it across five thousand entries needs the assigner
+in the label pipeline rather than in the app, and that has not been done.

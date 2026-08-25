@@ -1,0 +1,34 @@
+{
+  "disorder": {
+    "accuracy": 0.9053030825460313,
+    "per_class": {
+      "ordered": {
+        "recall": 0.9150302952617126,
+        "precision": 0.9822030534755113
+      },
+      "disordered": {
+        "recall": 0.7708815914974793,
+        "precision": 0.39632224168126096
+      }
+    },
+    "mcc": 0.5095439131096178
+  },
+  "structure": {
+    "accuracy": 0.8187297427763602,
+    "per_class": {
+      "helix": {
+        "recall": 0.8466960158968898,
+        "precision": 0.8735487670891524
+      },
+      "strand": {
+        "recall": 0.7819565061365105,
+        "precision": 0.8069573375469089
+      },
+      "coil": {
+        "recall": 0.8067919980148649,
+        "precision": 0.7695550245705784
+      }
+    },
+    "mcc": null
+  }
+}

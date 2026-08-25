@@ -1173,3 +1173,45 @@ would have appeared to order completely, and the disordered count that is the
 whole point of the table would have been zero everywhere.
 
 65 BoffinStructure tests.
+
+
+## Phase 11 (part): Audio Graphs (2026-08-25)
+
+The build plan calls chart accessibility "not optional polish", and it is right.
+A track is a SHAPE, and the question a shape answers is "where does it change". A
+sentence reading "mean -0.4, minimum -3.2 at residue 41" is a different and much
+smaller answer than a tone that falls away under a finger.
+
+Continuous tracks now carry an `AXChartDescriptor`, so a VoiceOver user gets an
+Audio Graph of hydropathy, charge or a delta-LLR profile rather than a summary
+of one.
+
+Three decisions worth naming:
+
+**Gaps stay gaps.** Hydropathy leaves the termini blank rather than averaging a
+truncated window, and sonifying a zero there would be a tone where there is no
+measurement.
+
+**Only continuous tracks are sonified.** A categorical track has no curve, and a
+tone sequence over arbitrary category indices is noise presented as information.
+Where there is no continuous track an empty descriptor is attached rather than
+none, so the rotor entry exists and says there is nothing to hear instead of
+disappearing.
+
+**The spoken summary says where.** "Minimum -3.2" is a number; "lowest at residue
+41" is somewhere to go and look.
+
+## The CC0 label set, built (2026-08-25)
+
+**5,012 chains and 1,476,209 residues**, derived from PDB entries rather than
+redistributed: 7.1% disordered, 41.3% helix, 19.9% strand, 38.8% coil. Selection
+is X-ray at 2.5 A or better, one chain per accession, because "not observed"
+means something specific in a crystal and means nothing in a predicted model.
+
+The licence decision has since made this optional rather than necessary, and it
+is being finished anyway, because it answers a question the licence never did:
+does a head trained on labels derived straight from the PDB match one trained on
+NetSurfP's curation of the same thing? Embedding and training are running; the
+numbers go in their own commit.
+
+36 BoffinCharts tests, 13 UI tests.

@@ -144,6 +144,10 @@ public struct TrackRulerView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Residue ruler")
         .accessibilityValue(accessibilityDescription)
+        // Audio Graphs for the continuous tracks. A track is a SHAPE, and the
+        // question a shape answers is "where does it change"; a spoken summary
+        // is a much smaller answer than a tone that falls away under a finger.
+        .audioGraph(for: sonifiableTrack)
     }
 
     // MARK: - Gestures
@@ -386,6 +390,21 @@ public struct TrackRulerView: View {
             // drawn rather than a plot with an invented domain.
             return
         }
+    }
+
+    /// The track an Audio Graph is built from.
+    ///
+    /// The first CONTINUOUS one. A categorical track has no curve to sonify, and
+    /// a tone sequence over arbitrary category indices would be noise presented
+    /// as information. When there is none, an empty descriptor is attached
+    /// rather than none at all, so the rotor entry exists and reports that there
+    /// is nothing to hear instead of silently disappearing.
+    private var sonifiableTrack: AnyResidueTrack {
+        tracks.first { $0.kind == .continuous }
+            ?? AnyResidueTrack(
+                id: TrackID("empty"), title: "No continuous track",
+                kind: .continuous, values: .continuous([]),
+                colourScheme: .sequential(min: 0, max: 1))
     }
 
     private var accessibilityDescription: String {

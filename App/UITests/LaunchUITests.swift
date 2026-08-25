@@ -76,6 +76,61 @@ extension XCUIApplication {
         launch()
     }
 
+    /// Bring an element into view before tapping it.
+    ///
+    /// The Structure tab has grown several panels (assemblies, symmetry,
+    /// selection, figure export, interactions), so controls that used to sit
+    /// on the first screen are now below the fold. XCUITest happily reports
+    /// such an element as existing and then fails the tap with "Failed to not
+    /// hittable", which reads as a broken control rather than a scrolled one.
+    /// Scroll a screen until an element is reachable.
+    ///
+    /// Two traps, both hit here. Swiping the APP rather than the scroll view
+    /// changes tab: a SwiftUI `TabView` treats a horizontal-ish swipe as
+    /// navigation, and a test that drifted onto the Fitness tab reported
+    /// "painting put the viewer into an error state", which is a true statement
+    /// about a screen it should never have been looking at. And the structure
+    /// viewer is a web view that swallows gestures aimed at it.
+    ///
+    /// So the swipe goes to the scroll view or nowhere. No `app.swipeUp()`
+    /// fallback: doing nothing is recoverable, changing screen is not.
+    func scrollTo(_ element: XCUIElement, attempts: Int = 8) {
+        guard !element.isHittable else { return }
+        let scroller = scrollViews.firstMatch
+        guard scroller.exists else { return }
+        for _ in 0..<attempts {
+            scroller.swipeUp()
+            if element.isHittable { return }
+        }
+    }
+
+    /// Scroll back until an element reappears.
+    ///
+    /// A SwiftUI `ScrollView` drops off-screen content out of the accessibility
+    /// tree entirely, so something above the fold reads as missing rather than
+    /// as scrolled away.
+    func scrollBackTo(_ element: XCUIElement, attempts: Int = 8) {
+        let scroller = scrollViews.firstMatch
+        guard scroller.exists else { return }
+        for _ in 0..<attempts where !element.exists {
+            scroller.swipeDown()
+        }
+    }
+
+    /// Tap an element whether or not it reports itself hittable.
+    ///
+    /// `isHittable` is false for anything obscured, including a control merely
+    /// overlapped by the tab bar, and the resulting "Failed to not hittable"
+    /// reads as a broken control. A coordinate tap addresses the element's own
+    /// centre and is the honest way to say "press this".
+    func forceTap(_ element: XCUIElement) {
+        if element.isHittable {
+            element.tap()
+        } else {
+            element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
+    }
+
     /// Switch to a tab and wait for its screen.
     func openTab(_ name: String, file: StaticString = #filePath, line: UInt = #line) {
         let tab = buttons[name].firstMatch

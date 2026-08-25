@@ -218,6 +218,38 @@ public final class StructureViewerModel {
             "The structure was released to free memory. Load it again to carry on."
     }
 
+    /// Build symmetry mates, and report what actually happened.
+    ///
+    /// The return value distinguishes the three outcomes that would otherwise
+    /// look alike on screen: mates were built, the entry has no unit cell so
+    /// there are none to build, or the radius was zero and one copy is showing.
+    /// A viewer that renders the same picture for "no symmetry" and "symmetry
+    /// failed" is a viewer that cannot be trusted about crystal packing.
+    @discardableResult
+    public func setSymmetryMates(radius: Double) async throws -> SymmetryResult {
+        let result = try await bridge.send(
+            SetSymmetryMatesCommand(radius: radius), expecting: SymmetryResult.self)
+        symmetry = result
+        symmetryRadius = radius
+        return result
+    }
+
+    /// What the last symmetry request produced.
+    public private(set) var symmetry: SymmetryResult?
+    public private(set) var symmetryRadius: Double = 0
+
+    public struct SymmetryResult: Decodable, Sendable, Hashable {
+        public let atomCountBefore: Int
+        public let atomCountAfter: Int
+
+        /// How many atoms the neighbours added.
+        ///
+        /// The number that says whether anything happened. Zero after a
+        /// successful build means the radius caught no neighbour, which is a
+        /// real answer at 1 A and a suspicious one at 20.
+        public var added: Int { atomCountAfter - atomCountBefore }
+    }
+
     /// Draw the interaction profile in 3D, and report how much of it landed.
     ///
     /// The return value is the point. This feature has been built and removed

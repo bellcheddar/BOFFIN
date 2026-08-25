@@ -303,6 +303,46 @@
       return { assemblies: assemblies, models: trajectory.length || 1 };
     },
 
+    // Build crystallographic symmetry mates within a radius.
+    //
+    // What this is for: the deposited coordinates are one copy of the molecule
+    // in a crystal lattice, and a contact between two chains is either a
+    // biological interface or an artefact of how the crystal packed. You cannot
+    // tell them apart without the neighbours, so a viewer that cannot show the
+    // symmetry mates cannot answer the question that most often matters about
+    // an interface.
+    //
+    // Refuses honestly. A structure with no spacegroup cell (an NMR ensemble, a
+    // predicted model, anything not from a crystal) has no symmetry mates, and
+    // that is a fact about the structure rather than a failure. Reporting it as
+    // "0 added" would read as a broken command.
+    async setSymmetryMates(payload) {
+      const viewer = await ensurePlugin();
+      const structures = viewer.plugin.managers.structure.hierarchy.current.structures;
+      if (!structures.length) throw new Error('no structure is loaded');
+
+      // Whether this entry HAS symmetry is decided by the app, which parsed
+      // the file's own `_cell` and `_symmetry` categories. Mol* attaches
+      // symmetry as a lazily-computed model property rather than a plain
+      // field, and reaching into that property system means depending on
+      // minified internals that have already caught this bridge out once by
+      // exposing fewer names than their source suggests. The file is the
+      // simpler and more honest source, and BOFFIN has already read it.
+      const before = structures[0].cell.obj.data.elementCount;
+
+      await viewer.plugin.managers.structure.hierarchy.updateStructure(
+        structures[0],
+        payload.radius > 0
+          ? { type: { name: 'symmetry-mates', params: { radius: payload.radius } } }
+          : { type: { name: 'model', params: {} } }
+      );
+
+      const after = viewer.plugin.managers.structure.hierarchy.current.structures[0]
+        .cell.obj.data.elementCount;
+      post({ kind: 'loaded', atomCount: after });
+      return { atomCountBefore: before, atomCountAfter: after };
+    },
+
     async setAssembly(payload) {
       const viewer = await ensurePlugin();
       const structures = viewer.plugin.managers.structure.hierarchy.current.structures;

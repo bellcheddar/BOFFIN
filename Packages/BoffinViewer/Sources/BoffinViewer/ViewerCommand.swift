@@ -189,6 +189,29 @@ public struct ListAssembliesCommand: ViewerCommand {
     public init() {}
 }
 
+/// Build crystallographic symmetry mates within a radius, or return to one copy.
+///
+/// The deposited coordinates are one molecule in a lattice, and a contact
+/// between two chains is either a biological interface or an artefact of how
+/// the crystal packed. Those look identical without the neighbours, so this is
+/// the command that answers the question most often asked about an interface.
+public struct SetSymmetryMatesCommand: ViewerCommand {
+    public let name = "setSymmetryMates"
+    /// Angstroms around the deposited copy. Zero returns to one copy.
+    public let radius: Double
+
+    /// Mol*'s own bound on the parameter.
+    ///
+    /// Taken from the vendored build rather than chosen: exceeding it is
+    /// clamped silently there, which would make the returned atom count
+    /// disagree with the radius the caller believes it asked for.
+    public static let maximumRadius: Double = 50
+
+    public init(radius: Double) {
+        self.radius = min(max(radius, 0), Self.maximumRadius)
+    }
+}
+
 /// Draw the interaction profile as dashed lines in the structure.
 ///
 /// Endpoints are named by author chain, author residue number and atom name:

@@ -1653,3 +1653,53 @@ with no simulator, following the project's own rule that real behaviour is
 tested inside a package.
 
 BoffinViewer 23 tests, 21 UI tests.
+
+---
+
+## Phase 7 (rest): symmetry mates, and a layout defect they exposed (2026-08-25)
+
+The deposited coordinates are one molecule in a crystal lattice, and a contact
+between two chains is either a biological interface or an artefact of how it
+packed. Those are indistinguishable without the neighbours, so this answers the
+question most often asked about an interface, and it completes the story the
+biological-assembly work started.
+
+**Whether an entry HAS symmetry is read from the entry.** Mol* attaches
+symmetry as a lazily-computed model property rather than a plain field, so
+`model.symmetry` is simply absent until something asks for it, and the first
+attempt duly reported "this entry declares no symmetry" for ubiquitin. Reaching
+further into that property system means depending on minified internals that
+have already caught this bridge out once. BOFFIN parses the same file, and
+`_cell` and `_symmetry` are ordinary categories in it.
+
+**A zero cell is how a file says "not from a crystal".** Both categories are
+frequently PRESENT and empty in NMR and predicted entries, so testing that the
+category exists reports every AlphaFold model as crystallographic. All three
+edges must be positive.
+
+An entry with no lattice is told so as a fact: "this entry has no unit cell, so
+it has no symmetry mates. Predicted models and NMR ensembles never do." Not
+"could not build symmetry mates", which would send someone looking for a bug in
+an app that is working correctly.
+
+One category-naming trap on the way: keys keep their leading underscore, so
+`file["cell"]` finds nothing and returns a perfectly plausible "no symmetry" for
+every crystal structure ever deposited. The test on 1UBQ's published cell
+(50.84, 42.77, 28.95, P 21 21 21) is what caught it.
+
+**The defect it exposed.** The Structure tab's control panel was a plain
+`VStack` under a viewer taking all remaining height. That was fine when it held
+two pickers. It now carries assemblies, crystal symmetry, the selection
+builder, figure export and the interaction profile, and on a phone most of it
+was simply unreachable: laid out, off the bottom, with nothing to scroll. A UI
+test found it by failing to tap a control it could see in the hierarchy.
+
+The controls now scroll and the viewer takes a fixed share rather than
+everything left over. Two wrong turns getting there, both worth recording: an
+ideal height with a layout priority made the viewer win the negotiation and
+pushed every control off the bottom, and a `swipeUp` sent to the APP rather
+than to the scroll view changed TAB, so a test drifted onto Fitness and
+reported "painting put the viewer into an error state" about a screen it should
+never have been looking at.
+
+BoffinStructure 94 tests, 22 UI tests.

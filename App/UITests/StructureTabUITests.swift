@@ -81,12 +81,20 @@ final class StructureTabUITests: XCTestCase {
         XCTAssertTrue(
             track.waitForExistence(timeout: 20),
             "no continuous track was offered for painting")
-        track.tap()
+        app.scrollTo(track)
+        app.forceTap(track)
 
         // The bridge reports failures into the state label, so an error here
         // would replace the atom count. Painting must leave it alone.
+        //
+        // Scroll back first: reaching the track control required scrolling
+        // down, and a SwiftUI ScrollView drops off-screen content out of the
+        // accessibility tree entirely, so the count would read as missing when
+        // it is merely above the fold.
+        let count = app.staticTexts["\(660.formatted()) atoms"]
+        app.scrollBackTo(count)
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 20),
+            count.waitForExistence(timeout: 20),
             "painting the track put the viewer into an error state")
 
         let shot = XCTAttachment(screenshot: app.screenshot())
@@ -463,5 +471,54 @@ extension StructureTabUITests {
         XCTAssertTrue(
             count.label.contains("atoms"),
             "the wrapped expression stopped matching: \(count.label)")
+    }
+}
+
+extension StructureTabUITests {
+
+    /// Phase 7's last item: symmetry mates that actually appear.
+    ///
+    /// The assertion is on the count of atoms the neighbours contributed, not
+    /// on the command returning. Ubiquitin is P 21 21 21, a real crystal form,
+    /// so a 10 Å shell around it must contain other copies. If the build
+    /// silently did nothing, the added count is zero and the picture is
+    /// identical to the one before, which is precisely the failure mode this
+    /// project has hit twice in the viewer already.
+    func testSymmetryMatesAddNeighbouringCopies() throws {
+        let app = XCUIApplication()
+        app.launchSkippingOnboarding()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(timeout: 60),
+            "the structure never loaded")
+
+        let expand = app.buttons["boffin.symmetry.10"]
+        XCTAssertTrue(expand.waitForExistence(timeout: 20), "no symmetry control")
+        expand.tap()
+
+        let result = app.staticTexts["boffin.symmetry.result"]
+        XCTAssertTrue(
+            result.waitForExistence(timeout: 60), "symmetry produced no result at all")
+
+        // Ubiquitin is a crystal structure, so this must be the "applied"
+        // branch rather than the "no unit cell" one.
+        XCTAssertFalse(
+            result.label.lowercased().contains("no unit cell"),
+            "1UBQ is a crystal structure and should declare a cell: \(result.label)")
+        XCTAssertTrue(
+            result.label.contains("neighbours"),
+            "symmetry was not applied: \(result.label)")
+
+        // And neighbours were genuinely added. Zero atoms in a 10 Å shell
+        // around a protein in a lattice would mean the build did nothing.
+        let digits = result.label.prefix { $0.isNumber || $0 == "," }
+        let added = Int(digits.replacingOccurrences(of: ",", with: "")) ?? 0
+        XCTAssertGreaterThan(
+            added, 0,
+            "no atoms came from neighbouring copies, so nothing was built: \(result.label)")
     }
 }

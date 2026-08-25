@@ -40,6 +40,9 @@ struct StructureTabView: View {
     /// into a `.pml` file and opens on a desktop.
     @State private var selectionExpression = ""
     @State private var selectionMatch: Int?
+    @State private var symmetryError: UserFacingError?
+    /// The unit cell of the loaded entry, read from the file BOFFIN parsed.
+    @State private var loadedCell: CrystalSymmetry?
 
     var body: some View {
         NavigationStack {
@@ -73,8 +76,16 @@ struct StructureTabView: View {
     @ViewBuilder
     private func viewer(_ model: StructureViewerModel) -> some View {
         VStack(spacing: 0) {
+            // A fixed share for the viewer, the rest for the controls.
+            //
+            // `maxHeight: .infinity` gave the viewer everything and left the
+            // panel with whatever its content happened to need, which put the
+            // first control row under the tab bar. An ideal height with a
+            // layout priority was worse: the viewer won the negotiation and the
+            // controls were pushed off the bottom entirely.
             StructureViewerView(model: model)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
+                .frame(height: 300)
                 .background(.black)
                 .accessibilityIdentifier("boffin.structure-viewer")
                 // The web view is a separate process and the system terminates
@@ -88,9 +99,23 @@ struct StructureTabView: View {
                     Task { await model.releaseUnderMemoryPressure() }
                 }
 
-            controls(model)
-                .padding(Spacing.s)
-                .background(.bar)
+            // The controls SCROLL, and they have to.
+            //
+            // This was a plain VStack under a viewer taking all remaining
+            // height. That was fine when it held a representation picker and a
+            // colour picker; it now carries assemblies, crystal symmetry, the
+            // selection builder, figure export and the interaction profile, and
+            // on a phone most of that was simply unreachable: laid out, off the
+            // bottom, with nothing to scroll. A UI test caught it by failing to
+            // tap a control it could see in the hierarchy.
+            //
+            // The viewer gets a share of the height rather than everything left
+            // over, so the panel always has somewhere to be.
+            ScrollView {
+                controls(model)
+                    .padding(Spacing.s)
+            }
+            .background(.bar)
         }
     }
 
@@ -294,6 +319,8 @@ struct StructureTabView: View {
     @ViewBuilder
     private func interactionControls(_ model: StructureViewerModel) -> some View {
         if case .loaded = model.state {
+            symmetryPanel(model)
+
             selectionPanel
 
             figureExport(model)
@@ -431,6 +458,7 @@ struct StructureTabView: View {
             let store = try? AtomStore.from(file)
         else { return }
         await model.load(data, format: .binaryCIF, source: .bundled("1hck.bcif"))
+        loadedCell = CrystalSymmetry.read(from: file)
         loadedStore = store
         loadedViewerStore = store
         // Disulfides are the one construct constraint that cannot be read off
@@ -470,6 +498,70 @@ struct StructureTabView: View {
             overlayError = nil
         } catch {
             overlayError = UserFacingError(error, whileDoing: "drawing the interactions")
+        }
+    }
+
+    // MARK: - Crystal symmetry
+
+    /// Show the neighbours in the lattice.
+    ///
+    /// The deposited coordinates are one molecule in a crystal, and a contact
+    /// between two chains is either a biological interface or an artefact of
+    /// how it packed. Those are indistinguishable without the neighbours.
+    @ViewBuilder
+    private func symmetryPanel(_ model: StructureViewerModel) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text("Crystal packing").font(.headline)
+
+            HStack(spacing: Spacing.s) {
+                ForEach([0.0, 5.0, 10.0], id: \.self) { radius in
+                    Button(radius == 0 ? "One copy" : "\(Int(radius)) Å") {
+                        Task { await applySymmetry(radius, to: model) }
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.caption2)
+                    .disabled(loadedCell.map { !$0.isCrystallographic } ?? false)
+                    .accessibilityIdentifier("boffin.symmetry.\(Int(radius))")
+                }
+            }
+
+            // Whether this entry can have symmetry mates at all is read from
+            // the file's own cell, not asked of the viewer. An NMR ensemble and
+            // a predicted model have no lattice, so offering to build their
+            // neighbours is offering something that cannot exist.
+            if let cell = loadedCell, !cell.isCrystallographic, let refusal = cell.refusal {
+                Label(refusal, systemImage: "info.circle")
+                    .font(.caption2).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("boffin.symmetry.result")
+            } else if let symmetry = model.symmetry {
+                // The added count is what says something happened. Zero after a
+                // successful build is a real answer at 1 Å and a suspicious one
+                // at 10.
+                Text(
+                    "\(symmetry.added.formatted()) atoms from neighbours"
+                        + (loadedCell?.spacegroup.map { ", spacegroup \($0)" } ?? "")
+                )
+                .font(.caption2).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("boffin.symmetry.result")
+            }
+
+            if let symmetryError {
+                FailureView(symmetryError)
+            }
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Brand.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func applySymmetry(_ radius: Double, to model: StructureViewerModel) async {
+        do {
+            _ = try await model.setSymmetryMates(radius: radius)
+            symmetryError = nil
+        } catch {
+            symmetryError = UserFacingError(error, whileDoing: "building symmetry mates")
         }
     }
 
@@ -792,7 +884,9 @@ struct StructureTabView: View {
             let data = try? Data(contentsOf: url)
         else { return }
         await model.load(data, format: .binaryCIF, source: .bundled("1ubq.bcif"))
-        let atoms = (try? BinaryCIF.decode(data)).flatMap { try? AtomStore.from($0) }
+        let decoded = try? BinaryCIF.decode(data)
+        loadedCell = decoded.flatMap { CrystalSymmetry.read(from: $0) }
+        let atoms = decoded.flatMap { try? AtomStore.from($0) }
         loadedViewerStore = atoms
         if let atoms { store.noteStructure(atoms) } else { store.forgetStructure() }
     }

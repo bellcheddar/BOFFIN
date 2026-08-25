@@ -162,17 +162,27 @@ struct OrderTabView: View {
                 )
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-                // Reworded 2026-08-25 after bootstrapping the benchmarks by
-                // CHAIN rather than by residue. The previous wording followed
-                // the CASP12 result, where the head scores below the
-                // no-language-model floor: 21 chains, and the 95% interval is
-                // [0.337, 0.662] against a floor of 0.573, so that comparison
-                // decides nothing. The deficit that IS established is on
-                // CB513, where the interval sits wholly below its floor.
+                // Corrected 2026-08-25, twice in one day, and the second
+                // correction was of the first.
+                //
+                // The wording briefly claimed this head "measures below what
+                // the same head achieves with no language model at all". That
+                // was false. It compared against NetSurfP's published one-hot
+                // baseline, which is NetSurfP's architecture, not this one.
+                // Training THIS head on one-hot amino acids, same seed, same
+                // schedule, same chains, gives 0.380 on CB513 against 0.426
+                // with the embeddings: the language model is contributing
+                // +0.046 there and +0.106 on TS115.
+                //
+                // The real gap is to NetSurfP's model and training budget, not
+                // to its input representation, and that is a different
+                // sentence with a different meaning for a reader deciding
+                // whether to trust the track.
                 Text(
-                    "Disorder is the weakest of these tracks: on one benchmark it "
-                        + "measures below what the same head achieves with no language "
-                        + "model at all. Read it as a hint, not a call. Research use only."
+                    "Disorder is the weakest of these tracks and the one to treat as a "
+                        + "hint rather than a call. It is well short of the best published "
+                        + "predictors, which are larger models trained end to end. "
+                        + "Research use only."
                 )
                 .font(.caption2)
                 .foregroundStyle(.tertiary)

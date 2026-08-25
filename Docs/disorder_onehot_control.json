@@ -1,0 +1,32 @@
+{
+  "cb513": {
+    "our_onehot_mcc": 0.37986077722178946,
+    "our_onehot_ci": [
+      0.3324441762427626,
+      0.42930270855654856
+    ],
+    "our_embedding_mcc": 0.426,
+    "embedding_gain": 0.04613922277821053,
+    "netsurfp_onehot": 0.502
+  },
+  "ts115": {
+    "our_onehot_mcc": 0.5374529241397443,
+    "our_onehot_ci": [
+      0.48034755638677645,
+      0.5901904626378656
+    ],
+    "our_embedding_mcc": 0.643,
+    "embedding_gain": 0.10554707586025569,
+    "netsurfp_onehot": 0.594
+  },
+  "casp12": {
+    "our_onehot_mcc": 0.5122680749049695,
+    "our_onehot_ci": [
+      0.4001583478780472,
+      0.6154306594967088
+    ],
+    "our_embedding_mcc": 0.515,
+    "embedding_gain": 0.0027319250950305074,
+    "netsurfp_onehot": 0.573
+  }
+}

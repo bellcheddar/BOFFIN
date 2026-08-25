@@ -676,3 +676,58 @@ labels that were already on disk. The other two remain.
 embedding is frozen, so the auxiliary task can only reshape a 128-wide trunk
 sitting on top of representations it cannot alter. NetSurfP trains its backbone.
 An auxiliary signal that cannot reach the representation has much less to give.
+
+## The disorder comparison was against the wrong model (2026-08-25)
+
+### What was claimed
+
+That BOFFIN's disorder head measures below a "no-language-model floor", and
+therefore that on this benchmark the embeddings contribute nothing. It was on
+screen, in the README and in the roadmap.
+
+### Why it was wrong
+
+The floor was **NetSurfP's architecture** fed one-hot amino acids. BOFFIN's
+number is a small dilated convolutional head fed frozen 480-dimensional ESM-2
+embeddings. Two things differ at once, so the gap could not be attributed to
+either, and it was being attributed to the representation.
+
+### The missing arm
+
+The same head, same seed, same schedule, same class weight, same chains, same
+threshold-tuning protocol. Only the first 1x1 projection changes shape, from
+480 channels to 20.
+
+| Benchmark | This head, one-hot | This head, embeddings | Embedding gain | NetSurfP one-hot |
+|---|---|---|---|---|
+| CB513 | 0.380 [0.332, 0.429] | 0.426 | **+0.046** | 0.502 |
+| TS115 | 0.537 [0.480, 0.590] | 0.643 | **+0.106** | 0.594 |
+| CASP12 | 0.512 [0.400, 0.615] | 0.515 | +0.003 | 0.573 |
+
+### What it means
+
+**The embeddings are contributing.** On CB513 they are worth +0.046 MCC over
+one-hot in an otherwise identical model, and +0.106 on TS115. The claim that
+the language model adds nothing there was false.
+
+**The gap to NetSurfP is architecture and training budget, not representation.**
+This head on one-hot scores 0.380 where NetSurfP on one-hot scores 0.502. The
+0.122 between those two is the part that has nothing to do with embeddings: a
+128-wide three-block convolutional head against a much larger model trained end
+to end, with the backbone itself learning.
+
+**It confirms the hypothesis offered after the RSA null.** That result was
+explained by the embedding being frozen, leaving an auxiliary signal nowhere to
+go. The same explanation covers this: the deficit lives in the head and in what
+it is allowed to change, not in the input.
+
+### What changes
+
+The remaining roadmap work moves from labels to capacity. PDB-derived negatives
+were the next candidate; on this evidence, head capacity and letting more of the
+model adapt are the better bets, and the benchmark that can see the difference
+is CB513.
+
+The on-screen wording is corrected. It had said this head "measures below what
+the same head achieves with no language model at all", which is exactly the
+error: the same head with no language model achieves 0.380, not 0.502.

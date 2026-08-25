@@ -1830,3 +1830,45 @@ Offered as hypothesis rather than finding: the embedding is frozen, so the
 auxiliary task can only reshape a 128-wide trunk sitting on representations it
 cannot alter. NetSurfP trains its backbone, and an auxiliary signal that cannot
 reach the representation has much less to give.
+
+---
+
+## The disorder comparison was against the wrong model (2026-08-25)
+
+BOFFIN told users its disorder head measures below a "no-language-model floor",
+and concluded the embeddings contribute nothing there. On screen, in the README
+and in the roadmap.
+
+**That floor is NetSurfP's architecture fed one-hot amino acids.** BOFFIN's
+number is a small dilated convolutional head fed frozen ESM-2 embeddings. The
+comparison changed the model and the representation at once and attributed the
+difference to the representation.
+
+The missing arm: the same head, same seed, same chains, same schedule, same
+class weight, same threshold protocol, with only the first 1x1 projection
+resized from 480 channels to 20.
+
+| Benchmark | This head, one-hot | This head, embeddings | Gain | NetSurfP one-hot |
+|---|---|---|---|---|
+| CB513 | 0.380 [0.332, 0.429] | 0.426 | +0.046 | 0.502 |
+| TS115 | 0.537 [0.480, 0.590] | 0.643 | +0.106 | 0.594 |
+| CASP12 | 0.512 [0.400, 0.615] | 0.515 | +0.003 | 0.573 |
+
+**The embeddings are contributing**, by +0.046 on CB513 and +0.106 on TS115 in
+an otherwise identical model. The claim that they added nothing was false.
+
+**The gap to NetSurfP is architecture and training budget.** This head on
+one-hot scores 0.380 where NetSurfP on one-hot scores 0.502, and that 0.122 has
+nothing to do with embeddings: a 128-wide three-block head against a much larger
+model trained end to end with its backbone learning.
+
+**It confirms the hypothesis offered after the RSA null**, that a frozen
+embedding leaves the deficit in the head rather than the input. Two experiments
+now point the same way, and the remaining roadmap work moves from labels to
+capacity.
+
+The on-screen wording is corrected. It had said this head "measures below what
+the same head achieves with no language model at all" — wording introduced
+earlier the same day while narrowing an even looser claim, and exactly wrong in
+the specific: the same head with no language model achieves 0.380, not 0.502.
+Narrowing a claim is not the same as checking it.

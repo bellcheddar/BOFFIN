@@ -127,3 +127,44 @@ struct ViewerCommandTests {
         #expect(!html.contains("https://"))
     }
 }
+
+@Suite("Structure fetching")
+struct StructureFetcherTests {
+
+    /// Validation happens before the network, so a mistyped identifier is an
+    /// immediate legible error rather than a round trip and a 404.
+    @Test("A malformed identifier is refused without a request")
+    func rejectsMalformedIdentifiers() async {
+        let fetcher = StructureFetcher()
+        for bad in ["", "1", "12345", "1u b", "../etc/passwd", "1ubq/../x"] {
+            await #expect(throws: StructureFetchError.self) {
+                _ = try await fetcher.rcsb(bad)
+            }
+        }
+        for bad in ["", "P0/CG48", "P0 CG48", "../x"] {
+            await #expect(throws: StructureFetchError.self) {
+                _ = try await fetcher.alphaFold(bad)
+            }
+        }
+    }
+
+    /// A predicted model and an experimental structure put DIFFERENT numbers in
+    /// the same column, and colouring one as the other makes a picture that is
+    /// beautiful and wrong.
+    @Test("A prediction says it is one, and says what its confidence column means")
+    func predictionsAreLabelled() {
+        let predicted = StructureSource.predicted(accession: "P0CG48")
+        #expect(predicted.isPrediction)
+        #expect(predicted.confidenceLabel.contains("pLDDT"))
+        #expect(predicted.caveat?.contains("PREDICTED") == true)
+
+        let experimental = StructureSource.experimental(pdbID: "1UBQ")
+        #expect(!experimental.isPrediction)
+        #expect(experimental.confidenceLabel.contains("B-factor"))
+        #expect(experimental.caveat == nil)
+
+        let bundled = StructureSource.bundled("1ubq.bcif")
+        #expect(!bundled.isPrediction)
+        #expect(bundled.caveat == nil)
+    }
+}

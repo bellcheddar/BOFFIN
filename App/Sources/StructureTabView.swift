@@ -21,6 +21,7 @@ struct StructureTabView: View {
     @State private var model: StructureViewerModel?
     @State private var setupError: String?
     @State private var paintedTrack: TrackID?
+    @State private var identifier: String = ""
 
     var body: some View {
         NavigationStack {
@@ -76,6 +77,19 @@ struct StructureTabView: View {
                 .accessibilityIdentifier("boffin.load-structure")
             }
 
+            fetchControls(model)
+
+            // A predicted model is not a structure, and the difference has to
+            // be on screen rather than in a tooltip: the confidence column of an
+            // AlphaFold model is pLDDT, which is the same field as a B-factor
+            // meaning the opposite thing.
+            if let caveat = model.source?.caveat {
+                Label(caveat, systemImage: "wand.and.stars")
+                    .font(.caption2).foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("boffin.prediction-caveat")
+            }
+
             if let notice = model.guardrailNotice {
                 Label(notice, systemImage: "speedometer")
                     .font(.caption2).foregroundStyle(.orange)
@@ -99,6 +113,66 @@ struct StructureTabView: View {
             .font(.caption)
 
             trackPainting(model)
+            if let selection = model.selection { inspector(selection) }
+        }
+    }
+
+    /// What was tapped, and what BOFFIN knows about it.
+    ///
+    /// The structure reports an AUTHOR number. Turning that into a position in
+    /// the user's own sequence needs the alignment, and for the bundled 1UBQ
+    /// fixture the two coincide, so this says which claim it is making rather
+    /// than quietly presenting one as the other.
+    @ViewBuilder
+    private func inspector(_ selection: (chain: String, authorNumber: Int)) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text("Selected").font(.caption.weight(.semibold))
+                Text("chain \(selection.chain), residue \(selection.authorNumber)")
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(Brand.accent)
+                Spacer()
+            }
+            if let sequence = store.sequence,
+                selection.authorNumber >= 1,
+                selection.authorNumber <= sequence.count
+            {
+                let residue = sequence.residues[selection.authorNumber - 1]
+                Text(
+                    "Position \(selection.authorNumber) of the loaded sequence is "
+                        + "\(String(residue.code)). This assumes the structure's author "
+                        + "numbering matches the sequence, which holds for the bundled "
+                        + "fixture and not in general."
+                )
+                .font(.caption2).foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityIdentifier("boffin.structure-selection")
+    }
+
+    /// Fetching, which is additive: everything above works offline.
+    @ViewBuilder
+    private func fetchControls(_ model: StructureViewerModel) -> some View {
+        HStack(spacing: Spacing.xs) {
+            TextField("PDB ID or UniProt", text: $identifier)
+                .textFieldStyle(.roundedBorder)
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+                .font(.system(.caption, design: .monospaced))
+                .accessibilityIdentifier("boffin.structure-identifier")
+            Button("RCSB") {
+                let wanted = identifier
+                Task { await model.fetch { try await StructureFetcher().rcsb(wanted) } }
+            }
+            .buttonStyle(.bordered).font(.caption2)
+            .disabled(identifier.count != 4)
+            Button("AlphaFold") {
+                let wanted = identifier
+                Task { await model.fetch { try await StructureFetcher().alphaFold(wanted) } }
+            }
+            .buttonStyle(.bordered).font(.caption2)
+            .disabled(identifier.count < 6)
         }
     }
 
@@ -184,7 +258,7 @@ struct StructureTabView: View {
         guard let url = Self.fixture(named: "1ubq.bcif"),
             let data = try? Data(contentsOf: url)
         else { return }
-        await model.load(data, format: .binaryCIF)
+        await model.load(data, format: .binaryCIF, source: .bundled("1ubq.bcif"))
     }
 
     /// Map a track onto author numbering and send it.

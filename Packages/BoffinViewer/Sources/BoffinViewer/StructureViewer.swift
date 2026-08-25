@@ -36,6 +36,17 @@ public final class StructureViewerModel {
     /// rather than leaving a user wondering why the cartoon went away.
     public private(set) var guardrailNotice: String?
 
+    /// Where the loaded structure came from, so the UI can label a prediction.
+    public private(set) var source: StructureSource?
+
+    /// The last residue tapped in the structure, in the structure's own author
+    /// numbering.
+    ///
+    /// Author numbering, not a sequence index, because that is what the
+    /// structure knows and what a paper quotes. Translating it into the user's
+    /// sequence is the app's job and needs the alignment.
+    public private(set) var selection: (chain: String, authorNumber: Int)?
+
     /// Above this, a `WKWebView` on a phone stops being slow and starts being
     /// hung, so the viewer coarsens itself rather than trying.
     ///
@@ -67,16 +78,36 @@ public final class StructureViewerModel {
                     self.state = .loaded(atomCount: count)
                 case .failed(let message):
                     self.state = .failed(message)
-                case .picked, .hovered:
+                case .picked(let chain, let number):
+                    self.selection = (chain, number)
+                case .hovered:
                     break
                 }
             }
         }
     }
 
-    /// Load a structure and apply the guardrail if it is a large one.
-    public func load(_ data: Data, format: LoadStructureCommand.StructureFormat) async {
+    /// Fetch a structure and load it.
+    ///
+    /// Network work, so it is additive: a failure sets the state and leaves
+    /// whatever was already loaded alone.
+    public func fetch(_ work: @Sendable () async throws -> FetchedStructure) async {
         state = .loading
+        do {
+            let fetched = try await work()
+            await load(fetched.data, format: fetched.format, source: fetched.source)
+        } catch {
+            state = .failed(String(describing: error))
+        }
+    }
+
+    /// Load a structure and apply the guardrail if it is a large one.
+    public func load(
+        _ data: Data, format: LoadStructureCommand.StructureFormat,
+        source: StructureSource? = nil
+    ) async {
+        state = .loading
+        self.source = source
         do {
             struct Reply: Decodable { let atomCount: Int }
             let reply = try await bridge.send(

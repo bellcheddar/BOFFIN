@@ -32,6 +32,53 @@
     }
   }
 
+  // Read chain and author number out of a Mol* location.
+  //
+  // The hierarchy indirection is the awkward part and it is not decoration: an
+  // element index addresses an ATOM, and the chain and residue it belongs to are
+  // found by walking the segment maps. Reading auth_asym_id at the element index
+  // directly returns whatever chain happens to sit at that ordinal, which is
+  // usually the right answer for a single-chain structure and wrong for every
+  // other one.
+  function describe(location) {
+    const unit = location.unit;
+    const element = location.element;
+    const hierarchy = unit.model.atomicHierarchy;
+    const chainIndex = hierarchy.chainAtomSegments.index[element];
+    const residueIndex = hierarchy.residueAtomSegments.index[element];
+    return {
+      chain: hierarchy.chains.auth_asym_id.value(chainIndex),
+      number: hierarchy.residues.auth_seq_id.value(residueIndex),
+      residue: hierarchy.atoms.label_comp_id
+        ? hierarchy.atoms.label_comp_id.value(element)
+        : '',
+    };
+  }
+
+  function watchInteractions(viewer) {
+    const plugin = viewer.plugin;
+    // Clicks and hovers both arrive as behaviour events. Subscribing rather than
+    // polling means a pick costs nothing until one happens.
+    plugin.behaviors.interaction.click.subscribe((event) => {
+      try {
+        const loci = event.current && event.current.loci;
+        if (!loci || !loci.elements || !loci.elements.length) return;
+        const first = loci.elements[0];
+        const location = {
+          unit: first.unit,
+          element: first.unit.elements[molstar.OrderedSet
+            ? molstar.OrderedSet.start(first.indices)
+            : 0],
+        };
+        const info = describe(location);
+        post({ kind: 'picked', chain: info.chain, number: info.number });
+      } catch (error) {
+        // A pick that cannot be described is not worth an error banner: the
+        // user tapped the background or a water. Say nothing.
+      }
+    });
+  }
+
   async function ensurePlugin() {
     if (state.plugin) return state.plugin;
     state.plugin = await molstar.Viewer.create('viewer', {
@@ -46,6 +93,7 @@
       pdbProvider: 'rcsb',
       emdbProvider: 'rcsb',
     });
+    watchInteractions(state.plugin);
     return state.plugin;
   }
 

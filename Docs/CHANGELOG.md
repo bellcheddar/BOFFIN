@@ -701,3 +701,37 @@ and says why, rather than asking first: asking would mean rendering the
 expensive thing to find out it was expensive.
 
 10 UI tests, 7 BoffinViewer tests, 18 BoffinStructure tests.
+
+
+## Phase 7 (part 2): picking, fetching, and predictions labelled as such (2026-08-25)
+
+**Tap-to-select** completes the bridge's return path, which until now carried
+only load and failure. The awkward part is not decoration: an element index
+addresses an ATOM, and the chain and residue it belongs to are found by walking
+Mol\*'s segment maps. Reading `auth_asym_id` at the element index directly
+returns whatever chain happens to sit at that ordinal, which is the right answer
+for a single-chain structure and wrong for every other one.
+
+The inspector reports an AUTHOR number, and says so. Turning that into a
+position in the user's sequence needs the alignment; for the bundled fixture the
+two coincide, so the copy states which claim it is making rather than presenting
+one as the other.
+
+**Fetching from RCSB and AlphaFold DB**, additive and offline-safe: the bundled
+fixtures load without it and a failure is an ordinary state with a reason in it.
+BinaryCIF from RCSB, because it is markedly smaller over a mobile connection and
+there is no text to tokenise at the other end. Identifiers are validated before
+any request, so a typo is an immediate legible error rather than a round trip and
+a 404, and the AlphaFold model version is pinned rather than "latest": a silently
+changing model is a silently changing figure.
+
+**A predicted model is not a structure, and the type will not let that be lost.**
+`StructureSource` travels with the data, and its `confidenceLabel` differs
+because the number differs: an experimental structure's column is a B-factor in
+angstroms squared where lower is better ordered, and a predicted model's is
+pLDDT from 0 to 100 where higher is more confident. They are the same field in
+the same file format meaning opposite things, and colouring one as the other
+produces a picture that is beautiful and wrong. Every AlphaFold load carries a
+caveat on screen.
+
+10 UI tests, 9 BoffinViewer tests.

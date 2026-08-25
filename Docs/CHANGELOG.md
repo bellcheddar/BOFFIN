@@ -511,3 +511,64 @@ Intramembrane regions are labelled -1 and excluded from the loss rather than
 folded into a neighbour. A re-entrant loop dips into the bilayer without
 crossing it, so calling it transmembrane teaches the head that a span can end
 where the chain turns round, and calling it outside teaches the opposite.
+
+
+## Phase 6 (part): construct solver and tag planning (2026-08-25)
+
+The Boundary tab proposes truncations, and it shows what it is ENFORCING as
+prominently as what it proposes. A ranked list of boundaries with no visible
+constraints is an opinion; the same list beside "these five regions may not be
+cut" is a derivation, and a user can tell at a glance whether the solver knew
+about the thing they care about.
+
+`ConstructSolver` lives in BoffinCore and knows nothing about models. Its inputs
+come from three modules that cannot see each other, and the dependency rule is
+right here rather than inconvenient: the solver reasons about REGIONS THAT MUST
+NOT BE CUT and about where other people successfully cut before, and the app is
+the only place that can see all three sources.
+
+**Hard constraints are enforced, not scored.** A weighted penalty would let a
+construct that bisects the DFG motif win on the strength of everything else
+about it, and that construct is not a compromise, it is dead protein. Signal
+peptides are the one annotated region a construct may drop, which is usually the
+point of making one.
+
+**Refusal is a first-class result with a reason.** A fully disordered input is
+declined because there is no domain to truncate to; so is an input with no
+disorder prediction, because trimming without one is guessing. An empty list
+would read as "found nothing" and invite the user to try again.
+
+**Precedent is carried into the user's own numbering** through the homolog
+alignment. A deposited range in a homologue's UniProt numbering means nothing
+here until it has been mapped across, and mapping it is what the alignment is
+for.
+
+### The protease check
+
+A cleavable tag is a protease recognition sequence deliberately placed at one end
+of a construct. If the same sequence occurs INSIDE the protein, the protease cuts
+there too, and the result is a preparation that looks like degradation and gets
+blamed on the sample. It is entirely avoidable, so every proposal is scanned and
+a protease whose site occurs internally is **refused rather than ranked lower**,
+with the position it would cut at.
+
+TEV (ENLYFQ/G), HRV 3C (LEVLFQ/GP) and thrombin (LVPR/GS), in that order.
+Thrombin is last because its specificity is the loosest of the three and
+secondary cleavage inside the protein is documented, and the note says so rather
+than leaving the ordering to be inferred. The recognition sequences are pinned in
+a test, because a typo there is invisible until the cleavage step months later.
+
+Tag placement follows the biology: a signal peptide forces the tag to the C
+terminus, since an N-terminal tag either blocks secretion or is cleaved off with
+the peptide. Otherwise the disordered terminus is preferred, and where neither is
+clearly better the plan says it is giving a conventional default rather than a
+recommendation.
+
+140 BoffinCore tests, 45 BoffinML tests, 8 UI tests.
+
+### Still missing, and stated in the tab
+
+Linker design, construct card export with primer-ready DNA, and disulfide
+pairing. That last one is not an oversight: pairs cannot be read off a sequence,
+so a boundary can currently separate two cysteines that pair. It needs the
+structure viewer.

@@ -42,6 +42,7 @@ struct BoundaryTabView: View {
                     proposalList(proposals)
                 }
                 constraintList
+                if let plan = store.tagPlan { tagSection(plan) }
                 caveat
             }
             .padding(Spacing.m)
@@ -133,14 +134,80 @@ struct BoundaryTabView: View {
         .background(Brand.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
     }
 
+    /// Tag placement, and the protease check that matters more than it.
+    private func tagSection(_ plan: TagPlan) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text("Tag and protease").font(.headline)
+            HStack {
+                Text("Place the tag at the \(plan.terminus.name) end")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Brand.accent)
+                Spacer()
+            }
+            ForEach(plan.rationale, id: \.self) { line in
+                Text(line)
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if !plan.usableProteases.isEmpty {
+                Text("Usable proteases").font(.caption.weight(.semibold))
+                    .padding(.top, 2)
+                ForEach(plan.usableProteases) { protease in
+                    VStack(alignment: .leading, spacing: 1) {
+                        HStack {
+                            Text(protease.name).font(.caption.weight(.semibold))
+                            Text(protease.recognition)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundStyle(Brand.accent)
+                            Spacer()
+                            Text("scar \(protease.scar)")
+                                .font(.system(size: 9, design: .monospaced))
+                                .foregroundStyle(.tertiary)
+                        }
+                        Text(protease.note)
+                            .font(.caption2).foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            // The refusals are the point of this section, so they are not
+            // tucked away: a protease that cuts inside the construct turns a
+            // design error into what looks like proteolysis in the prep.
+            if !plan.refusedProteases.isEmpty {
+                Text("Refused, because the site occurs inside this construct")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.orange)
+                    .padding(.top, 2)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(plan.refusedProteases, id: \.protease.id) { refusal in
+                    HStack {
+                        Text(refusal.protease.name).font(.caption)
+                        Text(refusal.protease.recognition)
+                            .font(.system(.caption2, design: .monospaced))
+                        Spacer()
+                        Text("at residue \(refusal.position + 1) of the construct")
+                            .font(.system(size: 9, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                    .foregroundStyle(.orange)
+                }
+            }
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+    }
+
     private var caveat: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("Not in this build", systemImage: "hammer")
                 .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             Text(
-                "Tag and linker planning, and construct card export with primer-ready "
-                    + "DNA. Disulfide pairing is not yet a constraint either, so a "
-                    + "boundary can currently separate two cysteines that pair."
+                "Linker design and construct card export with primer-ready DNA. "
+                    + "Disulfide pairing is not a constraint either: pairs cannot be "
+                    + "read off a sequence, so a boundary can currently separate two "
+                    + "cysteines that pair. That needs the structure viewer."
             )
             .font(.caption2).foregroundStyle(.tertiary)
             .fixedSize(horizontal: false, vertical: true)

@@ -11,8 +11,8 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3 and 5 **complete**. Next: Phase 6, the Boundary tab
-- **Last completed:** Phase 3's transmembrane and signal-peptide head on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 3 and 5 complete; **6 in progress** (solver, precedent and tag planning done; linkers, construct cards and disulfides outstanding)
+- **Last completed:** Phase 6's construct solver and tag planning on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
 ### Phase 5 findings

@@ -63,6 +63,9 @@ final class SequenceStore {
     /// something is.
     private(set) var constructConstraints: [ConstructConstraint] = []
 
+    /// Tag placement and protease choice for the best proposal.
+    private(set) var tagPlan: TagPlan?
+
     // MARK: - Fitness
 
     private(set) var llr: LLRMatrix?
@@ -144,6 +147,7 @@ final class SequenceStore {
             familyCall = nil
             constructs = .declined("Analysing.")
             constructConstraints = []
+            tagPlan = nil
             homologs = []
             precedent = []
             homologState = .idle
@@ -281,6 +285,26 @@ final class SequenceStore {
             disordered: predictions?.isDisordered ?? [],
             constraints: constructConstraints,
             precedent: deposited)
+
+        tagPlan = nil
+        if let best = constructs.proposals.first {
+            let residues = best.range.compactMap { index -> AminoAcid? in
+                guard sequence.residues.indices.contains(index) else { return nil }
+                if case .canonical(let acid) = sequence.residues[index].identity {
+                    return acid
+                }
+                return nil
+            }
+            let disordered = predictions?.isDisordered ?? []
+            func isDisordered(_ index: Int) -> Bool {
+                disordered.indices.contains(index) ? disordered[index] : false
+            }
+            tagPlan = TagPlanner.plan(
+                construct: residues,
+                hasSignalPeptide: constructConstraints.contains { $0.kind == .signalPeptide },
+                startsDisordered: isDisordered(best.range.lowerBound),
+                endsDisordered: isDisordered(best.range.upperBound))
+        }
     }
 
     /// Where a homolog's UniProt residue number lands in the user's sequence.

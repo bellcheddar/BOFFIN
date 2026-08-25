@@ -56,9 +56,9 @@
 <div class="emd">
 <h1>🧬 BOFFIN</h1>
 <blockquote>
-<p><strong>Turn an iPhone or iPad into a self-contained protein workstation: paste a sequence, get boundaries, disorder, fitness and family, then present the structure from the same device.</strong></p>
+<p><strong>A protein language model in your pocket: paste a sequence, and an iPhone tells you where the domain starts, which mutations it will tolerate, what family it belongs to and what has already been crystallised, then shows you the structure. No cloud, no account, no signal required.</strong></p>
 </blockquote>
-<p><img alt="swift" src="https://img.shields.io/badge/swift-6.2-F05138?logo=swift&amp;logoColor=white"> <img alt="swiftui" src="https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&amp;logoColor=white"> <img alt="xcode" src="https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&amp;logoColor=white"> <img alt="project" src="https://img.shields.io/badge/project-native%20Xcode-1575F9"> <img alt="coreml" src="https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&amp;logoColor=white"> <img alt="esm2" src="https://img.shields.io/badge/ESM--2-t12__35M__UR50D-467FF7"> <img alt="ane" src="https://img.shields.io/badge/ANE%20residency-98.8%25-00d084"> <img alt="molstar" src="https://img.shields.io/badge/Mol*-MIT-00897B"> <img alt="swift-testing" src="https://img.shields.io/badge/swift--testing-368%20passing-9b51e0"> <img alt="data" src="https://img.shields.io/badge/data-RCSB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb-4a9fd4"> <img alt="offline" src="https://img.shields.io/badge/offline-no%20cloud%20inference-00d084"> <img alt="phase" src="https://img.shields.io/badge/phase-5%20of%2012%20%28Family%20tab%29-fcb900"> <img alt="licence" src="https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey"> <img alt="author" src="https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B"></p>
+<p><img alt="swift" src="https://img.shields.io/badge/swift-6.2-F05138?logo=swift&amp;logoColor=white"> <img alt="swiftui" src="https://img.shields.io/badge/SwiftUI-iOS%2026%20%C2%B7%20iPadOS%2026-0071E3?logo=apple&amp;logoColor=white"> <img alt="xcode" src="https://img.shields.io/badge/Xcode-26.6-1575F9?logo=xcode&amp;logoColor=white"> <img alt="coreml" src="https://img.shields.io/badge/Core%20ML-Neural%20Engine-000000?logo=apple&amp;logoColor=white"> <img alt="esm2" src="https://img.shields.io/badge/model-ESM--2%20t12__35M-467FF7"> <img alt="ane" src="https://img.shields.io/badge/ANE%20residency-98.8%25-00d084"> <img alt="embed" src="https://img.shields.io/badge/embed%20300%20aa-31%20ms-00d084"> <img alt="search" src="https://img.shields.io/badge/homolog%20search-5.4%20ms%20%C2%B7%2072k%20entries-00d084"> <img alt="molstar" src="https://img.shields.io/badge/Mol*-5.11.0%20vendored-00897B"> <img alt="swift-testing" src="https://img.shields.io/badge/swift--testing-371%20passing-9b51e0"> <img alt="data" src="https://img.shields.io/badge/data-PDB%20%C2%B7%20UniProt%20%C2%B7%20Pfam%20%C2%B7%20KLIFS%20%C2%B7%20GPCRdb%20%C2%B7%20AlphaFold-4a9fd4"> <img alt="offline" src="https://img.shields.io/badge/inference-100%25%20on%20device-00d084"> <img alt="privacy" src="https://img.shields.io/badge/data%20collected-none-00d084"> <img alt="phase" src="https://img.shields.io/badge/phase-11%20of%2012%20%28polish%29-fcb900"> <img alt="licence" src="https://img.shields.io/badge/licence-not%20yet%20chosen-lightgrey"> <img alt="author" src="https://img.shields.io/badge/author-Marc%20C.%20Deller%2C%20D.Phil.-1C244B"></p>
 <table class="emd-info-table">
 <tr>
 <td>🌐 <b>Website</b></td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
@@ -68,306 +68,205 @@
 </table>
 
 <hr>
-<p><strong>BOFFIN</strong> (<strong>B</strong>oundary, <strong>O</strong>rder, <strong>F</strong>itness and <strong>F</strong>amily <strong>IN</strong>ference) is a native SwiftUI application for iOS and iPadOS. It runs protein language model inference on the Apple Neural Engine, entirely on device, and pairs it with a full interactive structure viewer intended as a mobile equivalent of PyMOL.</p>
-<p>Why it matters: the analyses a structural biologist actually reaches for (where does the ordered domain start, which mutations will be tolerated, what family is this, has anyone crystallised something like it) normally mean a laptop, a cluster queue or a web service that wants your sequence. BOFFIN does all of them from a single forward pass on a phone, in aeroplane mode, with no sequence ever leaving the device. It is useful for: designing a construct at the bench before you order the gene, sanity-checking a variant on the train, triaging a homolog set between meetings, and presenting a structure from an iPad without carrying a laptop to the room.</p>
+<p><strong>BOFFIN</strong> (<strong>B</strong>oundary, <strong>O</strong>rder, <strong>F</strong>itness and <strong>F</strong>amily <strong>IN</strong>ference) is a native iPhone and iPad app that runs a protein language model on Apple's Neural Engine, entirely on the device, and pairs it with a full interactive structure viewer intended as a mobile equivalent of PyMOL.</p>
+<p>Why it matters: the questions a structural biologist asks first about a new protein (where does the ordered part begin and end, which residues can I mutate, what family is this, has anyone solved something like it) currently mean a laptop, a queue on a cluster, or a web server that wants a copy of your sequence. BOFFIN answers all of them from a single pass of a neural network that finishes in about the time it takes to lift your thumb, on a phone, in aeroplane mode, with the sequence never leaving your hand. It is useful for: designing a construct at the bench before you order the gene, sanity-checking a variant on the train, triaging a set of homologs between meetings, and presenting a structure from an iPad without carrying a laptop into the room.</p>
 <p>Research use only. No clinical, diagnostic or therapeutic claims.</p>
-<h2>🧭 The two invariants</h2>
-<p>Everything in BOFFIN follows from two design commitments. They are load-bearing, not stylistic, and they are why the app can be fast on a phone.</p>
-<p><strong>1. One forward pass, four fan-outs.</strong> Every analytical feature is a read-out from a <em>single</em> ESM-2 pass on the Neural Engine, not an independent pipeline:</p>
+<h2>🧠 What a protein language model knows</h2>
+<p>A protein language model is trained the way a text model is: show it hundreds of millions of natural protein sequences with residues hidden, and ask it to guess what was removed. To do that well it has to learn what evolution has already learned. Which positions never change because the fold collapses without them. Which pairs of residues always change together because they touch each other in space. Which stretches are so tolerant of substitution that they are probably not folded at all.</p>
+<p>BOFFIN uses <strong>ESM-2</strong> (Lin <em>et al.</em>, <em>Science</em> 2023), in its 35-million-parameter size. That is deliberately not the largest one. The 15-billion-parameter version is a few points better on most benchmarks and will not run on a phone at all, and the practical question is not which model wins a leaderboard but which model answers a bench question before you lose interest in the answer.</p>
+<p>What comes out of the model is not a prediction. It is a <strong>representation</strong>: a 480-number description of every residue, and a matrix of how surprised the model is by the residue that is actually there. Everything BOFFIN shows you is read out of those two things.</p>
+<h2>⚡ Why the Neural Engine</h2>
+<p>Every Apple silicon chip carries three processors that can do this arithmetic: the CPU, the GPU, and the <strong>Neural Engine</strong> (ANE), a block designed for nothing but neural network inference. The ANE is far faster per watt than the other two, which on a phone is the whole game: it is the difference between an answer and a warm handset with a flat battery.</p>
+<p>Getting a model onto it is not a switch you flip. The ANE is fixed-function hardware with strong opinions, and a model converted the obvious way runs almost entirely on the GPU while reporting success. BOFFIN's conversion follows Apple's published tensor layout for transformers from the outset, and the result is measured rather than assumed:</p>
+<blockquote>
+<p><strong>98.8% of the model's operations run on the Neural Engine</strong> (746 of 755), verified by asking Core ML for its own compute plan rather than by watching a graph in a profiler.</p>
+</blockquote>
+<p>Two things were learned making that true, and both are the sort of thing that silently costs you the feature:</p>
+<ul>
+<li><strong>The ANE is fp16 hardware.</strong> Ask for the full 32-bit precision a desktop uses and residency is <em>zero</em>: everything falls back. The numerical agreement with the reference implementation therefore has to be judged in relative terms, which it passes: cosine similarity 0.99997, and the mutation scores agree with the reference at a Spearman correlation of 0.99998.</li>
+<li><strong>Attention with rotary position encoding caches itself by sequence length.</strong> A naively traced model freezes that cache at whatever length happened to be traced, and then quietly returns nonsense for every other protein. BOFFIN converts a set of length buckets and stitches longer sequences from overlapping tiles.</li>
+</ul>
+<h3>One pass, four answers</h3>
+<p>The expensive step is running the model. So BOFFIN runs it <strong>once</strong>, and every feature in the app is a different read-out of that same pass:</p>
 <div class="emd-table-wrap"><table class="emd-data-table">
 <thead>
 <tr>
-<th>Fan-out</th>
-<th>Source tensor</th>
-<th>Feature</th>
+<th>What is read</th>
+<th>What it becomes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td data-label="Fan-out">Per-residue hidden states</td>
-<td data-label="Source tensor"><code>last_hidden_state</code></td>
-<td data-label="Feature">Disorder, secondary structure, TM spans, domain boundaries</td>
+<td data-label="What is read">The per-residue description</td>
+<td data-label="What it becomes">Disorder, secondary structure, transmembrane helices, domain boundaries</td>
 </tr>
 <tr>
-<td data-label="Fan-out">Masked-token logits</td>
-<td data-label="Source tensor"><code>logits</code> at masked positions</td>
-<td data-label="Feature">ΔLLR substitution matrix (variant fitness)</td>
+<td data-label="What is read">How surprised the model is at each position</td>
+<td data-label="What it becomes">A full mutation-tolerance map, all 20 amino acids at every residue</td>
 </tr>
 <tr>
-<td data-label="Fan-out">Mean-pooled embedding</td>
-<td data-label="Source tensor"><code>mean(last_hidden_state)</code></td>
-<td data-label="Feature">Family classification, homolog cosine search</td>
+<td data-label="What is read">The average over the whole chain</td>
+<td data-label="What it becomes">Family classification, and similarity search against every protein in the PDB</td>
 </tr>
 </tbody>
 </table></div>
-<p>The expensive step is amortised across the whole app rather than repeated per feature.</p>
-<p><strong>2. Everything is a <code>ResidueTrack</code>.</strong> Disorder, secondary structure, TM spans, ΔLLR, motifs and structure-derived interactions are all arrays aligned one-to-one with the sequence, stacked on one scrollable ruler. Tabs are filters over that ruler, not separate features. Any feature that cannot be expressed as a <code>ResidueTrack</code> or a structure overlay needs an explicit design decision first.</p>
-<p>A misaligned track does not crash: it draws a convincing picture of the wrong thing. Every track is therefore validated against its sequence at the point of production.</p>
-<h2>✨ What it will do</h2>
+<p>This is why the app can be fast on a phone rather than merely possible on one. Describing a 300-residue protein takes about <strong>31 ms</strong>, and searching all 72,421 proteins in the PDB for its nearest relatives takes <strong>5.4 ms</strong>. Both figures are measured on the development Mac against phone budgets of 250 ms and 100 ms respectively; measuring them on the device itself is still outstanding, and is on the list below rather than quietly assumed.</p>
+<h2>🔬 What it does</h2>
 <div class="emd-table-wrap"><table class="emd-data-table">
 <thead>
 <tr>
 <th>Tab</th>
-<th>Purpose</th>
+<th>What you get</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td data-label="Tab"><strong>Order</strong></td>
-<td data-label="Purpose">Disorder probability, SS3/SS8, TM helices and signal peptide, low complexity, plus MW, pI, ε₂₈₀ and GRAVY over any selection</td>
+<td data-label="What you get">Where the protein is folded and where it is not: disorder, secondary structure, transmembrane helices, signal peptide, low complexity. Plus molecular weight, isoelectric point, extinction coefficient and hydropathy over any stretch you select</td>
 </tr>
 <tr>
 <td data-label="Tab"><strong>Fitness</strong></td>
-<td data-label="Purpose">ΔLLR heatmap (20 amino acids × N positions), sequence logo in bits, mutation basket, disorder masking, CSV and PNG export</td>
+<td data-label="What you get">A heat map of every possible point mutation, scored by how much the model dislikes it. Sequence logos, a mutation basket, and CSV export for the ones you want to order</td>
 </tr>
 <tr>
 <td data-label="Tab"><strong>Family</strong></td>
-<td data-label="Purpose">Pfam-level classification with calibrated confidence, KLIFS pocket numbering for kinases, GPCRdb generic numbering for class A GPCRs, motif tracks, SIFTS mapping, embedding homolog search</td>
+<td data-label="What you get">What family this is, with a confidence that has been checked against how often it is actually right. Kinase pocket numbering and GPCR generic numbering mapped onto <em>your</em> sequence. Motif annotation. Similarity search over the whole PDB</td>
 </tr>
 <tr>
 <td data-label="Tab"><strong>Boundary</strong></td>
-<td data-label="Purpose">Ranked construct truncations that never cut through a motif, TM span or disulfide, with crystallisation precedent from the homolog set and tag/linker planning</td>
+<td data-label="What you get">Construct design: truncations ranked, tags planned, proteases checked, and codon-optimised DNA ready for primers. Refusal is a valid answer, with the reason given</td>
 </tr>
 <tr>
 <td data-label="Tab"><strong>Structure</strong></td>
-<td data-label="Purpose">Mol*-based viewer: representations, colour themes (including painting any <code>ResidueTrack</code> onto the structure), a PyMOL-like selection language, measurements, scenes, presentation mode, Pencil annotation, and <code>.pml</code> import/export</td>
+<td data-label="What you get">A full Mol*-based viewer: representations, colour themes, a PyMOL-style selection language, measurements, interaction diagrams, saved scenes and a presentation mode. Open a <code>.pml</code> from the desktop, or send one back</td>
 </tr>
 </tbody>
 </table></div>
-<h2>🧱 Architecture</h2>
-<p>Local SPM packages under <code>Packages/</code>, each independently testable. The app target is a thin shell that wires them together.</p>
-<pre><code class="language-text">BoffinCore          → nothing
-BoffinML            → BoffinCore
-BoffinData          → BoffinCore
-BoffinStructure     → BoffinCore
-BoffinCharts        → BoffinCore
-BoffinUI            → BoffinCore
-BoffinViewer        → BoffinCore, BoffinStructure
-App                 → everything (wiring only)
-</code></pre>
-<p>This is not a convention: <code>Tools/check-module-graph.sh</code> fails the build on any violation, checking both source imports and package manifest declarations. If a feature seems to need an upward dependency, the abstraction is in the wrong module.</p>
-<p><code>BOFFIN.xcodeproj</code> is a plain native Xcode project, committed to the repository and the source of truth for project configuration. Clone and open it: there is no generation step and no extra toolchain to install. Project changes are made in Xcode and land as a <code>project.pbxproj</code> diff. Per-user state (<code>xcuserdata</code>) is gitignored, and CI fails if any is ever committed.</p>
-<h2>📋 Requirements</h2>
+<h3>One ruler, everything on it</h3>
+<p>Disorder, secondary structure, transmembrane spans, mutation tolerance, motifs and structural contacts are all just <em>numbers along the sequence</em>. BOFFIN stacks them on a single scrollable ruler, so you read them against each other rather than flipping between five views. The tabs are filters over that one ruler, not five separate tools.</p>
+<p>The corresponding hazard is taken seriously: a track that is out of register with its sequence does not crash, it draws a perfectly convincing picture of the wrong protein. Every track is checked against its sequence at the moment it is made.</p>
+<h2>📊 How well it works</h2>
+<p>Every number here is measured on held-out data and logged, and the honest ones are included alongside the good ones.</p>
 <div class="emd-table-wrap"><table class="emd-data-table">
 <thead>
 <tr>
-<th>Requirement</th>
-<th>Version</th>
-<th>Notes</th>
+<th>What</th>
+<th>Result</th>
+<th>Against</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td data-label="Requirement">macOS</td>
-<td data-label="Version">26 (Tahoe)</td>
-<td data-label="Notes">Development machine</td>
+<td data-label="What">Secondary structure (3-state)</td>
+<td data-label="Result">0.808 / 0.824 / 0.743</td>
+<td data-label="Against">CB513 / TS115 / CASP12; 3 to 5 points under a backbone 19× larger</td>
 </tr>
 <tr>
-<td data-label="Requirement">Xcode</td>
-<td data-label="Version">26.x</td>
-<td data-label="Notes">Command Line Tools alone are not enough: <code>swift test</code> needs <code>lib_TestingInterop.dylib</code>, which ships only with Xcode. Xcode 26 does not bundle simulator runtimes, so run <code>xcodebuild -downloadPlatform iOS</code> once</td>
+<td data-label="What">Disorder</td>
+<td data-label="Result">MCC 0.628 on TS115</td>
+<td data-label="Against">Beats NetSurfP-2.0</td>
 </tr>
 <tr>
-<td data-label="Requirement">Swift</td>
-<td data-label="Version">6.2 language mode</td>
-<td data-label="Notes">Strict concurrency enabled</td>
+<td data-label="What">Disorder, novel folds</td>
+<td data-label="Result">MCC 0.500 on CASP12</td>
+<td data-label="Against"><strong>Below</strong> the no-language-model floor of 0.573. Said so on screen</td>
 </tr>
 <tr>
-<td data-label="Requirement">Target OS</td>
-<td data-label="Version">iOS 26.0 / iPadOS 26.0</td>
-<td data-label="Notes"></td>
+<td data-label="What">Transmembrane helices</td>
+<td data-label="Result">F1 0.885 per residue</td>
+<td data-label="Against">And exactly seven spans on the β2-adrenergic receptor, which is the test that counts</td>
+</tr>
+<tr>
+<td data-label="What">Signal peptide</td>
+<td data-label="Result">F1 0.943</td>
+<td data-label="Against">Trained on Swiss-Prot's own curated annotations</td>
+</tr>
+<tr>
+<td data-label="What">Family classification</td>
+<td data-label="Result">97.8% top-1 over 100 families</td>
+<td data-label="Against">1% by chance; calibration error under 0.01</td>
+</tr>
+<tr>
+<td data-label="What">Homolog search</td>
+<td data-label="Result">recall@10 0.966</td>
+<td data-label="Against">Against exhaustive full-precision search</td>
+</tr>
+<tr>
+<td data-label="What">Mutation scores vs reference</td>
+<td data-label="Result">Spearman ρ 0.99998</td>
+<td data-label="Against">Cross-checked against the original Python implementation</td>
 </tr>
 </tbody>
 </table></div>
-<h2>🔧 Getting started</h2>
-<pre><code class="language-bash">git clone https://github.com/bellcheddar/Boffin.git
-cd Boffin
-
-open BOFFIN.xcodeproj     # no generation step: the project is committed
-
-xcodebuild build -project BOFFIN.xcodeproj -scheme BOFFIN \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-xcodebuild test  -project BOFFIN.xcodeproj -scheme BOFFIN \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-
-./Tools/check-module-graph.sh                 # enforce the module dependency rule
-swift format lint --recursive --strict App Packages
-</code></pre>
-<p>Package-level tests run without a simulator, because every package declares macOS alongside iOS:</p>
-<pre><code class="language-bash">cd Packages/BoffinCore &amp;&amp; swift test
-</code></pre>
-<h2>🧪 Fixtures and testing</h2>
-<p><code>Fixtures/</code> holds the golden set, committed with provenance and SHA-256 checksums in <code>Fixtures/MANIFEST.md</code>. It is committed rather than fetched so the test suite runs with no network, matching the app's own offline rule.</p>
-<div class="emd-table-wrap"><table class="emd-data-table">
-<thead>
-<tr>
-<th>Fixture</th>
-<th>Exercises</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td data-label="Fixture">1UBQ (ubiquitin)</td>
-<td data-label="Exercises">Baseline and fast path</td>
-</tr>
-<tr>
-<td data-label="Fixture">1HCK (CDK2 with ATP and Mg)</td>
-<td data-label="Exercises">KLIFS numbering, motifs, interaction profiling</td>
-</tr>
-<tr>
-<td data-label="Fixture">2RH1 (β2-adrenergic receptor)</td>
-<td data-label="Exercises">GPCRdb numbering, TM prediction</td>
-</tr>
-<tr>
-<td data-label="Fixture">6EQE (<em>Piscinibacter sakaiensis</em> PETase)</td>
-<td data-label="Exercises">Catalytic triad annotation</td>
-</tr>
-<tr>
-<td data-label="Fixture">1XQ8 (α-synuclein, NMR)</td>
-<td data-label="Exercises">Disorder track, boundary solver refusal, multi-model ensemble</td>
-</tr>
-<tr>
-<td data-label="Fixture">7K00 (<em>E. coli</em> 70S ribosome)</td>
-<td data-label="Exercises">Viewer performance guardrail</td>
-</tr>
-<tr>
-<td data-label="Fixture">1E8A (selenomethionine)</td>
-<td data-label="Exercises">Non-standard residues, alternate locations</td>
-</tr>
-<tr>
-<td data-label="Fixture">8 malformed inputs</td>
-<td data-label="Exercises">Truncated FASTA, empty records, non-canonical codes, CRLF, bare sequence</td>
-</tr>
-</tbody>
-</table></div>
-<p>Three fixture choices are judgement calls rather than facts, and are flagged in the manifest rather than assumed: 2RH1 is a T4 lysozyme fusion rather than wild-type ADRB2 (which is why its entry sequence is 500 residues), 1HCK carries ATP rather than a drug-like inhibitor, and 7K00 is 7.3 MB.</p>
-<p>Where scientific correctness is at stake (numbering schemes, interaction geometry, biochemical constants), the test is written first from the published definition. A plausible-looking implementation of GPCRdb numbering that is silently wrong is worse than no feature, because it will be believed.</p>
-<h2>📊 Performance budgets</h2>
-<p>Measured on iPhone 15 Pro class hardware and re-measured at the end of every phase, logged to <code>Docs/perf-log.md</code>. Regressions are bugs, not trade-offs.</p>
-<div class="emd-table-wrap"><table class="emd-data-table">
-<thead>
-<tr>
-<th>Operation</th>
-<th>Budget</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td data-label="Operation">Cold launch to interactive</td>
-<td data-label="Budget">&lt; 1.2 s</td>
-</tr>
-<tr>
-<td data-label="Operation">Embed, 300 residues</td>
-<td data-label="Budget">&lt; 250 ms</td>
-</tr>
-<tr>
-<td data-label="Operation">Full 300-residue ΔLLR scan</td>
-<td data-label="Budget">&lt; 6 s</td>
-</tr>
-<tr>
-<td data-label="Operation">Family classification</td>
-<td data-label="Budget">&lt; 50 ms</td>
-</tr>
-<tr>
-<td data-label="Operation">Homolog search, 100 k index</td>
-<td data-label="Budget">&lt; 100 ms</td>
-</tr>
-<tr>
-<td data-label="Operation">Structure load, 5 k atoms</td>
-<td data-label="Budget">&lt; 1.5 s</td>
-</tr>
-<tr>
-<td data-label="Operation">ANE residency</td>
-<td data-label="Budget">&gt; 90 % of ops</td>
-</tr>
-</tbody>
-</table></div>
-<p>The residency figure is the one the whole premise rests on: a naive trace of HuggingFace ESM falls back to the GPU and defeats the point of the app, so the conversion follows Apple's <code>ml-ane-transformers</code> tensor layout from the start rather than as a later optimisation.</p>
-<h2>⚖️ Licensing and attribution</h2>
-<p>Every dependency, data source and model is recorded in <code>Docs/ATTRIBUTIONS.md</code> before it is used, with the licence as read at source and the date it was read.</p>
-<p>Verified so far:</p>
-<div class="emd-table-wrap"><table class="emd-data-table">
-<thead>
-<tr>
-<th>Source</th>
-<th>Licence</th>
-<th>Consequence</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td data-label="Source">PLIP</td>
-<td data-label="Licence"><strong>GNU GPL v2</strong> (verified 2026-08-24)</td>
-<td data-label="Consequence"><strong>Never linked, vendored or ported.</strong> The interaction profiler is a clean-room Swift implementation of the published geometric criteria, which are standard structural chemistry and not themselves proprietary</td>
-</tr>
-<tr>
-<td data-label="Source">Mol*</td>
-<td data-label="Licence">MIT (verified 2026-08-24)</td>
-<td data-label="Consequence">Vendored offline with pinned commit hash. No CDN reference anywhere: CI fails the build if one appears</td>
-</tr>
-<tr>
-<td data-label="Source">ESM-2</td>
-<td data-label="Licence">MIT (verified 2026-08-24)</td>
-<td data-label="Consequence">Weights bundled. Note the ESM Metagenomic Atlas <em>data</em> is separately CC BY 4.0 and is not used</td>
-</tr>
-</tbody>
-</table></div>
-<p>KLIFS is the one term still to confirm, since redistribution of derived numbering tables inside a shipped app is genuinely in question, and it gates the Family tab.</p>
+<h2>🙅 What it will not tell you</h2>
+<p>An app that only advertises what it is good at is a sales brochure. These are on the screen, not just in this file.</p>
+<ul>
+<li><strong>The family classifier is closed set.</strong> It knows 100 families and must answer with one of them. Ubiquitin, which is not among them, is confidently called something else at 79.7%. No confidence threshold catches this, because the model genuinely is confident, so the limitation is printed on every call rather than hidden behind a number.</li>
+<li><strong>Disorder prediction is weakest exactly where you need it most.</strong> On sequences with no close relative in the PDB it currently underperforms not using a language model at all.</li>
+<li><strong>A predicted structure is not a structure.</strong> An experimental temperature factor and an AlphaFold confidence occupy the same field of the same file format and mean opposite things. BOFFIN carries which one it has through the entire app and captions every predicted model accordingly.</li>
+<li><strong>Interaction analysis rests on assumptions about hydrogens.</strong> Most crystal structures do not contain any, so hydrogen bonds are inferred from geometry alone. The specific assumptions travel <em>inside</em> the exported data, above the results, rather than as a footnote nobody reads.</li>
+<li><strong>The deposited coordinates are often not the molecule.</strong> A dimer deposited as one chain looks like a monomer until the biological assembly is built. The viewer says which one you are looking at.</li>
+</ul>
+<h2>🔒 Everything stays on the device</h2>
+<p>There is no inference server, no account, and no telemetry. The privacy manifest declares that BOFFIN collects <strong>nothing</strong>, and not "nothing identifiable": nothing. Structure files can be fetched from the PDB and AlphaFold if you ask for them, and that is the only network traffic the app generates. An unpublished sequence pasted into BOFFIN never leaves the phone, which is the difference between using it on a real project and using it on a demo.</p>
+<h2>⚖️ Where the data comes from</h2>
+<p>Every model, dataset and library is recorded with its licence, read at source and dated, in <code>Docs/ATTRIBUTIONS.md</code>, and credited in the app whether or not the licence asks for it.</p>
+<p>Two consequences worth stating plainly. <strong>PLIP is GPL v2</strong>, so BOFFIN's interaction analysis is a clean-room implementation of the published geometric criteria and PLIP's code is never linked, ported or consulted. And a licence question turned out to be a science question: the transmembrane predictor could not use the standard training sets because they are not redistributable, so the labels were rebuilt from <strong>Swiss-Prot's own curated annotations</strong>, which are CC BY 4.0. The replacement is not a compromise, it is where the curators put the annotation in the first place.</p>
+<p>Where a source states no terms at all, it is used for non-commercial research and the position is recorded as a risk rather than dressed up as a permission (decision of 2026-08-25).</p>
+<h2>🔧 For developers</h2>
+<p><code>BOFFIN.xcodeproj</code> is a plain Xcode project committed to the repository: clone it, open it, build it, with no generation step. The code sits in seven local Swift packages whose dependency graph is enforced by a script rather than by convention. Build, test and architecture detail is in <a href="CLAUDE.md"><code>CLAUDE.md</code></a>, the full engineering plan in <code>Docs/BOFFIN_BUILD_PLAN.md</code>, and every performance number in <code>Docs/perf-log.md</code>.</p>
+<p>Test fixtures are real structures chosen so that each one can fail differently: ubiquitin, CDK2 with ATP, the β2-adrenergic receptor, PETase, α-synuclein by NMR, a 70S ribosome, a selenomethionine structure, and eight deliberately malformed inputs. Where scientific correctness is at stake, the test is written from the published definition before the implementation, because a numbering scheme that is silently wrong is worse than one that is missing: it will be believed.</p>
 <h2>✅ To Do</h2>
-<p>Roadmap for BOFFIN, in dependency order. Each phase ends with tests green, performance logged and a demoable build. A phase does not begin until the previous one's acceptance criteria are met. Suggestions welcome.</p>
+<p>The roadmap, in dependency order. Each phase ends with tests green, performance measured and a build you can hold. Completed items keep their reasoning, because the list doubles as the project record. Suggestions welcome.</p>
 <ul class="emd-tasklist">
-<li><span class="emd-check">&#9989;</span> <strong>Phase 0: repository foundations.</strong> Git, seven local SPM packages, Xcode project, app shell, CI, swift-format, brand and scientific palette tokens, <code>ResidueTrack</code> with alignment validation, and the golden fixture set with provenance and checksums. The module dependency checker is canary-tested against both a planted illegal import and a planted illegal manifest dependency, because a rule-checker that has never failed is not a checker</li>
-<li><span class="emd-check">&#9989;</span> <strong>Dropped Tuist for a native Xcode project.</strong> Tuist was trialled in Phase 0 and removed on 2026-08-24. The seven local SPM packages were kept, since they are what makes the module dependency rule mechanically enforceable: this changed how the <em>project</em> is managed, not how the <em>modules</em> are structured. The accepted cost is that project changes now land as generated <code>.pbxproj</code> diffs, which merge badly</li>
-<li><span class="emd-check">&#9989;</span> <strong>Closed the Phase 0 acceptance gaps.</strong> 27 package tests pass, the project opens from a clean checkout with no generation step, and the app builds and runs on both the iPhone 17 Pro and iPad Pro 13-inch (M5) simulators. CI's first run earned its keep by finding three defects local testing could not: packages pinned to <code>.macOS(.v26)</code> were unloadable on the macOS 15 runner, the app had no <code>CFBundleIdentifier</code> (with <code>GENERATE_INFOPLIST_FILE=NO</code> Xcode injects nothing, so it builds fine and fails at install), and pinned simulator model names were wrong for the runner</li>
-<li><span class="emd-check">&#11036;</span> <strong>Answer the seven open questions.</strong> Listed in <code>Docs/BOFFIN_BUILD_PLAN.md</code> §15. Q1 (head training data) gates Phase 3, Q2 (index scope) and Q3 (family coverage) gate Phase 5. None of them gate Phases 1, 2 or 4, so sequence and ML work is not blocked</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 1: the sequence spine.</strong> FASTA and UniProt parsing with a diagnostics channel (nothing is changed silently), analytical properties (MW, pI on two selectable pKa scales, ε₂₈₀ reduced and cystine, GRAVY, instability index), and the virtualised track ruler with pinch-zoom and drag selection. Constant tables including the 400-entry DIWV table are generated from checksummed sources rather than transcribed. Found and fixed a real correctness trap: the common reference implementation brackets its pI search to pH 4.05 to 12 and returns the <em>bound</em> for sequences outside it, so a poly-acidic peptide reads exactly 4.05; BOFFIN brackets 0 to 14 and reads 3.49</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 2: ML core.</strong> The premise is proven: <strong>98.8% ANE residency</strong> (746 of 755 executable operations), measured with <code>MLComputePlan</code> rather than eyeballed in Instruments. Parity passes on all six shape buckets (relative error 0.61%, cosine 0.99997, ΔLLR Spearman ρ 0.999975). Ships the pinned conversion pipeline, the <code>EmbeddingEngine</code> actor with bucketing, overlap tiling, warm-up and caching, and a cross-language golden test so a Swift-side tokenising error cannot hide behind self-consistency. Three findings: fair-esm's rotary embeddings cache by sequence length and a naive trace freezes them at one bucket; <strong>the ANE is fp16 hardware</strong>, so fp32 gets 0% residency and the plan's absolute parity gate had to become a relative one; and <code>const</code> operations must be excluded from the residency denominator or 98.8% reads as 41.5%</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 3 (part): secondary structure and disorder heads.</strong> Trained from scratch on published datasets, because fine-tuning published heads is impossible three ways: DeepTMHMM and NetSurfP-3.0 are built on ESM-1b at 1280 dimensions against our 480, their biLSTM+CRF architectures forfeit ANE residency, and neither is redistributable. Measured against the published baselines including the no-language-model floor: Q3 0.808/0.824/0.743 and Q8 0.676/0.718/0.630 on CB513/TS115/CASP12, which is 3 to 5 points under a 19× larger backbone. Disorder MCC 0.628 on TS115 beats NetSurfP-2.0</li>
-<li><span class="emd-check">&#11036;</span> <strong>Improve the disorder head on novel folds.</strong> MCC 0.500 on CASP12 is <em>below</em> the no-language-model floor of 0.573, so on sequences with no close PDB relatives it is currently worse than not using the model. The UI says so rather than averaging it away. Worth trying: RSA as an auxiliary task (NetSurfP predicts it jointly), more head capacity, or a CAID-style reference set with PDB-derived negatives</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 3 (rest): TM spans and signal peptide.</strong> The blocker was never technical: DeepTMHMM needs a paid commercial licence outside academia and TOPCONS states no terms at all, so a head trained on either could not ship. <strong>UniProt is CC BY 4.0 and Swiss-Prot curates <code>TRANSMEM</code> and <code>SIGNAL</code> directly</strong>, so the labels now come from somewhere redistributable. 13,000 entries, 5.81 M residues, a 0.78 MB head at 0.71 ms. Per-residue F1 0.885 transmembrane and 0.943 signal. <strong>Accepted on the fixture, not on an average: the beta-2 adrenergic receptor shows exactly seven transmembrane spans</strong>, ubiquitin none, PETase none. A hypothesis died on the way: span precision of 0.58 looks like fragmented helices and merging short gaps is the obvious fix, but the validation sweep rejects it at every gap because adjacent helices are separated by short loops and merging fuses two real ones. A length filter alone took precision to 0.845</li>
-<li><span class="emd-check">&#9989;</span> <strong>Removed the SIFTS dependency from the core numbering path.</strong> SIFTS states no licence, and the obvious workaround fails: RCSB is CC0 but labels its copy <code>provenance_source: SIFTS</code>, and its policy excludes data from integrated external resources. <strong>The way out is a different source, not a different supplier</strong> — <code>_pdbx_poly_seq_scheme</code>, <code>_struct_ref_seq</code> and <code>_pdbx_struct_assembly</code> are inside every mmCIF entry and the PDB archive is CC0. What is lost is stated rather than glossed: <code>_struct_ref_seq</code> is the <em>depositor's</em> alignment and SIFTS is EBI's curated correction of it, so this is the licence-clear path and not the more accurate one. One bug on the way would have gutted a feature: an unobserved residue does <strong>not</strong> have a missing author number, so reading it that way reported all 298 residues of CDK2 as observed and would have made every construct in the precedent table look fully ordered</li>
-<li><span class="emd-check">&#9989;</span> <strong>Settled the unstated-terms question.</strong> Marc's decision, 2026-08-25: datasets that state no terms are used for non-commercial research. That covers SIFTS and the DTU distributions of CB513, TS115 and CASP12, and they are no longer release blockers. The factual position is on the record in <code>Docs/ATTRIBUTIONS.md</code> — silence is not a permissive licence, so this is a risk position rather than a permission, and it should be revisited before any commercial release. Every source is attributed regardless of whether a licence demands it</li>
+<li><span class="emd-check">&#9989;</span> <strong>Foundations.</strong> Repository, module structure with a mechanically enforced dependency rule, continuous integration, the shared residue ruler, and the golden fixture set with provenance and checksums. The rule-checker is deliberately tested against planted violations, because a checker that has never failed is not a checker</li>
+<li><span class="emd-check">&#9989;</span> <strong>Chose a plain Xcode project over a generator.</strong> Trialled and reversed on 2026-08-24. The accepted cost is that project changes merge badly; the gain is that a clone opens and builds with no extra toolchain</li>
+<li><span class="emd-check">&#9989;</span> <strong>The sequence spine.</strong> Sequence parsing that reports what it changed instead of silently fixing it, the analytical properties every construct paper quotes, and a virtualised ruler that stays smooth on a phone. One real correctness trap found: the widely copied reference implementation of isoelectric point searches only pH 4.05 to 12 and returns the <em>boundary</em> for anything outside it, so a very acidic peptide reads exactly 4.05. BOFFIN searches 0 to 14 and reads 3.49</li>
+<li><span class="emd-check">&#9989;</span> <strong>The machine learning core.</strong> The premise proven: <strong>98.8% of operations on the Neural Engine</strong>, parity with the reference implementation on every length bucket, and a cross-language test so a tokenising mistake on the Swift side cannot hide behind its own consistency</li>
+<li><span class="emd-check">&#9989;</span> <strong>Secondary structure and disorder.</strong> Trained from scratch, because the published heads cannot be adapted: they are built on a different, much larger backbone, their architectures would forfeit the Neural Engine entirely, and they are not redistributable. Measured against the published baselines <em>including</em> the no-language-model floor, which is the comparison that says whether the model is contributing anything</li>
+<li><span class="emd-check">&#11036;</span> <strong>Improve disorder on novel folds.</strong> Currently below the no-language-model floor on CASP12. Worth trying: predicting solvent accessibility jointly, more capacity in the head, or a reference set with structure-derived negatives</li>
+<li><span class="emd-check">&#9989;</span> <strong>Transmembrane spans and signal peptides.</strong> The blocker was a licence, not an algorithm, and the answer was to go back to the curators: Swiss-Prot annotates both directly and is CC BY 4.0. Accepted on a structure rather than an average: <strong>the β2-adrenergic receptor shows exactly seven spans</strong>, ubiquitin none, PETase none. One appealing hypothesis died on the way: fragmented helix predictions look like they want short gaps merged, and merging them fuses genuinely adjacent helices at every gap size tested</li>
+<li><span class="emd-check">&#9989;</span> <strong>Removed a licence-encumbered dependency from the numbering path.</strong> The mapping between a PDB entry and a UniProt sequence came from a source that states no terms, and the obvious substitute inherits the same provenance. The way out was a different <em>source</em>, not a different supplier: the information is inside every structure file, and the PDB archive is public domain. What is lost is stated rather than glossed, since the in-file version is the depositor's alignment rather than a curated correction of it</li>
+<li><span class="emd-check">&#9989;</span> <strong>Settled the unstated-terms question.</strong> Marc's decision, 2026-08-25: sources that state no terms are used for non-commercial research, attributed regardless. Silence is not a permissive licence, so this is recorded as a risk position</li>
 <li><span class="emd-check">&#11036;</span> <strong>Revisit the licence position before any commercial release.</strong> A different decision with a different risk profile</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 4: Fitness tab.</strong> ΔLLR heatmap, sequence logo (information-content and signed modes), mutation basket, disorder masking and CSV export. Two scoring modes, each labelled with how it was produced: masked marginal, and a fast preview by wild-type marginal that is one forward pass instead of N. Found and fixed a bug that produced a completely convincing heatmap of garbage: <code>MLMultiArray</code> is not densely packed, so indexing by <code>token × vocabulary</code> instead of by the array's own strides reads a shifted row for every token after the first</li>
-<li><span class="emd-check">&#11036;</span> <strong>Measure the ΔLLR scan on a real device.</strong> Masked marginal is 9.35 s per 300 residues on an M1 Max against a 6 s budget specified for iPhone 15 Pro hardware. Batching would recover about 31% and Core ML will not combine a batch dimension with enumerated sequence shapes (SIGTRAP or an indefinite hang, depending on configuration), so this needs either device measurement, a per-bucket model, or a relaxed budget</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 5 (part): family motifs.</strong> Protein kinase and class A GPCR motifs annotated on the shared ruler, detected by published sequence patterns with ordering constraints rather than pattern alone (HRD occurs by chance about once per 8,000 residues). Validated against CDK2's textbook numbering: G-loop G11, β3 lysine K33, HRD H125, DFG D145. Negative controls matter as much, and ubiquitin, ADRB2 and PETase are all correctly refused. Variants handled because they were measured across all 521 human KLIFS kinases: the HRD histidine is Y in 45 of them, the DFG phenylalanine L in 51</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 5 (part 2): canonical numbering.</strong> Needleman-Wunsch with affine gaps over BLOSUM62 maps a pasted sequence onto the bundled KLIFS and GPCRdb tables. Verified against textbook numbering (KLIFS 17 → CDK2 K33, KLIFS 81 → D145, GPCRdb 3x50 → ADRB2 R131) and, just as important, cross-family numbering is refused. Two corrections on the way: identity over <em>aligned columns</em> is badly biased (it excludes gaps, so ubiquitin scored 0.35 against a kinase pocket), and alignment score is the wrong instrument for family membership, so numbering is gated on the motif detector instead</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 5 (part 3): Pfam classifier.</strong> 97.8% top-1 across 100 families (1% random baseline), 99.8% top-5, calibration error under 0.01, in a 0.81 MB head over the pooled embedding. Temperature scaling was fitted and then <em>not</em> applied, because the calibration split said it made things worse. Records a failure accuracy cannot show: the classifier is <strong>closed set</strong>, so ubiquitin (family PF00240, not trained) is called PF00076 at 79.7% confidence, and no threshold catches that — the limitation is stated on screen on every call</li>
-<li><span class="emd-check">&#11036;</span> <strong>Expand classifier coverage beyond 100 families.</strong> Pfam has over 30,000. The closed-set behaviour is stated honestly but the real fix is coverage, plus a genuine open-set rejection mechanism: cosine to the nearest class centroid was measured and is too weak (correct CDK2 scores 0.829, misclassified ubiquitin 0.864)</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 5 (part 4): SIFTS mapping and homolog search.</strong> Exhaustive search over one pooled embedding per UniProt accession in the PDB (72,421 entries, int8, Accelerate), plus SIFTS segments carrying SEQRES, UniProt and PDB author numbering together. An ANN index was considered and rejected: at this size a query is a 34.8 M multiply-and-add, so approximation would buy latency the app does not need and pay in silently imperfect recall. Three defects found on the way, none of which raised an error: a <strong>truncated <code>curl</code> download</strong> left 19,151 of 258,224 PDB entries and quietly redefined "best structure of this protein" as "alphabetically first PDB ID"; <strong>ranking chains by resolution selects fragments</strong> (ADRB2's best-resolution chain is a 90-residue tail at 1.9 A, beating the receptor at 2.4 A, which would have put a disordered peptide in the index in place of a GPCR); and a <strong>1,022-residue ceiling excluded EGFR</strong> and 3,533 others, so the index now tiles exactly as the app does</li>
-<li><span class="emd-check">&#9989;</span> <strong>Fixed CI, red for four consecutive commits.</strong> <code>try #require(modelIsAvailable)</code> inside a test does not skip it: it marks the test FAILED. Thirteen BoffinML tests went red on a runner with no 67 MB converted model while every local run stayed green, because the artefacts exist on this machine. Suites are now gated with <code>.enabled(if:)</code>, which reports <em>skipped</em>. The simulator job was failing for a cousin of the same problem: tapping "Fast preview" with no model returned silently, so the UI test saw neither a heatmap nor an explanation</li>
-<li><span class="emd-check">&#9989;</span> <strong>Whitened the homolog index, which was quietly losing a quarter of its answers.</strong> Pooled ESM-2 embeddings are anisotropic: random pairs scored a cosine of <strong>0.848</strong> on average with a 99.9th percentile of <strong>0.980</strong>, so everything that distinguishes a hit from a stranger sat in the last two percent of the range, which is precisely what int8 quantisation cannot hold. Measured recall@10 against exhaustive float search was <strong>0.748</strong>, with no error and no symptom. Centring and projecting out four principal directions took it to <strong>0.966</strong> and moved the null to 0.000, which also makes the number on screen mean something. The similarity floor is now the measured 99.9th percentile of unrelated pairs (0.641) rather than a plausible-looking 0.5. Search is <strong>5.4 ms over 72,421 entries</strong> in release, eighteen times inside budget</li>
-<li><span class="emd-check">&#9989;</span> <strong>Fixed the iPad UI tests, failing for two reasons that were both about the tests.</strong> <code>app.tabBars</code> finds nothing on iPadOS 26 because a SwiftUI <code>TabView</code> renders a top strip rather than a UIKit tab bar, and <code>isHittable</code> is false on a tab because each is published as a Button containing an identical Button. Seven UI tests now pass on both iPhone 17 Pro and iPad Pro 13-inch</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 6 (part): construct solver, precedent and tag planning.</strong> Truncations ranked against <strong>hard constraints that are enforced rather than scored</strong>: a weighted penalty would let a construct that bisects the DFG motif win on everything else about it, and that construct is not a compromise, it is dead protein. Refusal is a first-class result, so a fully disordered input is declined with the reason rather than returning an empty list. Precedent is carried into the user's own numbering through the homolog alignment. The tab shows what it is <em>enforcing</em> as prominently as what it proposes. Tag planning includes the check that earns its keep: <strong>a protease whose recognition sequence occurs inside the construct is refused, not ranked lower</strong>, because TEV cutting the protein in half looks like proteolysis in the prep rather than a design error</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 6 (part 2): the construct card.</strong> Boundaries, rationale, enforced regions, tag plan, protease refusals, computed properties and a FASTA record, as plain text with a share sheet. Plain text because a card is read by a person, forwarded, and pasted into a supplier's web form, and all three survive it better than a PDF. Everything on it is either measured or labelled a convention: linker length has no measurement behind it, so the provenance travels <em>inside</em> the card rather than around it. One mismatch caught on the way: the pKa scale was a parameter to the text renderer, so a card could print the EMBOSS provenance above Bjellqvist numbers, which differ by 0.2 to 0.5 pH units. It is now stored with the properties it produced, so the mismatch is not expressible</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 6 (part 3): primer-ready DNA.</strong> The codon table is <strong>computed from 4,317 coding sequences and 1,342,016 codons</strong> of the <em>E. coli</em> K-12 reference genome, not copied: Kazusa's published table for this organism rests on <strong>14 CDS and 5,122 codons</strong>, which is a fine sample of fourteen genes and exactly the artefact that acquires authority by being quoted. The generator avoids what it can see itself creating (homopolymers, eleven common cloning sites, rare codons) and records every substitution. A failing test bought one residue of lookahead: a legal codon can strand the <em>next</em> residue, since <code>ATG</code>-<code>CAT</code> is fine and the methionine after it has only <code>ATG</code>, completing an NdeI site that cannot then be designed around</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 6 (rest): disulfide pairs as a hard constraint.</strong> Pairs cannot be read off a sequence, so a boundary can currently separate two cysteines that pair. Needs the structure viewer</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 7 (part): structure viewer.</strong> Mol* 5.11.0 vendored (MIT, checksummed in <code>VENDOR.md</code>), a BinaryCIF and MessagePack parser written from the specification, the typed bridge in both directions, and the <code>ResidueTrack</code> painted onto the structure. <strong>1UBQ loads offline and Mol* reports 660 atoms, which is exactly what BOFFIN's own parser reads from the same file</strong> — two independent implementations agreeing. Nothing is interpolated into JavaScript: a test passes a chain identifier of <code>A'); window.evil=1; ('</code> and asserts it survives as data. Another test reads the bridge shim out of the bundle and checks every Swift command name has a handler, because a command with no handler is a silent no-op. Two useful failures: <code>.copy("Resources")</code> makes a bundle codesign refuses with no hint that a directory name caused it, and BinaryCIF is not a format name to Mol* but mmCIF with a binary flag</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 7 (part 2): picking, fetching and predictions labelled as such.</strong> Tap-to-select completes the bridge's return path, walking Mol*'s segment maps rather than reading <code>auth_asym_id</code> at the element index, which is right for a single-chain structure and wrong for every other one. RCSB and AlphaFold fetch, additive and offline-safe, with identifiers validated before any request and the AlphaFold model version pinned rather than "latest" — a silently changing model is a silently changing figure. <strong>A predicted model is not a structure and the type will not let that be lost</strong>: an experimental B-factor and a predicted pLDDT are the same field in the same format meaning opposite things, so <code>StructureSource</code> carries which it is and every prediction shows a caveat</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 7 (part 3): assemblies, ensembles and memory.</strong> The deposited coordinates are the <strong>asymmetric unit</strong>, a crystallographic convenience that is frequently not the molecule: a dimer with one chain in it looks like a monomer until the biological assembly is built, which is a picture of the wrong protein rather than an incomplete one. The viewer lists what a structure declares, builds it, and says so. NMR ensembles report how many models they hold and that one is shown. Memory pressure releases the structure and keeps the page alive, so recovery is one command rather than a blank viewer. Two things the tests caught: a nil assembly encoded to <code>{}</code> and worked only by coincidence in someone else's <code>if</code>, and <strong>SPM's <code>.copy</code> of a directory does not reliably invalidate on inner-file changes</strong>, so the bundled bridge lagged its own source</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 7 (rest): representations and export.</strong> Surfaces and symmetry mates, altloc selection, high-DPI and transparent PNG export for figures</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 8 (part): the selection language.</strong> Tokeniser, recursive-descent parser and evaluator. <strong><code>byres (polymer within 5 of organic)</code> returns CDK2's ATP site on 1HCK</strong>, checked against structural facts rather than the evaluator's own output: ten to forty residues, includes the hinge and the glycine-rich loop, no heteroatoms, and every selected residue confirmed within 5 Å of the ligand. <code>or</code> binds loosest as in PyMOL; <code>50-120</code> is one token on purpose, since splitting on the minus would break the negative residue numbers the PDB uses for expression tags; and an unknown keyword names itself rather than returning everything or nothing, because an over-broad selection makes a figure that is wrong in a way nobody can see</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 8 (part 2): measurement.</strong> Distances, angles and dihedrals, with the <strong>sign of a torsion treated as the point rather than a detail</strong> — a viewer reporting the wrong sign is reporting the wrong conformation, and both look equally plausible on screen. Clamping before <code>acos</code> is not defensive programming: three nearly collinear atoms put the cosine a hair outside [-1, 1] and <code>acos(1.0000000001)</code> is NaN, which reaches a label as "nan degrees". Checked on constructed geometry and then on 1UBQ, where the peptide bond measures 1.33 Å, N-CA-C is 111°, and omega is trans. One test fixture was wrong and the real-structure test passing beside it is what said so</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 8 (part 3): <code>.pml</code> round-tripping.</strong> A deck built on a phone opens on a desktop. <strong>The import is the half that has to fail loudly</strong>: a <code>.pml</code> file is a program, so a viewer that quietly ignores what it cannot represent draws a scene that is subtly not the one the file describes. Unsupported commands are reported with their line numbers. The selection expression travels verbatim, which is the whole reason for adopting PyMOL's syntax rather than inventing one, and presenter notes survive as comments because PyMOL has no field for them and they are the half of a deck that explains the other half</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 8 (part 4): scene decks and presentation mode.</strong> Named scenes captured from the viewer, presented full-bleed, exported as <code>.pml</code>. <strong>Advancing stops at the end rather than wrapping</strong> — reaching the last slide and finding the first again reads as having lost your place — and it is <strong>not tap-to-advance</strong>, because a tap on a molecule belongs to the molecule: in front of a room you rotate as often as you change slide. Four failures on the way, none of them in the deck: an accessibility identifier on a <em>stack</em> makes the whole stack one element and hid the controls; typing a scene name passed on iPhone and failed on iPad; a wedged simulator reported <code>Application failed preflight checks</code>; and CI's no-CDN check tripped on a <em>comment</em> in vendored Mol* citing a SIGGRAPH paper</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 8 (rest): touch selection builder, external display and Pencil.</strong> A visual selection builder so the language is optional, a presenter view on the device with the structure on the external display, and Pencil annotation anchored to scene index</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 9 (part): clean-room <code>InteractionProfiler</code>.</strong> PLIP is GPL v2 and is never linked, ported or consulted; what is reimplemented are the published geometric criteria, in a single tunable struct. <strong>Protonation is the hard part and the honest answer is to say what was assumed</strong>: most crystal structures have no hydrogens, so every profile carries a statement naming the specific choices rather than a vague disclaimer, because a reader cannot otherwise tell which contacts survive a different assumption. Where a criterion cannot be applied (hydrogen-bond angles without hydrogens, halogen angles without connectivity) it is not applied silently. Checked against CDK2's ATP site: the hinge, the glycine-rich loop, salt bridges to the triphosphate. One test tightens every cutoff and asserts strictly fewer contacts, because a criterion that is read and never applied looks exactly like one that is applied and generous</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 9 (part 2): diagram, summary and CSV.</strong> The 2D diagram is drawn natively on a <strong>circle rather than a force-directed layout</strong>, which would look more like the published figures and would move a residue between renders of the same structure, making two figures of one site impossible to compare. Kinds are distinguished by dash pattern as well as colour so the figure survives being printed in grey, and VoiceOver reads every contact. <strong>The assumptions go inside the CSV</strong>, not alongside it, and sit <em>above</em> the results in the app: a reader who stops after the numbers has to have seen what they rest on. One field was renamed after a test noticed author numbers above 300 in a 298-residue kinase — metal coordination is to the metal, so <code>proteinAtom</code> was right for four kinds out of five</li>
-<li><span class="emd-check">&#9989;</span> <strong>Fixed two viewer commands that were doing nothing.</strong> The Mol* UMD build exports <strong>thirteen names</strong>; <code>Shape</code>, <code>Symmetry</code> and <code>OrderedSet</code> live under <code>molstar.lib</code>, and code written against the top-level names does not throw — it evaluates to <code>undefined</code> and takes the fallback branch. <code>listAssemblies</code> returned an empty list forever, and every pick reported the <em>first atom of the unit</em> rather than the one tapped, always plausibly. Every test passed throughout, because they checked a command was <strong>dispatched</strong> rather than that it did anything. An empty assembly list now carries a note saying which path was taken, so "declares none" and "could not look" no longer read the same</li>
-<li><span class="emd-check">&#11036;</span> <strong>Verify assembly discovery against a structure known to declare one.</strong> Implemented and guarded, but the UI test asserting it was deleted rather than tuned: it could not pass without pinning what Mol* reports for one file, which changes between versions</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 9 (rest): the 3D overlay.</strong> Dashed lines in the viewer, toggleable by type. <strong>Built twice and removed twice.</strong> The first draft assembled a list of shapes and did nothing with them. The second used Mol*'s measurement manager with endpoints named in PyMOL syntax, and measured <strong>0 of 40 lines drawn</strong>: <code>StructureSelectionFromScript</code> with <code>language: "pymol"</code> returns an empty selection in the viewer UMD build, with the state cell reporting success and no error. The counter that caught it exists because an overlay drawing nothing looks identical to one with nothing to draw. Whatever replaces it needs an explicit test that BOFFIN's atom index and Mol*'s element index agree, rather than an assumption that they do</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 10 (part): opening files and Shortcuts.</strong> A FASTA shared from Mail, Files or AirDrop opens and analyses. The plist half is the half that is invisible when missing: without <code>CFBundleDocumentTypes</code> the share sheet never offers BOFFIN and <code>onOpenURL</code> is never called, which reads as a bug in the handler. <code>public.plain-text</code> is claimed as an <strong>alternate</strong>, not an owner — claiming ownership of plain text is how an app becomes the thing that opens your shopping list. Two App Intents run <strong>without bringing the app forward</strong>, and expose only the analysis that needs no model: a Shortcut that sometimes fails because a 67 MB asset was not downloaded is worse than one that never offered the option</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 10 (rest): extensions and sync.</strong> Share extension, Quick Look preview, CloudKit sync, Handoff, widget and Live Activity. Each needs a new Xcode target, which <code>Tools/add-file-to-target.py</code> deliberately does not create</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 11 (part): Audio Graphs.</strong> Continuous tracks carry an <code>AXChartDescriptor</code>, so a VoiceOver user <strong>hears</strong> hydropathy or a ΔLLR profile rather than being read a summary of it. A track is a shape and the question a shape answers is "where does it change". Gaps stay gaps — sonifying a zero where hydropathy leaves the termini blank would be a tone where there is no measurement — only continuous tracks are sonified, and the spoken summary says <em>where</em> the extremes are rather than only what they are</li>
-<li><span class="emd-check">&#9989;</span> <strong>Phase 11 (part): privacy manifest and acknowledgements.</strong> The manifest declares that BOFFIN collects <strong>nothing</strong> — not "nothing identifiable", nothing. Every source is credited whether or not its licence asks, and the terms column reads "None stated" in orange where that is true, because rounding an unstated licence up on an acknowledgements screen would mislead exactly where a reader is looking for the truth</li>
-<li><span class="emd-check">&#9989;</span> <strong>Answered whether the dataset curation was load-bearing.</strong> Heads trained on labels taken <strong>straight from PDB entries</strong> — 5,012 chains, 1,476,209 residues, split by accession so the score is not memorisation — reach disorder <strong>MCC 0.510</strong> and three-state <strong>accuracy 0.819</strong>. The shipped NetSurfP-trained heads measured MCC 0.628/0.500 and Q3 0.808/0.824/0.743 on their own benchmarks, so both land inside the range. Not a like-for-like comparison and not quoted as one. The honest weakness is disorder precision at 0.396: class weighting bought recall, which for construct design is the right way round</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 11: Polish and release.</strong> Accessibility audit, onboarding, empty and error states, privacy manifest, attributions screen, TestFlight</li>
-<li><span class="emd-check">&#11036;</span> <strong>Phase 12 (stretch): native renderer and AR.</strong> Metal impostor renderer spike benchmarked against Mol*, RealityKit AR presentation, visionOS evaluation. Gated on measured performance rather than preference</li>
-<li><span class="emd-check">&#11036;</span> <strong>Choose a licence.</strong> Not yet decided. The choice is constrained: PLIP's GPL v2 is why the interaction profiler is clean-room, and a closed-source App Store release rules out copyleft dependencies generally</li>
-<li><span class="emd-check">&#11036;</span> <strong>Confirm the three fixture caveats.</strong> Whether GPCRdb tests assert against the 2RH1 fusion or canonical P07550, whether the profiler wants a drug-like CDK2 inhibitor rather than ATP, and whether 7K00 should move to on-demand fetch to lighten the repo</li>
+<li><span class="emd-check">&#9989;</span> <strong>The Fitness tab.</strong> Every point mutation scored, as a heat map and as sequence logos, with a basket for the ones you intend to make. Two scoring modes, each labelled with how it was produced, because the fast one is an approximation and saying so is cheaper than being caught. Found a bug that produced an entirely convincing heat map of garbage: the model's output buffer is padded rather than densely packed, so reading it by arithmetic instead of by its own strides shifts every row after the first</li>
+<li><span class="emd-check">&#11036;</span> <strong>Measure everything on a real device.</strong> Every performance figure so far comes from a development Mac, so the phone budgets are unverified rather than met. The pressing one is the full mutation scan, at 9.35 s per 300 residues on a Mac against a 6 s phone budget. Batching would recover about a third and the framework will not combine batching with variable-length input, so this needs device numbers, a different packaging, or an honest budget</li>
+<li><span class="emd-check">&#9989;</span> <strong>Family motifs.</strong> Kinase and class A GPCR motifs annotated on the shared ruler, detected by sequence pattern <em>plus</em> ordering, because the HRD motif occurs by chance about once per 8,000 residues. Validated against CDK2's textbook numbering, and just as importantly, correctly refused on ubiquitin, a GPCR and PETase. The variants are handled because they were counted across all 521 human kinases rather than assumed</li>
+<li><span class="emd-check">&#9989;</span> <strong>Canonical numbering.</strong> Alignment maps a pasted sequence onto the curated kinase-pocket and GPCR numbering tables, so the published position names land on <em>your</em> residues. Two corrections on the way: percent identity measured over aligned columns only is badly biased (ubiquitin scored 0.35 against a kinase pocket that way, on a short flattering overlap), and alignment score is the wrong instrument for deciding family membership, so numbering is gated on the motif detector instead</li>
+<li><span class="emd-check">&#9989;</span> <strong>The family classifier.</strong> 97.8% top-1 across 100 families in under a megabyte. Confidence calibration was fitted and then deliberately <em>not</em> applied, because the held-out split said it made things worse: calibration is a correction for over-confidence, not a ritual</li>
+<li><span class="emd-check">&#11036;</span> <strong>Expand coverage beyond 100 families.</strong> Pfam has over 30,000, and the real fix for closed-set behaviour is coverage plus a genuine rejection mechanism. Distance to the nearest family centre was measured as a candidate and is too weak to separate a correct call from a confident mistake</li>
+<li><span class="emd-check">&#9989;</span> <strong>Homolog search over the whole PDB.</strong> Every protein in the archive reduced to one vector, searched exhaustively in 5.4 ms. Approximate search was considered and rejected: at this size the exact answer is already fast, so approximation would buy nothing and pay in recall you cannot see going missing. Three defects found on the way, none of which raised an error: a <strong>truncated download</strong> left 7% of the archive in the index and quietly redefined "the best structure of this protein" as "the alphabetically first one"; <strong>ranking by resolution picks fragments</strong>, so a 90-residue tail was about to represent a GPCR; and a length ceiling had silently excluded EGFR along with 3,533 others</li>
+<li><span class="emd-check">&#9989;</span> <strong>Whitened the search index, which was losing a quarter of its answers in silence.</strong> Protein embeddings are anisotropic: two unrelated proteins already score 0.848 similar, so everything that distinguishes a real hit from a stranger lives in the last two percent of the range, which is precisely what compressing to 8 bits destroys. Recall was <strong>0.748</strong> with no error and no symptom. Removing the shared directions took it to <strong>0.966</strong>, and made the number on screen mean something as a side effect</li>
+<li><span class="emd-check">&#9989;</span> <strong>Construct design.</strong> Truncations ranked against <strong>hard constraints that are enforced rather than scored</strong>, because a construct that bisects a catalytic motif is not a compromise, it is dead protein. Precedent from real PDB entries is translated into the user's own numbering. Tag planning refuses a protease whose recognition site occurs inside the construct, since TEV cutting the protein in half presents as proteolysis in the prep rather than as a design error</li>
+<li><span class="emd-check">&#9989;</span> <strong>The construct card.</strong> Everything you would paste into a supplier's form, as plain text with a share sheet, and every number on it either measured or labelled a convention. One mismatch caught: the pH scale used was a parameter to the printer rather than a property of the result, so a card could print one provenance above the other scale's numbers</li>
+<li><span class="emd-check">&#9989;</span> <strong>Primer-ready DNA.</strong> The codon usage table is <strong>computed from 4,317 coding sequences and 1.34 million codons</strong> of the <em>E. coli</em> reference genome rather than copied. The widely quoted published table for this organism rests on 14 genes: a fine sample of fourteen genes, and exactly the sort of artefact that acquires authority by being cited. A failing test bought one codon of lookahead, because a legal choice can strand the <em>next</em> residue into creating a restriction site</li>
+<li><span class="emd-check">&#11036;</span> <strong>Disulfide pairs as a hard constraint.</strong> A boundary can currently separate two cysteines that pair, because pairing cannot be read off a sequence. Needs the structure</li>
+<li><span class="emd-check">&#9989;</span> <strong>The structure viewer.</strong> Mol* vendored offline with a pinned version, structure files parsed from the specification, and any ruler track paintable onto the structure. <strong>Ubiquitin loads with no network and Mol* counts 660 atoms, exactly what BOFFIN's own parser counts</strong>, which is two independent implementations agreeing. Nothing is ever interpolated into JavaScript, and a test proves it by passing a chain name that is an attempted injection and asserting it survives as data</li>
+<li><span class="emd-check">&#9989;</span> <strong>Fetching, picking, and predictions labelled as predictions.</strong> Tap a residue and the app knows which one you meant, including in structures with more than one chain. PDB and AlphaFold fetch, with the AlphaFold model version pinned rather than "latest", because a silently changing model is a silently changing figure</li>
+<li><span class="emd-check">&#9989;</span> <strong>Biological assemblies and NMR ensembles.</strong> The viewer lists what a structure declares, builds it, and says which you are looking at. Memory pressure releases the structure and keeps the page alive, so recovery is one command rather than a blank screen</li>
+<li><span class="emd-check">&#11036;</span> <strong>Surfaces, symmetry mates and figure export.</strong> High-resolution and transparent export for publication figures</li>
+<li><span class="emd-check">&#9989;</span> <strong>A PyMOL-style selection language.</strong> Tokeniser, parser and evaluator. <code>byres (polymer within 5 of organic)</code> returns CDK2's ATP site, checked against structural facts rather than against the evaluator's own output. An unknown keyword names itself rather than quietly selecting everything or nothing, because an over-broad selection makes a figure that is wrong in a way nobody can see</li>
+<li><span class="emd-check">&#9989;</span> <strong>Measurement.</strong> Distances, angles and torsions, with <strong>the sign of a torsion treated as the point rather than a detail</strong>: a viewer reporting the wrong sign is reporting the wrong conformation and both look equally plausible. Checked on constructed geometry and then on ubiquitin, where the peptide bond measures 1.33 Å and omega is trans. One hand-built test fixture was wrong, and the real-structure test passing beside it is what said so</li>
+<li><span class="emd-check">&#9989;</span> <strong><code>.pml</code> round-tripping.</strong> A scene deck built on a phone opens on a desktop. <strong>The import is the half that has to fail loudly</strong>, since a viewer that quietly ignores what it cannot represent draws a scene that is subtly not the one described. Selection expressions travel verbatim, which is the entire reason for adopting PyMOL's syntax rather than inventing one</li>
+<li><span class="emd-check">&#9989;</span> <strong>Scene decks and presentation mode.</strong> Full-bleed presentation with presenter notes. <strong>Advancing stops at the end rather than wrapping</strong>, because finding slide one again reads as having lost your place, and it is deliberately not tap-to-advance: in front of a room you rotate the molecule far more often than you change slide</li>
+<li><span class="emd-check">&#11036;</span> <strong>Touch selection builder, external display and Pencil.</strong> A visual builder so the selection language is optional, a presenter view with the structure on the projector, and annotation anchored to the scene</li>
+<li><span class="emd-check">&#9989;</span> <strong>Interaction analysis, clean-room.</strong> Hydrogen bonds, salt bridges, stacking, hydrophobic contacts and metal coordination from the published geometric criteria, in one tunable set of cutoffs. <strong>Where a criterion cannot honestly be applied it is not applied silently.</strong> One test tightens every cutoff and asserts strictly fewer contacts, because a criterion that is read and never used looks exactly like one that is used and generous</li>
+<li><span class="emd-check">&#9989;</span> <strong>Interaction diagram, summary and export.</strong> Drawn on a <strong>circle rather than a force-directed layout</strong>, which would look more like the published figures and would move a residue between two renders of the same site, making the figures impossible to compare. Contact types differ by dash pattern as well as colour so the figure survives being printed in grey, and VoiceOver reads every one</li>
+<li><span class="emd-check">&#9989;</span> <strong>Fixed two viewer commands that were doing nothing at all.</strong> The vendored build exports far fewer names at the top level than its source suggests, and code written against the missing ones does not throw: it evaluates to undefined and takes the fallback branch. Assembly listing returned empty forever and every pick reported the first atom rather than the one tapped, always plausibly. Every test passed throughout, because they checked a command was <em>dispatched</em> rather than that it did anything</li>
+<li><span class="emd-check">&#11036;</span> <strong>Verify assembly discovery against a structure known to declare one.</strong> Implemented and guarded, but the test asserting it was deleted rather than pinned to one viewer version</li>
+<li><span class="emd-check">&#11036;</span> <strong>The 3D interaction overlay.</strong> Dashed lines in the viewer. <strong>Built twice and removed twice</strong>: the second attempt measured <strong>0 of 40 lines drawn</strong>, with the viewer reporting success and no error. The counter that caught it exists precisely because an overlay drawing nothing looks identical to one with nothing to draw</li>
+<li><span class="emd-check">&#9989;</span> <strong>Opening files and Shortcuts.</strong> A sequence shared from Mail, Files or AirDrop opens and analyses. Two Shortcuts actions run <strong>without bringing the app forward</strong>, and expose only the analysis that needs no model, because a Shortcut that sometimes fails because an asset was not downloaded is worse than one that never offered</li>
+<li><span class="emd-check">&#11036;</span> <strong>Extensions and sync.</strong> Share extension, Quick Look preview, CloudKit sync, Handoff, widget and Live Activity</li>
+<li><span class="emd-check">&#9989;</span> <strong>Audio Graphs.</strong> Continuous tracks carry a chart description, so a VoiceOver user <strong>hears</strong> hydropathy or a mutation-tolerance profile rather than being read a summary of it. A track is a shape, and the question a shape answers is <em>where does it change</em>. Gaps stay gaps: only continuous tracks are sonified, because a tone where there is no measurement is a lie in a new medium</li>
+<li><span class="emd-check">&#9989;</span> <strong>Privacy manifest and acknowledgements.</strong> The manifest declares that BOFFIN collects nothing. Every source is credited whether or not its licence asks, and the terms column reads "None stated" in orange where that is true, because rounding an unstated licence up on an acknowledgements screen would mislead exactly where a reader has gone looking for the truth</li>
+<li><span class="emd-check">&#9989;</span> <strong>Answered whether the dataset curation was load-bearing.</strong> Heads trained on labels taken <strong>straight from PDB entries</strong> (5,012 chains, 1.48 million residues, split so the score cannot be memorisation) land inside the range of the heads trained on the curated versions of the same underlying data. Not a like-for-like comparison and not quoted as one. The licence question, since decided separately, was never a question about quality</li>
+<li><span class="emd-check">&#11036;</span> <strong>Polish and release.</strong> Onboarding, empty and error states, a Dynamic Type audit, TestFlight</li>
+<li><span class="emd-check">&#11036;</span> <strong>Native renderer and augmented reality.</strong> A Metal renderer benchmarked against Mol* rather than assumed to beat it, and RealityKit presentation. Gated on measured performance, not preference</li>
+<li><span class="emd-check">&#11036;</span> <strong>Choose a licence.</strong> Constrained by the copyleft dependency that is already avoided by clean-room implementation, and by what an App Store release permits</li>
+<li><span class="emd-check">&#11036;</span> <strong>Confirm three fixture caveats.</strong> Whether the GPCR tests should assert against the fusion construct or the canonical sequence, whether the interaction profiler wants a drug-like inhibitor rather than ATP, and whether the ribosome should be fetched on demand to lighten the repository</li>
 </ul>
 <h2>🚫 Out of scope for v1</h2>
-<p>Structure prediction (no AlphaFold or Boltz on device), MSA generation, molecular dynamics, docking, and any cloud inference. Prediction requests are routed to <a href="https://github.com/bellcheddar/BoltzMaker">BoltzMaker</a> on the desktop instead.</p>
+<p>Structure prediction (no AlphaFold or Boltz running on the device), multiple sequence alignment generation, molecular dynamics, docking, and any cloud inference whatsoever. Prediction requests are handed off to <a href="https://github.com/bellcheddar/BoltzMaker">BoltzMaker</a> on the desktop instead.</p>
 <h2>📄 Licence</h2>
 <p>Not yet chosen: see the To Do list above. Until a licence is added, no permissions are granted beyond viewing.</p>
 <hr>

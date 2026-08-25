@@ -1703,3 +1703,45 @@ reported "painting put the viewer into an error state" about a screen it should
 never have been looking at.
 
 BoffinStructure 94 tests, 22 UI tests.
+
+---
+
+## Open-set rejection, shipped (2026-08-25)
+
+The experiment recorded in `Docs/perf-log.md` found that Mahalanobis distance
+separates unseen families from seen ones at AUROC 0.969, catching 80.5% of them
+at a 5% false-rejection rate. This is that result in the app.
+
+**What ships.** A 1.11 MB asset holding the whitening matrix and the class
+means. Mahalanobis distance under a shared covariance is an ordinary squared
+Euclidean distance after multiplying by the matrix square root of the
+precision, so the means are pre-whitened at build time and the app does two
+matrix products rather than a 480x480 quadratic form per class.
+
+**Float32, not float16.** The precision matrix has a wide dynamic range and
+feeds a squared distance, where a relative error is squared with it. Binary, not
+JSON: the whitener is 230,400 numbers and decimal text is the wrong container.
+
+**Cross-checked against the Python that set the threshold.** A Swift
+implementation that is self-consistently wrong would compare its own numbers
+against a threshold computed from different ones, and the rejection rate would
+be confidently meaningless. Five reference embeddings and their PyTorch
+distances are committed, and Swift agrees within 2% relative across distances
+spanning 6 to 370.
+
+**The cosine is kept as the fallback**, not deleted. A build without the asset
+is better served by a weak signal than by none.
+
+**What the UI says now.** The closed-set caveat is unchanged, because the
+limitation is unchanged. What is added is the catch rate: "a check for proteins
+from outside those families catches about 80% of them, so this is a weaker
+all-clear than it looks." One unseen protein in five reaches a confident call
+with no warning, and a reader who treats silence as an all-clear would be wrong
+that often. Stating the rate is the difference between a caveat and a claim.
+
+**A defensive detail with history.** The loader asserts the whole payload is
+present before reading any of it. A truncated download once left this project
+with 7% of the PDB and no error at all, which redefined a result rather than
+failing, and a half-read whitener would do the same to every distance.
+
+BoffinML 49 tests, including four for the loader and the parity check.

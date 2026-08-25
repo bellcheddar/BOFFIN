@@ -242,7 +242,72 @@ def main() -> int:
     print(f"  in-distribution similarity: mean {nearest.mean():.3f}, "
           f"5th percentile {similarityFloor:.3f}")
 
+    # Open-set rejection by Mahalanobis distance.
+    #
+    # Measured against four alternatives in Tools/heads/openset_experiment.py,
+    # holding out whole FAMILIES rather than sequences: AUROC 0.969 +/- 0.005,
+    # against 0.945 for max softmax and 0.850 for the centroid cosine that was
+    # tried first. It is also far the most stable across splits, which matters
+    # more than the mean here, because a score whose usefulness depends on which
+    # families happen to be missing is not one to ship a threshold on.
+    #
+    # Shared covariance, not per-class: with ~65 sequences per family in 480
+    # dimensions a per-class covariance is wildly underdetermined and its
+    # inverse is noise.
+    classMeans = np.stack([
+        X[y == index].mean(axis=0) for index in range(len(labels))
+    ]).astype(np.float64)
+    centred = X.astype(np.float64) - classMeans[y]
+    covariance = np.cov(centred, rowvar=False)
+    covariance += np.eye(covariance.shape[0]) * 1e-3
+    precision = np.linalg.pinv(covariance)
+
+    # Whiten once with the matrix square root, after which Mahalanobis is an
+    # ordinary squared Euclidean distance. That is what ships: the app does two
+    # matrix products instead of a 480x480 quadratic form per class.
+    eigenvalues, eigenvectors = np.linalg.eigh(precision)
+    eigenvalues = np.clip(eigenvalues, 0, None)
+    whitener = (eigenvectors @ np.diag(np.sqrt(eigenvalues)) @ eigenvectors.T)
+
+    def mahalanobis(batch: np.ndarray) -> np.ndarray:
+        whitenedBatch = batch @ whitener
+        whitenedMeans = classMeans @ whitener
+        squared = (
+            (whitenedBatch ** 2).sum(axis=1)[:, None]
+            - 2 * whitenedBatch @ whitenedMeans.T
+            + (whitenedMeans ** 2).sum(axis=1)[None, :])
+        return squared.min(axis=1)
+
+    # The threshold is the 95th percentile of the TRAINING distances, so about
+    # one in twenty proteins the model does know is flagged. Chosen from the
+    # cost of the two mistakes: a spurious warning costs a moment's doubt, and
+    # silently naming a family for a protein from outside the set is the
+    # failure the whole mechanism exists to prevent.
+    trainDistances = mahalanobis(splits["train"][0].astype(np.float64))
+    rejectionThreshold = float(np.quantile(trainDistances, 0.95))
+    testDistances = mahalanobis(splits["test"][0].astype(np.float64))
+    flaggedInDistribution = float((testDistances > rejectionThreshold).mean())
+    print(f"\n  Mahalanobis threshold {rejectionThreshold:.1f}; "
+          f"{flaggedInDistribution:.1%} of held-out in-distribution proteins flagged")
+    print("  measured detection of UNSEEN families at this rate: 0.805 +/- 0.017 "
+          "(openset_experiment.py)")
+
     MODELS.mkdir(parents=True, exist_ok=True)
+
+    # Binary, not JSON: the whitener is 480x480 and would be 230,400 numbers of
+    # decimal text. Float32 rather than float16 because the precision matrix has
+    # a wide dynamic range and this is the input to a squared distance, where a
+    # relative error is squared too.
+    with open(MODELS / "family_openset.bin", "wb") as handle:
+        handle.write(b"BOFOSET1")
+        handle.write(np.array(
+            [len(labels), EMBED_WIDTH], dtype=np.int32).tobytes())
+        handle.write(np.array([rejectionThreshold], dtype=np.float32).tobytes())
+        handle.write(whitener.astype(np.float32).tobytes())
+        handle.write(classMeans.astype(np.float32).tobytes())
+    print(f"  wrote family_openset.bin "
+          f"({(MODELS / 'family_openset.bin').stat().st_size / 1e6:.2f} MB)")
+
     np.save(MODELS / "family_centroids.npy", centroids)
     torch.save(head.state_dict(), MODELS / "family.pt")
     (MODELS / "family_labels.json").write_text(json.dumps({
@@ -254,6 +319,9 @@ def main() -> int:
         "embed_width": EMBED_WIDTH,
         "similarity_floor": similarityFloor,
         "closed_set": True,
+        "openset_threshold": rejectionThreshold,
+        "openset_auroc": 0.969,
+        "openset_detection_at_95": 0.805,
     }, indent=2) + "\n")
     print(f"\nwrote {(MODELS / 'family.pt').relative_to(ROOT)}")
     return 0

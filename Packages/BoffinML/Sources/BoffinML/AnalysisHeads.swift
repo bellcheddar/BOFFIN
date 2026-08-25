@@ -295,6 +295,7 @@ public actor AnalysisHeads {
     private let familyTop1: Double
     private let familyCentroids: [[Double]]
     private let familySimilarityFloor: Double
+    private let openSet: OpenSetModel?
     private var compiled: [URL: URL] = [:]
 
     private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "AnalysisHeads")
@@ -331,6 +332,11 @@ public actor AnalysisHeads {
         self.familyTop1 = metadata?.top1 ?? 0
         self.familyCentroids = metadata?.centroids ?? []
         self.familySimilarityFloor = metadata?.similarityFloor ?? 0
+        // Optional, like the classifier itself: without it the app falls back
+        // to the cosine, which was measured as the weaker score but is better
+        // than nothing and needs no extra asset.
+        self.openSet = OpenSetModel(
+            contentsOf: directory.appending(path: "family_openset.bin"))
         do {
             let data = try Data(contentsOf: directory.appending(path: "config.json"))
             self.configuration = try JSONDecoder().decode(HeadConfiguration.self, from: data)
@@ -686,6 +692,28 @@ public struct FamilyClassification: Sendable {
     /// How many families the classifier can answer with.
     public let familyCount: Int
 
+    /// Squared Mahalanobis distance to the nearest training family, when the
+    /// open-set asset is bundled.
+    public let openSetDistance: Double?
+
+    /// The distance above which a protein is called out of distribution.
+    public let openSetThreshold: Double?
+
+    /// The measured fraction of genuinely unseen families this catches.
+    ///
+    /// Carried alongside the verdict so the UI can state what the warning is
+    /// worth. A flag with no measured reliability invites a reader to treat its
+    /// silence as an all-clear, and here silence is wrong one time in five.
+    public let openSetDetectionRate: Double?
+
+    /// What the open-set flag is measured to catch, at the shipped threshold.
+    ///
+    /// From `Tools/heads/openset_experiment.py`, holding out whole families:
+    /// 0.805 +/- 0.017. Stated rather than rounded to "most", because one
+    /// unseen protein in five is still missed and a reader is entitled to know
+    /// that before trusting the absence of a warning.
+    static let openSetDetectionRate = 0.805
+
     /// Below this, the call is presented as uncertain rather than as an answer.
     ///
     /// The risk register names classifier over-confidence explicitly. The
@@ -713,9 +741,25 @@ public struct FamilyClassification: Sendable {
         if !isConfident {
             return "Low confidence. This is not a family assignment."
         }
-        return "The classifier chooses among \(familyCount) Pfam families and cannot "
+        // The closed-set caveat is shown even when everything looks fine, and
+        // this is the sentence that matters most.
+        //
+        // The open-set check catches about four unseen proteins in five, which
+        // means one in five reaches this branch wrongly: a confident call, no
+        // warning, and a family the protein does not belong to. A reader who
+        // takes the absence of a warning as an all-clear would be wrong that
+        // often, so the rate is stated rather than implied.
+        var text =
+            "The classifier chooses among \(familyCount) Pfam families and cannot "
             + "report one outside them, so treat a confident call as \"the closest of "
             + "those\" rather than as an exhaustive answer."
+        if let rate = openSetDetectionRate {
+            text +=
+                " A check for proteins from outside those families catches about "
+                + "\(Int((rate * 100).rounded()))% of them, so this is a weaker "
+                + "all-clear than it looks."
+        }
+        return text
     }
 }
 
@@ -808,12 +852,34 @@ extension AnalysisHeads {
             .prefix(5)
 
         let similarity = nearestFamilySimilarity(to: embedding.pooled)
+
+        // Open-set rejection.
+        //
+        // Mahalanobis distance in the embedding space, measured at AUROC 0.969
+        // against 0.850 for the centroid cosine this replaces. Not a
+        // replacement for saying the classifier is closed set: at the shipped
+        // threshold it catches about four unseen proteins in five, so one in
+        // five still gets a confident wrong family and the caveat stays.
+        let distance = openSet?.distance(from: embedding.pooled)
+        let outsideTrainingSet: Bool
+        if let distance, let openSet {
+            outsideTrainingSet = distance > openSet.threshold
+        } else {
+            // The old instrument, kept as the fallback rather than deleted:
+            // some build without the asset is better served by a weak signal
+            // than by none.
+            outsideTrainingSet = similarity < familySimilarityFloor
+        }
+
         return FamilyClassification(
             ranked: Array(ranked),
             isConfident: (ranked.first?.confidence ?? 0) >= FamilyClassification.confidenceFloor,
             top1Accuracy: familyTop1,
             similarityToNearestFamily: similarity,
-            isInDistribution: similarity >= familySimilarityFloor,
-            familyCount: families.count)
+            isInDistribution: !outsideTrainingSet,
+            familyCount: families.count,
+            openSetDistance: distance,
+            openSetThreshold: openSet?.threshold,
+            openSetDetectionRate: openSet == nil ? nil : FamilyClassification.openSetDetectionRate)
     }
 }

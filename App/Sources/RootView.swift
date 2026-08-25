@@ -11,6 +11,7 @@ import SwiftUI
 
 struct RootView: View {
     @State private var store = SequenceStore()
+    @State private var openError: String?
 
     var body: some View {
         TabView {
@@ -30,6 +31,29 @@ struct RootView: View {
                 StructureTabView(store: store)
             }
         }
+        // A FASTA shared from Mail, Files or AirDrop. The plist half of this is
+        // in Info.plist and is the half that is invisible when it is missing:
+        // without CFBundleDocumentTypes the share sheet never offers BOFFIN and
+        // this closure is never called, which reads as a bug in the handler.
+        .onOpenURL { url in
+            do {
+                let text = try OpenedDocument.read(url)
+                store.load(text: text, fileName: url.lastPathComponent)
+                openError = nil
+            } catch let failure as OpenedDocument.Failure {
+                openError = failure.message
+            } catch {
+                openError = String(describing: error)
+            }
+        }
+        .alert(
+            "Could not open that file", isPresented: openAlert,
+            actions: { Button("OK") { openError = nil } },
+            message: { Text(openError ?? "") })
+    }
+
+    private var openAlert: Binding<Bool> {
+        Binding(get: { openError != nil }, set: { if !$0 { openError = nil } })
     }
 }
 

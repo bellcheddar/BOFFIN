@@ -29,6 +29,70 @@
 	     core path may require the network. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Document types. A FASTA file shared from Mail, Files or a colleague has
+	     to open here, and that is a plist entry rather than code: without it the
+	     share sheet never offers BOFFIN and `onOpenURL` is never called, which
+	     looks exactly like a bug in the handler.
+
+	     `public.plain-text` is claimed as an ALTERNATE, not an owner: BOFFIN is
+	     not the right app for every text file on the device, and claiming
+	     ownership of plain text is how an app becomes the thing that opens your
+	     shopping list. -->
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>public.fasta</string>
+			<key>UTTypeDescription</key>
+			<string>FASTA sequence</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>fasta</string>
+					<string>fa</string>
+					<string>faa</string>
+					<string>fas</string>
+					<string>seq</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>FASTA sequence</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.fasta</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Plain text</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	</array>
+	<key>UISupportsDocumentBrowser</key>
+	<false/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

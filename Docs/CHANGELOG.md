@@ -1091,3 +1091,46 @@ before committing. The first drafted a shape list and did nothing with it. Both
 would have been features that appear to work.
 
 12 UI tests, 10 BoffinViewer tests.
+
+
+## Phase 10 (part): opening files and Shortcuts (2026-08-25)
+
+**A FASTA shared from Mail, Files or AirDrop opens here.** Two halves, and the
+plist one is invisible when it is missing: without `CFBundleDocumentTypes` the
+share sheet never offers BOFFIN and `onOpenURL` is never called, which reads as
+a bug in the handler that is actually a missing key.
+
+`public.plain-text` is claimed as an **alternate**, not an owner. BOFFIN is not
+the right app for every text file on the device, and claiming ownership of plain
+text is how an app becomes the thing that opens your shopping list.
+
+Security-scoped access is not optional: a file from another app's container is
+readable only between `startAccessingSecurityScopedResource` and its stop, and
+skipping it reads the file successfully in the simulator and returns nothing on a
+device.
+
+Decoding is **permissive**. A FASTA written on a Windows machine in 1998 is not
+valid UTF-8 and is still a sequence file; refusing it would be correct and
+useless. Binary is caught separately by a NUL in the first kilobyte, which FASTA
+never contains, so a `.bcif` dropped on the app says "that is not text" instead
+of producing a confusing diagnostic about residues.
+
+### Shortcuts
+
+Two intents, both running **without bringing the app forward**: an intent that
+opens a tab and waits for a view is not an intent, it is a launcher.
+
+**Only the analysis that needs no model is exposed.** A Shortcut that sometimes
+returns properties and sometimes fails because a 67 MB asset has not been
+downloaded is worse than one that never offered the option: automation is judged
+on whether it can be relied on, not on its best case.
+
+The pKa scale is a visible parameter with both options, for the same reason the
+app offers both, and the scale is printed beside the isoelectric point. A
+Shortcut's output gets pasted into things, and a pI with no scale beside it is a
+number nobody can reproduce.
+
+Finding no motifs returns a sentence rather than an empty string, because a
+Shortcut that returns "" reads as a failure.
+
+164 BoffinCore tests, 12 UI tests.

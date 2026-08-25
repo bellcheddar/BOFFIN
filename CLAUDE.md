@@ -11,8 +11,8 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3 and 5 to 8 substantially complete; **9 in progress** (clean-room profiler done; overlay, diagram and table outstanding)
-- **Last completed:** Phase 9's interaction profiler on 2026-08-25 (see `Docs/CHANGELOG.md`)
+- **Phase:** 3 and 5 to 9 substantially complete; **10 in progress** (document types and App Intents done; extensions need new Xcode targets)
+- **Last completed:** Phase 10's document opening and App Intents on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
 ### Mol* API findings

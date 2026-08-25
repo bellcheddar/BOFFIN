@@ -30,6 +30,8 @@
 		E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F6704AD6431E78767C846 /* StructureTabView.swift */; };
 		40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */; };
 		0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */; };
+		F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */; };
+		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +85,8 @@
 		063F6704AD6431E78767C846 /* StructureTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabView.swift; path = App/Sources/StructureTabView.swift; sourceTree = "<group>"; };
 		467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabUITests.swift; path = App/UITests/StructureTabUITests.swift; sourceTree = "<group>"; };
 		C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDeck.swift; path = App/Sources/SceneDeck.swift; sourceTree = "<group>"; };
+		DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenedDocument.swift; path = App/Sources/OpenedDocument.swift; sourceTree = "<group>"; };
+		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +184,8 @@
 			isa = PBXGroup;
 			children = (
 				F1F519F5A35151A9069277CE /* BoffinApp.swift */,
+				07AB5915B686A16BF428E028 /* BoffinIntents.swift */,
+				DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */,
 				C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */,
 				063F6704AD6431E78767C846 /* StructureTabView.swift */,
 				C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */,
@@ -373,6 +379,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */,
+				E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */,
+				F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */,
 				0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */,
 				E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */,
 				E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */,

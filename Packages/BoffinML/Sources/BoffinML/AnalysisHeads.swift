@@ -310,14 +310,29 @@ public actor AnalysisHeads {
             shape: [1, NSNumber(value: width), 1, NSNumber(value: window)],
             dataType: .float16)
 
+        // Index through the array's OWN strides, never `channel * window`.
+        //
+        // `MLMultiArray` is not densely packed: Core ML pads for alignment, and
+        // the closure below is handed the strides precisely because they cannot
+        // be assumed. This code used to compute the offset itself and ignore
+        // them, which is the same mistake that produced a completely convincing
+        // delta-LLR heatmap of garbage in Phase 4: channel 0 reads correctly
+        // because its offset is zero, and every channel after it is silently
+        // shifted.
         input.withUnsafeMutableBytes { raw, strides in
             guard let base = raw.baseAddress?.assumingMemoryBound(to: Float16.self) else { return }
+            let channelStride = strides.count > 1 ? strides[1] : window
+            let positionStride = strides.count > 3 ? strides[3] : 1
             // Zero first: anything past the real residues is padding, and stale
             // memory there would be read as a real embedding.
-            for index in 0..<(width * window) { base[index] = 0 }
+            for channel in 0..<width {
+                let row = channel * channelStride
+                for position in 0..<window { base[row + position * positionStride] = 0 }
+            }
             for (position, vector) in vectors.enumerated() {
+                let column = position * positionStride
                 for channel in 0..<min(width, vector.count) {
-                    base[channel * window + position] = Float16(vector[channel])
+                    base[channel * channelStride + column] = Float16(vector[channel])
                 }
             }
         }
@@ -330,12 +345,18 @@ public actor AnalysisHeads {
 
         var rows: [[Double]] = []
         rows.reserveCapacity(vectors.count)
+        // Same rule on the way out. The output is (1, classes, 1, window) and
+        // its row stride is whatever Core ML chose, not `window`.
+        let outputStrides = logits.strides.map(\.intValue)
+        let classStride = outputStrides.count > 1 ? outputStrides[1] : window
+        let positionStride = outputStrides.count > 3 ? outputStrides[3] : 1
         logits.withUnsafeBytes { raw in
             let base = raw.bindMemory(to: Float16.self)
             for position in 0..<vectors.count {
                 var row = [Double](repeating: 0, count: classes)
+                let column = position * positionStride
                 for klass in 0..<classes {
-                    row[klass] = Double(base[klass * window + position])
+                    row[klass] = Double(base[klass * classStride + column])
                 }
                 rows.append(row)
             }

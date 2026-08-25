@@ -179,7 +179,7 @@ final class SequenceStore {
         modelState = .running
         do {
             let engine = try EmbeddingEngine(
-                modelURL: bundle.appending(path: "esm2_t12_35M_UR50D.mlpackage"),
+                modelURL: bundle.appending(path: Self.backboneName),
                 tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
             let embedding = try await engine.embed(sequence)
 
@@ -297,7 +297,21 @@ final class SequenceStore {
     /// Falls back to the repository's `Models/` folder during development,
     /// because the 67 MB backbone is a build artefact and is not committed.
     private static var modelDirectory: URL? {
-        if let bundled = Bundle.main.url(forResource: "Models", withExtension: nil) {
+        // Check for the BACKBONE, not for the folder.
+        //
+        // `Models/` exists in a clean checkout because the heads' JSON metadata
+        // is committed; the 67 MB `.mlpackage` is not. Testing the directory
+        // therefore reported the models as present on CI, the engine then failed
+        // to load with a Core ML error, and the app showed that error instead of
+        // "models are not bundled". The UI test was looking for the second and
+        // saw neither a heatmap nor the explanation it expected.
+        func hasBackbone(_ directory: URL) -> Bool {
+            FileManager.default.fileExists(
+                atPath: directory.appending(path: backboneName).path)
+        }
+        if let bundled = Bundle.main.url(forResource: "Models", withExtension: nil),
+            hasBackbone(bundled)
+        {
             return bundled
         }
         #if DEBUG
@@ -306,10 +320,14 @@ final class SequenceStore {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appending(path: "Models")
-        if FileManager.default.fileExists(atPath: development.path) { return development }
+        if hasBackbone(development) { return development }
         #endif
         return nil
     }
+
+    /// The converted backbone's package name, in one place because three call
+    /// sites need to agree about it.
+    private static let backboneName = "esm2_t12_35M_UR50D.mlpackage"
 
     /// Score substitutions across the sequence.
     ///
@@ -345,7 +363,7 @@ final class SequenceStore {
         scanTask = Task { @MainActor in
             do {
                 let engine = try EmbeddingEngine(
-                    modelURL: bundle.appending(path: "esm2_t12_35M_UR50D.mlpackage"),
+                    modelURL: bundle.appending(path: Self.backboneName),
                     tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
 
                 let matrix = try await engine.maskedMarginals(

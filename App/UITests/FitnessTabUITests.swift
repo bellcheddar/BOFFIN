@@ -35,15 +35,20 @@ final class FitnessTabUITests: XCTestCase {
         // what turned a missing artefact into four red CI runs.
         let heatmap = app.descendants(matching: .any)
             .matching(identifier: "boffin.llr-heatmap").firstMatch
+        // Either explanation counts. The app can be missing the model entirely
+        // (a clean checkout) or fail to load one that is present, and both are
+        // the app saying why rather than doing nothing.
         let missing = app.descendants(matching: .any)
             .matching(identifier: "boffin.models-missing").firstMatch
+        let failed = app.descendants(matching: .any)
+            .matching(identifier: "boffin.scan-failed").firstMatch
 
         let deadline = Date().addingTimeInterval(60)
-        while Date() < deadline, !heatmap.exists, !missing.exists {
+        while Date() < deadline, !heatmap.exists, !missing.exists, !failed.exists {
             usleep(200_000)
         }
 
-        if missing.exists {
+        if missing.exists || failed.exists {
             XCTAssertFalse(
                 heatmap.exists,
                 "the app both reported the models as missing and drew a heatmap")

@@ -35,6 +35,11 @@ struct StructureTabView: View {
     @State private var isExporting = false
     @State private var wantsTransparentBackground = true
     @State private var overlayError: UserFacingError?
+    @State private var isBuildingSelection = false
+    /// The selection expression, kept as text because that is what travels
+    /// into a `.pml` file and opens on a desktop.
+    @State private var selectionExpression = ""
+    @State private var selectionMatch: Int?
 
     var body: some View {
         NavigationStack {
@@ -289,6 +294,8 @@ struct StructureTabView: View {
     @ViewBuilder
     private func interactionControls(_ model: StructureViewerModel) -> some View {
         if case .loaded = model.state {
+            selectionPanel
+
             figureExport(model)
 
             VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -464,6 +471,61 @@ struct StructureTabView: View {
         } catch {
             overlayError = UserFacingError(error, whileDoing: "drawing the interactions")
         }
+    }
+
+    // MARK: - Selection
+
+    /// The selection expression, and a way to build one without typing it.
+    @ViewBuilder
+    private var selectionPanel: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            HStack {
+                Text("Selection").font(.headline)
+                Spacer()
+                Button("Build", systemImage: "hand.tap") { isBuildingSelection = true }
+                    .font(.caption2)
+                    .disabled(loadedViewerStore == nil)
+                    .accessibilityIdentifier("boffin.selection.build")
+            }
+
+            if selectionExpression.isEmpty {
+                Text(
+                    "`byres (polymer within 5 of organic)` is a fine thing to type on a "
+                        + "keyboard and a miserable thing to type on a phone. Build one "
+                        + "by tapping instead."
+                )
+                .font(.caption2).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text(selectionExpression)
+                    .sequenceFont(size: 11)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("boffin.selection.current")
+                if let selectionMatch {
+                    Text("\(selectionMatch.formatted()) atoms")
+                        .font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Brand.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
+        .sheet(isPresented: $isBuildingSelection) {
+            if let atoms = loadedViewerStore {
+                SelectionBuilderView(atoms: atoms, expression: $selectionExpression)
+                    .onDisappear { recountSelection(in: atoms) }
+            }
+        }
+    }
+
+    private func recountSelection(in atoms: AtomStore) {
+        let trimmed = selectionExpression.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let parsed = try? SelectionParser.parse(trimmed) else {
+            selectionMatch = nil
+            return
+        }
+        selectionMatch = SelectionEvaluator.evaluate(parsed, in: atoms).indices.count
     }
 
     // MARK: - Figure export

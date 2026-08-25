@@ -1564,3 +1564,45 @@ never have noticed. The expectation is now formatted the same way rather than
 hardcoded.
 
 BoffinViewer 17 tests, 20 UI tests.
+
+---
+
+## Phase 8 (part): the touch selection builder (2026-08-25)
+
+`byres (polymer within 5 of organic)` is a fine thing to type on a keyboard and
+a miserable thing to type on a phone, where the brackets and the underscore
+live two modifier taps away. That is a barrier to the feature rather than a
+cosmetic complaint: a selection nobody can be bothered to type is a selection
+nobody makes, and the selection language is how every other viewer feature is
+aimed.
+
+**The builder writes the language; it does not replace it.** Every tap edits
+the same expression string the user could have typed. The string is shown, it
+stays editable, and it is evaluated by the same parser as everything else. Two
+consequences, both deliberate:
+
+- It cannot express anything the language cannot, so there is no second
+  selection system to disagree with the first. A visual builder with its own
+  internal model is how two selection systems end up giving different answers
+  to what the user believes is one question.
+- The expression still travels into a `.pml` file and opens on a desktop, which
+  is the entire reason for adopting PyMOL's syntax rather than inventing one.
+
+Terms join with `and` rather than `or`, because tapping two things reads as
+narrowing: someone who taps "organic" and then "chain A" means the ligand in
+chain A. The expression is visible and editable, so the other reading is one
+character away.
+
+**The count is live, and zero is called out.** An expression that parses and
+matches nothing is the failure that looks most like success: it is grammatical,
+it raises no error, and it puts an empty overlay or a blank figure in front of
+someone. It gets a warning rather than a number among numbers.
+
+**Parser errors now name the offending text.** `SelectionError.message` lives
+with the grammar rather than in the view, because a view that switches over the
+cases itself becomes a second and slowly diverging account of what the parser
+accepts. Positions are reported from one: the parser counts from zero, and a
+person reading "position 0" of their own typing has to translate, which is how
+the wrong character gets deleted.
+
+BoffinStructure 90 tests, 21 UI tests.

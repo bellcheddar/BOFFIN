@@ -29,6 +29,34 @@ public enum SelectionError: Error, Sendable, Equatable {
     case badNumber(String)
     case unclosedParenthesis
     case trailing(String)
+
+    /// The failure, phrased for the person who typed it.
+    ///
+    /// Lives here rather than in the view, because every one of these messages
+    /// is a statement about the grammar and the grammar is defined here. A view
+    /// that switches over the cases itself is a second, slowly diverging
+    /// account of what the parser accepts.
+    ///
+    /// Each names the offending text. An unknown keyword that says only
+    /// "invalid selection" leaves the reader comparing their expression against
+    /// a syntax they do not have, which is how an over-broad selection ends up
+    /// accepted instead of fixed.
+    public var message: String {
+        switch self {
+        case .unexpectedEnd(let expected):
+            "The expression ends too early: \(expected) was expected."
+        case .unexpected(let token, let position):
+            "\"\(token)\" does not belong at position \(position + 1)."
+        case .unknownKeyword(let keyword):
+            "\"\(keyword)\" is not a selection keyword."
+        case .badNumber(let text):
+            "\"\(text)\" is not a number."
+        case .unclosedParenthesis:
+            "A bracket is opened and never closed."
+        case .trailing(let text):
+            "\"\(text)\" is left over at the end."
+        }
+    }
 }
 
 /// The parsed form of a selection.

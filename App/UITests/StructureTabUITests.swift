@@ -407,3 +407,61 @@ extension StructureTabUITests {
             "both structures are present at once")
     }
 }
+
+extension StructureTabUITests {
+
+    /// Phase 8: the selection language is optional.
+    ///
+    /// The builder writes the SAME expression a user could type, rather than
+    /// maintaining a parallel model of what is selected. So this test asserts
+    /// on the expression text and on the live count, which together prove the
+    /// two halves that matter: the taps produce valid syntax, and that syntax
+    /// matches something real in the loaded structure.
+    ///
+    /// The count is the half that would otherwise rot silently. A builder that
+    /// composes a perfectly grammatical expression matching nothing at all is
+    /// the failure that looks most like success, and it is what puts an empty
+    /// figure in front of someone.
+    func testSelectionBuilderComposesAWorkingExpression() throws {
+        let app = XCUIApplication()
+        app.launchSkippingOnboarding()
+        app.openTab("Structure")
+
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
+        load.tap()
+        XCTAssertTrue(
+            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(timeout: 60),
+            "the structure never loaded")
+
+        let build = app.buttons["boffin.selection.build"]
+        XCTAssertTrue(build.waitForExistence(timeout: 20), "no selection builder control")
+        build.tap()
+
+        // Tap a category. Ubiquitin is all polymer, so this must match a lot.
+        let polymer = app.buttons["boffin.selection.token.polymer"]
+        XCTAssertTrue(polymer.waitForExistence(timeout: 20), "the builder offered no categories")
+        polymer.tap()
+
+        let count = app.staticTexts["boffin.selection.count"]
+        XCTAssertTrue(count.waitForExistence(timeout: 10), "no live count")
+        XCTAssertTrue(
+            count.label.contains("atoms"),
+            "the builder composed something that does not match atoms: \(count.label)")
+        XCTAssertFalse(
+            count.label.lowercased().contains("matches nothing"),
+            "`polymer` matched nothing in ubiquitin, which is all polymer")
+
+        // Now wrap it, which is the part that is genuinely painful to type.
+        let byres = app.buttons["boffin.selection.byres"]
+        XCTAssertTrue(byres.exists, "no byres control")
+        byres.tap()
+
+        XCTAssertFalse(
+            count.label.lowercased().contains("not a selection keyword"),
+            "wrapping produced invalid syntax: \(count.label)")
+        XCTAssertTrue(
+            count.label.contains("atoms"),
+            "the wrapped expression stopped matching: \(count.label)")
+    }
+}

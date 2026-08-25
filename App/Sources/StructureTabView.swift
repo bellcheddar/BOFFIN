@@ -24,6 +24,10 @@ struct StructureTabView: View {
     @State private var identifier: String = ""
     @State private var profile: InteractionProfile?
     @State private var loadedStore: AtomStore?
+    /// The structure currently shown, parsed by BOFFIN rather than by the
+    /// viewer, so geometry questions are answered from our own read of the
+    /// bytes.
+    @State private var loadedViewerStore: AtomStore?
     @State private var deck = SceneDeckModel()
 
     var body: some View {
@@ -127,6 +131,7 @@ struct StructureTabView: View {
 
             assemblyControls(model)
             interactionControls(model)
+            agreementSection
             SceneDeckView(model: deck, viewer: model)
             trackPainting(model)
             if let selection = model.selection { inspector(selection) }
@@ -190,6 +195,80 @@ struct StructureTabView: View {
             .buttonStyle(.bordered).font(.caption2)
             .disabled(identifier.count < 6)
         }
+    }
+
+    /// The model's prediction against the structure's own geometry.
+    ///
+    /// This is the check the app can make that no benchmark can: the secondary
+    /// structure head predicts from sequence alone, and the loaded structure
+    /// says what the backbone actually does. Agreement is not a score for the
+    /// head, it is a statement about THIS protein, which is what a user wants
+    /// when deciding whether to trust a track.
+    @ViewBuilder
+    private var agreementSection: some View {
+        if let comparison = structureAgreement {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Prediction against geometry").font(.caption.weight(.semibold))
+                Text(
+                    String(
+                        format:
+                            "The secondary structure head agrees with the structure at "
+                            + "%.0f%% of %d residues (three state).",
+                        comparison.agreement * 100, comparison.compared)
+                )
+                .font(.caption2).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("boffin.structure-agreement")
+
+                Text(
+                    "Assignment is computed from the coordinates by BOFFIN's own "
+                        + "implementation of Kabsch and Sander, not read from the "
+                        + "entry. Residues are matched by position, which holds for "
+                        + "the bundled fixture and needs the alignment in general."
+                )
+                .font(.system(size: 9)).foregroundStyle(.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(Spacing.s)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+        }
+    }
+
+    /// Compare the head's three-state call with the structure's assignment.
+    private var structureAgreement: (agreement: Double, compared: Int)? {
+        guard let store = viewerStore,
+            let predictions = store.0 as AtomStore?,
+            let predicted = self.store.predictions?.secondaryStructure,
+            !predicted.isEmpty
+        else { return nil }
+        let assigned = SecondaryStructureAssigner.assign(predictions, chain: store.1)
+        guard !assigned.isEmpty else { return nil }
+
+        var compared = 0
+        var agreed = 0
+        for index in 0..<min(assigned.count, predicted.count) {
+            let structural = assigned[index].threeState
+            guard structural != "-" else { continue }
+            let model: Character
+            switch predicted[index] {
+            case .alphaHelix, .threeTenHelix, .piHelix: model = "H"
+            case .betaStrand, .betaBridge: model = "E"
+            default: model = "C"
+            }
+            compared += 1
+            if model == structural { agreed += 1 }
+        }
+        guard compared > 0 else { return nil }
+        return (Double(agreed) / Double(compared), compared)
+    }
+
+    /// The structure currently in the viewer, and the chain to compare.
+    private var viewerStore: (AtomStore, String)? {
+        guard let store = loadedViewerStore, let chain = store.chains.first else {
+            return nil
+        }
+        return (store, chain)
     }
 
     /// Interaction profiling for the loaded structure.
@@ -302,6 +381,7 @@ struct StructureTabView: View {
         else { return }
         await model.load(data, format: .binaryCIF, source: .bundled("1hck.bcif"))
         loadedStore = store
+        loadedViewerStore = store
         let ligand = SelectionEvaluator.evaluate(.category(.organic), in: store).indices
         profile = InteractionProfiler.profile(store, ligand: ligand)
     }
@@ -454,6 +534,7 @@ struct StructureTabView: View {
             let data = try? Data(contentsOf: url)
         else { return }
         await model.load(data, format: .binaryCIF, source: .bundled("1ubq.bcif"))
+        loadedViewerStore = (try? BinaryCIF.decode(data)).flatMap { try? AtomStore.from($0) }
     }
 
     /// Map a track onto author numbering and send it.

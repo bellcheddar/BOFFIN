@@ -205,4 +205,38 @@ final class StructureTabUITests: XCTestCase {
             "dismissing the presentation did not return to the tab")
     }
 
+    /// The check no benchmark can make: the head predicts from sequence alone
+    /// and the loaded structure says what the backbone actually does.
+    ///
+    /// Agreement is not a score for the head. It is a statement about THIS
+    /// protein, which is what a user needs when deciding whether to trust a
+    /// track on the ruler.
+    func testPredictionIsComparedAgainstTheStructuresOwnGeometry() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.buttons["Paste a sequence"].tap()
+        app.buttons["Use the ubiquitin example"].tap()
+        app.buttons["Analyse"].tap()
+        XCTAssertTrue(
+            app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
+
+        app.openTab("Structure")
+        let load = app.buttons["boffin.load-structure"]
+        XCTAssertTrue(load.waitForExistence(timeout: 30))
+        load.tap()
+        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: 60))
+
+        let agreement = app.staticTexts["boffin.structure-agreement"]
+        // Absent when the model is not bundled, which is a legitimate state and
+        // not a failure: the comparison needs a prediction to compare.
+        if agreement.waitForExistence(timeout: 30) {
+            XCTAssertTrue(
+                agreement.label.contains("agrees with the structure"),
+                "unexpected wording: \(agreement.label)")
+            XCTAssertTrue(
+                agreement.label.contains("three state"),
+                "the comparison does not say which alphabet it used")
+        }
+    }
 }

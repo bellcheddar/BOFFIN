@@ -102,6 +102,33 @@ analysis of large biomolecular structures*, Nucleic Acids Res 49:W431 (2021).
 
 ---
 
+## Decision on unstated terms, 2026-08-25
+
+**Marc's call: datasets that state no terms are used, for non-commercial research
+purposes.** That covers SIFTS and the DTU distributions of CB513, TS115 and
+CASP12. They are no longer treated as release blockers.
+
+The factual position, stated once so it is on the record rather than assumed:
+silence is not a permissive licence. Absent a grant, copyright defaults to all
+rights reserved, so this is a risk position rather than a permission. Every one
+of these sources is a public academic resource distributed for research, which is
+the low-risk end of that, and non-commercial use is the narrowest reading of it.
+
+Two things follow, and both are already true of the code:
+
+* **Attribution regardless.** Every source is cited here and surfaced in the
+  in-app Acknowledgements screen whether or not a licence requires it.
+* **The licence-clear alternatives are kept**, because they turned out to be
+  better engineering rather than merely safer. `EntryNumbering` reads numbering
+  from the entry itself, and `SecondaryStructureAssigner` computes DSSP from
+  coordinates, which means the app can answer geometry questions about a
+  structure a user supplies and not only about one somebody has pre-labelled.
+
+**Revisit this before any commercial release**, which is a different decision
+with a different risk profile.
+
+---
+
 ## To verify before the phase that first uses them
 
 | Source | Expected terms | First needed | Status |

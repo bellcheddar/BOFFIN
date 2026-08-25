@@ -15,6 +15,18 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 - **Last completed:** Phase 10's document opening and App Intents on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
+### Licence position, decided 2026-08-25
+
+**Marc's call: datasets stating no terms are used for non-commercial research.**
+SIFTS and the DTU sets are not release blockers. Silence is not a permissive
+licence and this is a risk position rather than a permission, which is recorded
+in `Docs/ATTRIBUTIONS.md`; revisit before any commercial release. Attribute
+everything regardless.
+
+The licence-clear alternatives were kept because they are better engineering,
+not because they were required: reading numbering from the entry lets BOFFIN
+answer questions about a structure a user supplies, and so does computing DSSP.
+
 ### Licence findings
 
 - **You cannot launder a licence through a supplier.** RCSB is CC0 and

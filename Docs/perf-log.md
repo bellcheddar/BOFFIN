@@ -486,3 +486,77 @@ Eight-state is the exception: `_struct_conf` gives three, and Q8 needs DSSP over
 the coordinates. `SecondaryStructureAssigner` now computes that, so the labels
 can be produced, but running it across five thousand entries needs the assigner
 in the label pipeline rather than in the app, and that has not been done.
+
+## Open-set rejection for the family classifier (2026-08-25)
+
+### The question
+
+The classifier is closed set: it knows 100 families and must answer with one of
+them, so a protein from a family it never saw is assigned the nearest one,
+confidently. The project's stated position was that no threshold catches this,
+based on ubiquitin (PF00240, not in the set) being called PF00076 at 79.7% while
+distance to the nearest class centroid failed to separate it from a correctly
+classified kinase.
+
+**That was one protein.** Two proteins are an anecdote. This is the experiment.
+
+### Method
+
+Hold out whole **families**, not sequences: 20 of the 100, five random splits.
+Train on the remaining 80, then ask of every held-out sequence whether a score
+would have rejected it, and of every in-distribution test sequence whether the
+same score would have wrongly rejected it.
+
+Holding out whole families is the entire point. A sequence-level split leaves
+each held-out sequence's family in the training set, so the model has seen its
+fold, its motifs and its neighbours, and "unknown" would mean nothing. Roughly
+1,000 known and 1,500 unknown sequences per split.
+
+### Results, mean AUROC over five splits (0.5 is chance)
+
+| Score | AUROC |
+|---|---|
+| **Mahalanobis distance** to the nearest class, shared covariance | **0.969 ± 0.005** |
+| Maximum softmax probability | 0.945 ± 0.014 |
+| Maximum logit | 0.896 ± 0.024 |
+| Energy, -logsumexp(logits) | 0.893 ± 0.025 |
+| Cosine to the nearest class centroid | 0.850 ± 0.016 |
+
+### What it changes
+
+**The centroid cosine really was the wrong instrument**, and it was the one
+tried: at 0.850 it is the weakest of the five. That earlier conclusion was right
+about the method and wrong to generalise from it to the question.
+
+**A rejection mechanism does exist.** Mahalanobis distance in the embedding
+space separates unseen families from seen ones at 0.969, and it is far the most
+*stable* across splits (± 0.005 against ± 0.014 to ± 0.031), which matters more
+than the mean: a score whose usefulness depends on which families happen to be
+missing is not one to ship a threshold on.
+
+**Max softmax is better than the anecdote suggested**, at 0.945. Ubiquitin is
+evidently a hard case rather than a representative one. Worth recording,
+because the project has been telling users that confidence cannot detect this,
+and on average over 1,500 unseen proteins it partly can.
+
+### The operating point, which is what a threshold needs
+
+AUROC says a score *ranks* unknowns above knowns. It does not say a usable
+threshold exists. Holding the false-rejection rate on in-distribution proteins
+at 5%:
+
+| Score | Unseen families caught |
+|---|---|
+| Mahalanobis | **0.805 ± 0.017** |
+| Max softmax | 0.761 ± 0.061 |
+
+5% is chosen from the cost of the two mistakes: wrongly warning about a protein
+the model does know costs a moment's doubt, while silently naming a family for a
+protein from outside the set is the failure this exists to prevent.
+
+### The honest limit
+
+**One unseen protein in five is still missed.** A warning at this threshold is
+an improvement, not a solution, and the on-screen statement that the classifier
+is closed set has to stay exactly as it is. What changes is that four out of
+five such proteins can now be flagged, instead of none.

@@ -244,7 +244,13 @@ public enum SecondaryStructureAssigner {
                 name: String
             )] = [:]
         var order: [Int] = []
-        for index in 0..<store.count {
+        // One conformation only. Assigning with `=` as the file is walked makes
+        // the LAST altloc win, and file order is altloc code order, which has
+        // no relationship to occupancy: on PETase that took the minor conformer
+        // for most of the 25 residues that have one. It also allowed a backbone
+        // to be assembled from atoms of DIFFERENT conformers, which is a
+        // geometry that exists in neither molecule.
+        for index in store.primaryConformationIndices() {
             guard store.chainID[index] == chain, !store.isHeteroatom[index] else { continue }
             let number = store.authorNumber[index]
             if byResidue[number] == nil {

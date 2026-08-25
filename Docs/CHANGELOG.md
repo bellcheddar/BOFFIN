@@ -1447,3 +1447,61 @@ Still open in Phase 7: symmetry mates and altloc selection. Surfaces already
 shipped as a representation.
 
 BoffinViewer 13 tests, 18 UI tests.
+
+---
+
+## Alternate conformations, resolved on purpose (2026-08-25)
+
+A residue refined in two or three conformations is written as two or three
+copies of its atoms, each with an altloc code and a partial occupancy summing
+to about one. They are alternative models of ONE residue, not several
+residues, and every analysis that walks the atom list has to decide which copy
+it means.
+
+**One of them was deciding by accident.** `SecondaryStructureAssigner.backbones`
+assigned each backbone atom with `=` as it walked the file, so the LAST copy in
+file order won. File order is altloc code order, which has no relationship to
+occupancy.
+
+Measured on PETase, which turns out to be the fixture that carries this: 709 of
+its 4,596 atoms have an altloc and **25 residues have alternate CA positions**.
+The last-wins rule took the minor conformer in most of them:
+
+| Residue | Occupancies | Last-wins picked |
+|---|---|---|
+| 53 | A 0.35, B 0.35, C 0.29 | C, the least occupied of three |
+| 59 | A 0.56, B 0.44 | B |
+| 92 | A 0.58, B 0.42 | B |
+| 94 | A 0.52, B 0.48 | B |
+| 95 | A 0.58, B 0.42 | B |
+
+**Worse in principle than in that measurement.** Nothing stopped the N coming
+from conformer A and the CA from conformer B. Those are two different
+molecules, and a peptide assembled from both has bond lengths and angles that
+exist in neither. Only CA alternates in this particular file, so the mixing was
+possible rather than realised, which is not a reason to leave it.
+
+**One rule now, shared.** `AtomStore.primaryConformationIndices()`: highest
+occupancy wins, ties go to the alphabetically first altloc code. The tie-break
+is not cosmetic, since residue 53 has two copies at 0.35 and a tie that
+resolves differently between runs means two exports of one structure disagree,
+which is worse than either answer. Atoms with no altloc are always kept.
+
+The interaction profiler gets the same narrowing on both sides, protein and
+ligand. Counting a doubled side chain twice reports two contacts where the
+crystallographer modelled one residue that could not decide, and the inflation
+is silent and lands in a figure and a CSV.
+
+**`alt` is now a selection keyword.** `alt A` selects one conformation and
+`alt ''` selects the atoms with no altloc at all, which is the more common
+question and had no expression before. Codes are NOT uppercased the way `resn`
+and `elem` are, because altloc codes are case sensitive and a file may use `a`
+and `A` for different conformations.
+
+**A second finding, in the fixtures themselves.** `Fixtures/MANIFEST.md`
+credited 1E8A with exercising alternate locations. It has none: zero atoms with
+an altloc. Anything written against that fixture would have passed vacuously
+while testing nothing, which is the failure mode a golden fixture set exists to
+prevent. The manifest now records where altlocs actually live.
+
+BoffinStructure 87 tests.

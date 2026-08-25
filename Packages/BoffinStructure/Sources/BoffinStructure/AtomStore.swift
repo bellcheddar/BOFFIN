@@ -177,3 +177,81 @@ extension AtomStore {
         model.reserveCapacity(capacity)
     }
 }
+
+// MARK: - Alternate conformations
+
+extension AtomStore {
+
+    /// The atoms belonging to the conformation that should be analysed.
+    ///
+    /// A residue refined in two or three conformations is written as two or
+    /// three copies of its atoms, each with an altloc code and a partial
+    /// occupancy summing to about one. They are alternative models of ONE
+    /// residue, not several residues, and every analysis that walks the atom
+    /// list has to decide which copy it means.
+    ///
+    /// Deciding it by accident is the failure this exists to prevent, and it
+    /// was a live one. `SecondaryStructureAssigner.backbones` assigned each
+    /// backbone atom with `=` as it walked the file, so the LAST copy in file
+    /// order won. File order is altloc code order, which has no relationship to
+    /// occupancy: measured on PETase, 25 residues carry alternate CA positions
+    /// and the last-wins rule takes the MINOR conformer in most of them,
+    /// including residue 53, where it picks the 0.29-occupancy copy over two
+    /// at 0.35.
+    ///
+    /// Worse in principle than in that measurement: nothing stopped the N
+    /// coming from conformer A and the CA from conformer B. Those are two
+    /// different molecules, and a peptide assembled from both has bond lengths
+    /// and angles that exist in neither.
+    ///
+    /// The rule here is the conventional one: highest occupancy wins, and ties
+    /// go to the alphabetically first altloc code, which is deterministic and
+    /// matches what the depositor wrote first. Atoms with no altloc are always
+    /// kept, since they are not alternatives to anything.
+    ///
+    /// - Returns: indices into this store, in their original order.
+    public func primaryConformationIndices() -> [Int] {
+        // Fast path: most structures have no alternate conformations at all,
+        // and building a dictionary for them is pure cost.
+        guard altLoc.contains(where: { !$0.isEmpty }) else {
+            return Array(0..<count)
+        }
+
+        struct Key: Hashable {
+            let model: Int
+            let chain: String
+            let number: Int
+            let atom: String
+        }
+
+        var chosen: [Key: Int] = [:]
+        for index in 0..<count where !altLoc[index].isEmpty {
+            let key = Key(
+                model: model[index], chain: chainID[index],
+                number: authorNumber[index], atom: atomName[index])
+            guard let incumbent = chosen[key] else {
+                chosen[key] = index
+                continue
+            }
+            if occupancy[index] > occupancy[incumbent] {
+                chosen[key] = index
+            } else if occupancy[index] == occupancy[incumbent],
+                altLoc[index] < altLoc[incumbent]
+            {
+                chosen[key] = index
+            }
+        }
+
+        let keep = Set(chosen.values)
+        return (0..<count).filter { altLoc[$0].isEmpty || keep.contains($0) }
+    }
+
+    /// Whether this structure models any residue in more than one conformation.
+    ///
+    /// Worth surfacing rather than silently handling: a user looking at a
+    /// disordered side chain should know the picture shows one of several
+    /// refined possibilities.
+    public var hasAlternateConformations: Bool {
+        altLoc.contains { !$0.isEmpty }
+    }
+}

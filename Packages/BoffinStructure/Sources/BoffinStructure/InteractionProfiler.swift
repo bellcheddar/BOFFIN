@@ -162,15 +162,29 @@ public enum InteractionProfiler {
             return InteractionProfile(interactions: [], assumptions: assumptions)
         }
 
+        // One conformation only, on both sides. A side chain refined in two
+        // positions is one side chain, and counting both reports two contacts
+        // where the crystallographer modelled one residue that cannot decide.
+        // The inflation is silent and lands in a figure and a CSV.
+        let conformation = Set(store.primaryConformationIndices())
+        // The ligand comes in from a caller's selection, which was evaluated
+        // over the whole store, so it needs the same narrowing: a ligand
+        // modelled in two orientations would otherwise contact everything
+        // twice.
+        let ligand = ligand.intersection(conformation)
+        guard !ligand.isEmpty else {
+            return InteractionProfile(interactions: [], assumptions: assumptions)
+        }
+
         let protein = Set(
-            (0..<store.count).filter {
+            conformation.filter {
                 !ligand.contains($0)
                     && SelectionEvaluator.polymerResidues.contains(
                         store.residueName[$0].uppercased())
                     && store.element[$0].uppercased() != "H"
             })
         let metals = Set(
-            (0..<store.count).filter {
+            conformation.filter {
                 SelectionEvaluator.metalResidues.contains(store.residueName[$0].uppercased())
             })
 

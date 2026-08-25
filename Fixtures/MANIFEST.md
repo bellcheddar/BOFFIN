@@ -17,10 +17,10 @@ app's own offline rule.
 | `structures/1ubq.bcif` | 1UBQ, ubiquitin | Baseline and fast path: small, well behaved, mixed alpha/beta |
 | `structures/1hck.bcif` | 1HCK, human CDK2 with ATP and Mg | KLIFS numbering, motif detection, interaction profiling |
 | `structures/2rh1.bcif` | 2RH1, beta-2 adrenergic receptor with carazolol | GPCRdb generic numbering, TM span prediction |
-| `structures/6eqe.bcif` | 6EQE, *Piscinibacter sakaiensis* PETase | Catalytic triad annotation |
+| `structures/6eqe.bcif` | 6EQE, *Piscinibacter sakaiensis* PETase | Catalytic triad annotation, disulfide detection, **alternate conformations** (709 of 4,596 atoms carry an altloc; 25 residues have alternate CA positions) |
 | `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal, multi-model ensemble |
 | `structures/7k00.bcif` | 7K00, *E. coli* 70S ribosome | Viewer performance guardrail (large assembly) |
-| `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues, alternate locations |
+| `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues. **Not** alternate locations: this row claimed them and the file has none, which was found on 2026-08-25 when the altloc handling was written against it and every test passed vacuously. PETase is the fixture that actually carries them |
 
 ## Sequences
 

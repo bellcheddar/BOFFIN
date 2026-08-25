@@ -83,6 +83,9 @@ public enum SelectionEvaluator {
         case .elements(let symbols):
             let wanted = Set(symbols)
             return filter(store) { wanted.contains(store.element[$0].uppercased()) }
+        case .alternateLocations(let codes):
+            let wanted = Set(codes)
+            return filter(store) { wanted.contains(store.altLoc[$0]) }
         case .category(let category):
             return categoryIndices(category, store)
         case .numericProperty(let property, let comparison, let value):

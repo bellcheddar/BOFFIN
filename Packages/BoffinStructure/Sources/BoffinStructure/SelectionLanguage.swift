@@ -45,6 +45,12 @@ public indirect enum Selection: Sendable, Hashable {
     case atomNames([String])
     /// `elem C+N`
     case elements([String])
+    /// `alt A+B`: atoms carrying one of these alternate location codes.
+    ///
+    /// `alt ''` selects atoms with NO altloc, which is the majority of any
+    /// structure and is the form PyMOL uses. Without it there would be no way
+    /// to express "the unambiguous part", which is the more common question.
+    case alternateLocations([String])
     /// `polymer`, `organic`, `solvent`, `hydro`, `backbone`, `sidechain`
     case category(Category)
     /// `b > 50`, `q < 0.5`
@@ -314,6 +320,11 @@ public enum SelectionParser {
                     return .atomNames(try list().map { $0.uppercased() })
                 case "elem", "element", "e.":
                     return .elements(try list().map { $0.uppercased() })
+                case "alt":
+                    // Not uppercased. Altloc codes are case sensitive in the
+                    // PDB format, and a file may legitimately use both 'a' and
+                    // 'A' for different conformations.
+                    return .alternateLocations(try list().map { $0 == "''" ? "" : $0 })
                 case "resi", "resid", "i.":
                     return .residueNumbers(try ranges())
                 default:

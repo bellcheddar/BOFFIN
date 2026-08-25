@@ -4,7 +4,7 @@ Constant tables in `BoffinCore` are generated, not transcribed. Regenerate
 with `python3 Tools/data/generate_amino_acid_tables.py` and commit the
 result together with this manifest.
 
-Last generated: **2026-08-24**
+Last generated: **2026-08-25**
 
 | Source | URL | SHA-256 |
 |---|---|---|
@@ -12,6 +12,7 @@ Last generated: **2026-08-24**
 | `ProtParamData.py` | <https://raw.githubusercontent.com/biopython/biopython/master/Bio/SeqUtils/ProtParamData.py> | `488a4c336556c5e6aa41e9208cd4a9390d7a29d3d83e2c8be1f0cb518c718947` |
 | `IsoelectricPoint.py` | <https://raw.githubusercontent.com/biopython/biopython/master/Bio/SeqUtils/IsoelectricPoint.py> | `93a0d329ba6379edd07c53f5ea8ecb39c9684d9218ab3fcb4736e1324e2caed2` |
 | `Epk.dat` | <https://raw.githubusercontent.com/kimrutherford/EMBOSS/master/emboss/data/Epk.dat> | `db2702d55a271069775d63b04c8ed3b17e4c7e8eefc83302705882b133c7b0a1` |
+| `BLOSUM62` | <https://raw.githubusercontent.com/biopython/biopython/master/Bio/Align/substitution_matrices/data/BLOSUM62> | `85510d3846ee6d5f4778e425cf8daf6e0dbb889b306f2d13434e1254780efb40` |
 
 ## What is taken from each
 

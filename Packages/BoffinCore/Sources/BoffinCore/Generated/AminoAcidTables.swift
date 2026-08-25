@@ -3,7 +3,7 @@
 //
 //  GENERATED FILE. Do not edit by hand.
 //  Regenerate with: python3 Tools/data/generate_amino_acid_tables.py
-//  Generated 2026-08-24. Source checksums in Tools/data/MANIFEST.md.
+//  Generated 2026-08-25. Source checksums in Tools/data/MANIFEST.md.
 //
 //  These are published scientific constants. Each table cites the paper
 //  it comes from: see Docs/ATTRIBUTIONS.md for the full provenance.
@@ -274,6 +274,138 @@ public enum AminoAcidTables {
             .glutamicAcid: 4.45,
             .tyrosine: 10.0,
         ])
+
+    /// BLOSUM62 substitution scores.
+    ///
+    /// Henikoff S, Henikoff JG. Amino acid substitution matrices from
+    /// protein blocks. PNAS 89:10915-10919 (1992).
+    ///
+    /// Used by the aligner that maps a pasted sequence onto the bundled
+    /// KLIFS and GPCRdb numbering. Only the canonical twenty: the
+    /// ambiguity codes are dropped rather than scored, because scoring X
+    /// against everything as a mild positive lets an alignment drift.
+    public static let blosum62: [AminoAcid: [AminoAcid: Int]] = [
+        .alanine: [
+            .alanine: 4, .cysteine: 0, .asparticAcid: -2, .glutamicAcid: -1, .phenylalanine: -2,
+            .glycine: 0, .histidine: -2, .isoleucine: -1, .lysine: -1, .leucine: -1,
+            .methionine: -1, .asparagine: -2, .proline: -1, .glutamine: -1, .arginine: -1,
+            .serine: 1, .threonine: 0, .valine: 0, .tryptophan: -3, .tyrosine: -2,
+        ],
+        .cysteine: [
+            .alanine: 0, .cysteine: 9, .asparticAcid: -3, .glutamicAcid: -4, .phenylalanine: -2,
+            .glycine: -3, .histidine: -3, .isoleucine: -1, .lysine: -3, .leucine: -1,
+            .methionine: -1, .asparagine: -3, .proline: -3, .glutamine: -3, .arginine: -3,
+            .serine: -1, .threonine: -1, .valine: -1, .tryptophan: -2, .tyrosine: -2,
+        ],
+        .asparticAcid: [
+            .alanine: -2, .cysteine: -3, .asparticAcid: 6, .glutamicAcid: 2, .phenylalanine: -3,
+            .glycine: -1, .histidine: -1, .isoleucine: -3, .lysine: -1, .leucine: -4,
+            .methionine: -3, .asparagine: 1, .proline: -1, .glutamine: 0, .arginine: -2, .serine: 0,
+            .threonine: -1, .valine: -3, .tryptophan: -4, .tyrosine: -3,
+        ],
+        .glutamicAcid: [
+            .alanine: -1, .cysteine: -4, .asparticAcid: 2, .glutamicAcid: 5, .phenylalanine: -3,
+            .glycine: -2, .histidine: 0, .isoleucine: -3, .lysine: 1, .leucine: -3, .methionine: -2,
+            .asparagine: 0, .proline: -1, .glutamine: 2, .arginine: 0, .serine: 0, .threonine: -1,
+            .valine: -2, .tryptophan: -3, .tyrosine: -2,
+        ],
+        .phenylalanine: [
+            .alanine: -2, .cysteine: -2, .asparticAcid: -3, .glutamicAcid: -3, .phenylalanine: 6,
+            .glycine: -3, .histidine: -1, .isoleucine: 0, .lysine: -3, .leucine: 0, .methionine: 0,
+            .asparagine: -3, .proline: -4, .glutamine: -3, .arginine: -3, .serine: -2,
+            .threonine: -2, .valine: -1, .tryptophan: 1, .tyrosine: 3,
+        ],
+        .glycine: [
+            .alanine: 0, .cysteine: -3, .asparticAcid: -1, .glutamicAcid: -2, .phenylalanine: -3,
+            .glycine: 6, .histidine: -2, .isoleucine: -4, .lysine: -2, .leucine: -4,
+            .methionine: -3, .asparagine: 0, .proline: -2, .glutamine: -2, .arginine: -2,
+            .serine: 0, .threonine: -2, .valine: -3, .tryptophan: -2, .tyrosine: -3,
+        ],
+        .histidine: [
+            .alanine: -2, .cysteine: -3, .asparticAcid: -1, .glutamicAcid: 0, .phenylalanine: -1,
+            .glycine: -2, .histidine: 8, .isoleucine: -3, .lysine: -1, .leucine: -3,
+            .methionine: -2, .asparagine: 1, .proline: -2, .glutamine: 0, .arginine: 0, .serine: -1,
+            .threonine: -2, .valine: -3, .tryptophan: -2, .tyrosine: 2,
+        ],
+        .isoleucine: [
+            .alanine: -1, .cysteine: -1, .asparticAcid: -3, .glutamicAcid: -3, .phenylalanine: 0,
+            .glycine: -4, .histidine: -3, .isoleucine: 4, .lysine: -3, .leucine: 2, .methionine: 1,
+            .asparagine: -3, .proline: -3, .glutamine: -3, .arginine: -3, .serine: -2,
+            .threonine: -1, .valine: 3, .tryptophan: -3, .tyrosine: -1,
+        ],
+        .lysine: [
+            .alanine: -1, .cysteine: -3, .asparticAcid: -1, .glutamicAcid: 1, .phenylalanine: -3,
+            .glycine: -2, .histidine: -1, .isoleucine: -3, .lysine: 5, .leucine: -2,
+            .methionine: -1, .asparagine: 0, .proline: -1, .glutamine: 1, .arginine: 2, .serine: 0,
+            .threonine: -1, .valine: -2, .tryptophan: -3, .tyrosine: -2,
+        ],
+        .leucine: [
+            .alanine: -1, .cysteine: -1, .asparticAcid: -4, .glutamicAcid: -3, .phenylalanine: 0,
+            .glycine: -4, .histidine: -3, .isoleucine: 2, .lysine: -2, .leucine: 4, .methionine: 2,
+            .asparagine: -3, .proline: -3, .glutamine: -2, .arginine: -2, .serine: -2,
+            .threonine: -1, .valine: 1, .tryptophan: -2, .tyrosine: -1,
+        ],
+        .methionine: [
+            .alanine: -1, .cysteine: -1, .asparticAcid: -3, .glutamicAcid: -2, .phenylalanine: 0,
+            .glycine: -3, .histidine: -2, .isoleucine: 1, .lysine: -1, .leucine: 2, .methionine: 5,
+            .asparagine: -2, .proline: -2, .glutamine: 0, .arginine: -1, .serine: -1,
+            .threonine: -1, .valine: 1, .tryptophan: -1, .tyrosine: -1,
+        ],
+        .asparagine: [
+            .alanine: -2, .cysteine: -3, .asparticAcid: 1, .glutamicAcid: 0, .phenylalanine: -3,
+            .glycine: 0, .histidine: 1, .isoleucine: -3, .lysine: 0, .leucine: -3, .methionine: -2,
+            .asparagine: 6, .proline: -2, .glutamine: 0, .arginine: 0, .serine: 1, .threonine: 0,
+            .valine: -3, .tryptophan: -4, .tyrosine: -2,
+        ],
+        .proline: [
+            .alanine: -1, .cysteine: -3, .asparticAcid: -1, .glutamicAcid: -1, .phenylalanine: -4,
+            .glycine: -2, .histidine: -2, .isoleucine: -3, .lysine: -1, .leucine: -3,
+            .methionine: -2, .asparagine: -2, .proline: 7, .glutamine: -1, .arginine: -2,
+            .serine: -1, .threonine: -1, .valine: -2, .tryptophan: -4, .tyrosine: -3,
+        ],
+        .glutamine: [
+            .alanine: -1, .cysteine: -3, .asparticAcid: 0, .glutamicAcid: 2, .phenylalanine: -3,
+            .glycine: -2, .histidine: 0, .isoleucine: -3, .lysine: 1, .leucine: -2, .methionine: 0,
+            .asparagine: 0, .proline: -1, .glutamine: 5, .arginine: 1, .serine: 0, .threonine: -1,
+            .valine: -2, .tryptophan: -2, .tyrosine: -1,
+        ],
+        .arginine: [
+            .alanine: -1, .cysteine: -3, .asparticAcid: -2, .glutamicAcid: 0, .phenylalanine: -3,
+            .glycine: -2, .histidine: 0, .isoleucine: -3, .lysine: 2, .leucine: -2, .methionine: -1,
+            .asparagine: 0, .proline: -2, .glutamine: 1, .arginine: 5, .serine: -1, .threonine: -1,
+            .valine: -3, .tryptophan: -3, .tyrosine: -2,
+        ],
+        .serine: [
+            .alanine: 1, .cysteine: -1, .asparticAcid: 0, .glutamicAcid: 0, .phenylalanine: -2,
+            .glycine: 0, .histidine: -1, .isoleucine: -2, .lysine: 0, .leucine: -2, .methionine: -1,
+            .asparagine: 1, .proline: -1, .glutamine: 0, .arginine: -1, .serine: 4, .threonine: 1,
+            .valine: -2, .tryptophan: -3, .tyrosine: -2,
+        ],
+        .threonine: [
+            .alanine: 0, .cysteine: -1, .asparticAcid: -1, .glutamicAcid: -1, .phenylalanine: -2,
+            .glycine: -2, .histidine: -2, .isoleucine: -1, .lysine: -1, .leucine: -1,
+            .methionine: -1, .asparagine: 0, .proline: -1, .glutamine: -1, .arginine: -1,
+            .serine: 1, .threonine: 5, .valine: 0, .tryptophan: -2, .tyrosine: -2,
+        ],
+        .valine: [
+            .alanine: 0, .cysteine: -1, .asparticAcid: -3, .glutamicAcid: -2, .phenylalanine: -1,
+            .glycine: -3, .histidine: -3, .isoleucine: 3, .lysine: -2, .leucine: 1, .methionine: 1,
+            .asparagine: -3, .proline: -2, .glutamine: -2, .arginine: -3, .serine: -2,
+            .threonine: 0, .valine: 4, .tryptophan: -3, .tyrosine: -1,
+        ],
+        .tryptophan: [
+            .alanine: -3, .cysteine: -2, .asparticAcid: -4, .glutamicAcid: -3, .phenylalanine: 1,
+            .glycine: -2, .histidine: -2, .isoleucine: -3, .lysine: -3, .leucine: -2,
+            .methionine: -1, .asparagine: -4, .proline: -4, .glutamine: -2, .arginine: -3,
+            .serine: -3, .threonine: -2, .valine: -3, .tryptophan: 11, .tyrosine: 2,
+        ],
+        .tyrosine: [
+            .alanine: -2, .cysteine: -2, .asparticAcid: -3, .glutamicAcid: -2, .phenylalanine: 3,
+            .glycine: -3, .histidine: 2, .isoleucine: -1, .lysine: -2, .leucine: -1,
+            .methionine: -1, .asparagine: -2, .proline: -3, .glutamine: -1, .arginine: -2,
+            .serine: -2, .threonine: -2, .valine: -1, .tryptophan: 2, .tyrosine: 7,
+        ],
+    ]
 
     /// EMBOSS pKa values, as used by the EMBOSS `iep` program.
     ///

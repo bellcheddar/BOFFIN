@@ -11,11 +11,19 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 5 (Family tab) **in progress**: motifs done, classifier and homolog index outstanding
+- **Phase:** 5 (Family tab) **in progress**: motifs and canonical numbering done; Pfam classifier, SIFTS and homolog index outstanding
 - **Last completed:** Phase 5 family motifs on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open question 1 answered 2026-08-24. Q2 and Q3 gate Phase 5
 
 ### Phase 5 findings
+
+- **Sequence identity over ALIGNED COLUMNS is a biased statistic.** It excludes
+  gaps, so a short overlap that happens to match scores as highly as a full
+  correspondence. Ubiquitin scored 0.35 against a kinase pocket and ADRB2 scored
+  0.48 against PLK2 that way. Divide by the REFERENCE length instead.
+- **Alignment score does not answer family membership.** It answers "how close
+  is the nearest reference". Numbering is gated on the motif detector, which
+  does answer membership and whose negative controls pass.
 
 - **Motif patterns need ORDERING CONSTRAINTS, not just patterns.** "HRD" occurs
   by chance about once per 8,000 residues. Requiring HRD before DFG at 12 to 45

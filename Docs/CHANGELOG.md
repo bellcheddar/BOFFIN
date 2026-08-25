@@ -220,3 +220,42 @@ Still outstanding for Phase 5: the Pfam classifier over the pooled embedding,
 mapping a pasted sequence onto the bundled numbering tables (needs alignment),
 SIFTS mapping, and the embedding index for homolog search. The Family tab says
 so on screen rather than leaving the absence to be read as a negative result.
+
+
+## Phase 5 (part 2): alignment and canonical numbering (2026-08-25)
+
+A pasted sequence now maps onto the bundled KLIFS and GPCRdb tables. 188
+package tests and 6 UI tests passing.
+
+- **Needleman-Wunsch with affine gaps** (Gotoh) over BLOSUM62, added to the
+  generated constant tables. Affine rather than linear because a linear penalty
+  charges the same to open a gap as to extend one, so it scatters short gaps
+  where a real indel belongs, which on a kinase scatters the pocket positions
+  across the loop insertions that distinguish families.
+- **Verified against textbook numbering**: KLIFS position 17 lands on CDK2's
+  K33 and position 81 on D145; GPCRdb 3x50 lands on ADRB2's R131.
+- **Cross-family numbering is refused**, which is the property that matters.
+
+Two things had to be corrected to get there, both of which returned confident
+wrong answers first:
+
+1. **Identity computed over aligned columns is badly biased.** It excludes the
+   gaps, so a sequence that aligns to a fifth of the reference and matches there
+   scores as highly as one that matches throughout. Ubiquitin scored 0.35
+   against a kinase pocket that way, and beta-2 adrenergic receptor scored 0.48
+   against PLK2. Identity is now identical residues over the REFERENCE length,
+   which asks the question that matters: how much of the curated entry did this
+   sequence actually reproduce?
+2. **Alignment score is the wrong instrument for family membership.** It answers
+   "how close is the nearest reference", not "is this a member". Numbering is
+   now gated on the motif detector, whose negative controls already pass, so
+   numbering refines a family call rather than making one.
+
+Also fixed: the GPCRdb label read as a bare `50`. The API returns `3.50x50`,
+which splits into Ballesteros-Weinstein `3.50` and GPCRdb suffix `50`, so the
+helix number has to be carried across from the first part or the scheme's
+defining format is lost.
+
+Every mapped numbering carries the reference it came from and the identity that
+produced it, in the track title and on the Family tab. A residue number gets
+copied out of an app; a caveat in a footnote does not travel with it.

@@ -11,6 +11,7 @@
 //  says so rather than implying the absence is a negative result.
 
 import BoffinCore
+import BoffinData
 import BoffinUI
 import SwiftUI
 
@@ -44,6 +45,9 @@ struct FamilyTabView: View {
                             familySection(family, found)
                         }
                     }
+                }
+                if let numbering = store.numbering, let scheme = store.numberingScheme {
+                    numberingSection(numbering, scheme: scheme)
                 }
                 pending
             }
@@ -107,17 +111,32 @@ struct FamilyTabView: View {
         }
     }
 
+    private func numberingSection(_ result: NumberingResult, scheme: String) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text("\(scheme) numbering").font(.headline)
+            // The confidence travels with the number, always. A residue number
+            // gets copied out of an app; a caveat in a footnote does not.
+            Text(
+                "Mapped from \(result.reference) at "
+                    + "\(Int(result.identity * 100))% identity over the reference. "
+                    + "\(result.numbers.count) residues numbered."
+            )
+            .font(.caption).foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(Spacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+    }
+
     /// State plainly what this tab does not do yet.
     private var pending: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("Not in this build", systemImage: "hammer")
                 .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             Text(
-                "Pfam classification from the pooled embedding, KLIFS and GPCRdb residue "
-                    + "numbering, SIFTS mapping to PDB author numbers, and homolog search "
-                    + "over the bundled embedding index. The numbering tables are fetched "
-                    + "and bundled; mapping a pasted sequence onto them needs alignment, "
-                    + "which is not written yet."
+                "Pfam classification from the pooled embedding, SIFTS mapping to PDB "
+                    + "author numbers, and homolog search over the bundled embedding index."
             )
             .font(.caption2).foregroundStyle(.tertiary)
             .fixedSize(horizontal: false, vertical: true)

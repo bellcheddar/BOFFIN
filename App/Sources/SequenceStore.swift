@@ -9,6 +9,7 @@
 //  needs an actor, and it already has one.
 
 import BoffinCore
+import BoffinData
 import BoffinML
 import Observation
 import SwiftUI
@@ -28,6 +29,8 @@ final class SequenceStore {
     // MARK: - Family
 
     private(set) var motifs: [MotifFamily: [Motif]] = [:]
+    private(set) var numbering: NumberingResult?
+    private(set) var numberingScheme: String?
 
     // MARK: - Fitness
 
@@ -81,6 +84,12 @@ final class SequenceStore {
         if let motifTrack = FamilyMotifs.track(motifs.values.flatMap { $0 }) {
             all.append(motifTrack)
         }
+        if let numbering, let scheme = numberingScheme, let sequence,
+            let track = FamilyStore.track(
+                numbering, residueCount: sequence.count, title: scheme)
+        {
+            all.append(track)
+        }
         return all + modelTracks
     }
 
@@ -99,6 +108,8 @@ final class SequenceStore {
             predictions = nil
             modelState = .idle
             motifs = [:]
+            numbering = nil
+            numberingScheme = nil
             llr = nil
             llrMode = nil
             mutations = []
@@ -255,6 +266,20 @@ final class SequenceStore {
         // Motifs are pure sequence pattern matching: no model, no network, and
         // available the instant a sequence is pasted.
         motifs = FamilyMotifs.all(in: sequence)
+
+        // Numbering is gated on the motifs, so it is only attempted for a
+        // sequence already identified as a family member.
+        numbering = nil
+        numberingScheme = nil
+        if let store = try? FamilyStore() {
+            if let result = try? store.klifsNumbering(for: sequence) {
+                numbering = result
+                numberingScheme = "KLIFS"
+            } else if let result = try? store.gpcrdbNumbering(for: sequence) {
+                numbering = result
+                numberingScheme = "GPCRdb"
+            }
+        }
         tracks = AnalyticalTracks.all(
             for: sequence, hydropathyWindow: hydropathyWindow, scale: pKaScale)
         properties = SequenceProperties(sequence, pKaScale: pKaScale)

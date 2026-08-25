@@ -74,7 +74,35 @@ SOURCES = {
         "https://raw.githubusercontent.com/kimrutherford/EMBOSS/master/"
         "emboss/data/Epk.dat"
     ),
+    "BLOSUM62": (
+        "https://raw.githubusercontent.com/biopython/biopython/master/"
+        "Bio/Align/substitution_matrices/data/BLOSUM62"
+    ),
 }
+
+
+def parse_blosum(text: str) -> dict[tuple[str, str], int]:
+    """Parse a BLOSUM matrix in NCBI format.
+
+    Header row names the columns; each subsequent row starts with its residue.
+    Only the canonical twenty are kept: the ambiguity codes (B, Z, X, *) are
+    dropped rather than scored, because an alignment that quietly scores X
+    against anything as a mild positive drifts.
+    """
+    rows: dict[tuple[str, str], int] = {}
+    header: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("#") or not line.strip():
+            continue
+        if not header:
+            header = line.split()
+            continue
+        parts = line.split()
+        residue, values = parts[0], parts[1:]
+        for column, value in zip(header, values):
+            if residue in CANONICAL and column in CANONICAL:
+                rows[(residue, column)] = int(value)
+    return rows
 
 
 def fetch(url: str) -> str:
@@ -150,6 +178,14 @@ def main() -> int:
     pk_nterminal = literal_after(isoelectric, "pKnterminal")
 
     emboss = parse_emboss_pka(downloaded["Epk.dat"])
+    blosum = parse_blosum(downloaded["BLOSUM62"])
+
+    missing_pairs = [
+        (a, b) for a in CANONICAL for b in CANONICAL if (a, b) not in blosum
+    ]
+    if missing_pairs:
+        print(f"BLOSUM62 missing {len(missing_pairs)} pairs", file=sys.stderr)
+        return 1
 
     missing = [aa for aa in CANONICAL if aa not in free_weights]
     if missing:
@@ -265,6 +301,23 @@ def main() -> int:
     for aa in sorted(k for k in negative_pks if k != "Cterm"):
         add(f"            .{CASE_NAME[aa]}: {swift_double(negative_pks[aa])},")
     add("        ])")
+    add("")
+    add("    /// BLOSUM62 substitution scores.")
+    add("    ///")
+    add("    /// Henikoff S, Henikoff JG. Amino acid substitution matrices from")
+    add("    /// protein blocks. PNAS 89:10915-10919 (1992).")
+    add("    ///")
+    add("    /// Used by the aligner that maps a pasted sequence onto the bundled")
+    add("    /// KLIFS and GPCRdb numbering. Only the canonical twenty: the")
+    add("    /// ambiguity codes are dropped rather than scored, because scoring X")
+    add("    /// against everything as a mild positive lets an alignment drift.")
+    add("    public static let blosum62: [AminoAcid: [AminoAcid: Int]] = [")
+    for first in CANONICAL:
+        pairs = ", ".join(
+            f".{CASE_NAME[second]}: {blosum[(first, second)]}" for second in CANONICAL
+        )
+        add(f"        .{CASE_NAME[first]}: [{pairs}],")
+    add("    ]")
     add("")
     add("    /// EMBOSS pKa values, as used by the EMBOSS `iep` program.")
     add("    ///")

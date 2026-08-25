@@ -24,6 +24,11 @@ let package = Package(
             dependencies: [
                 .product(name: "BoffinCore", package: "BoffinCore")
             ],
+            // The family numbering tables are 0.5 MB and are needed at runtime,
+            // so they are committed and bundled rather than downloaded. They
+            // are also the artefact that must never drift from what the motif
+            // and numbering code expects.
+            resources: [.process("Resources")],
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .testTarget(

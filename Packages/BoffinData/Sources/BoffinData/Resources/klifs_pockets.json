@@ -1,0 +1,3649 @@
+{
+ "AKT1": {
+  "uniprot": "P31749",
+  "family": "Akt",
+  "group": "AGC",
+  "full_name": "v-akt murine thymoma viral oncogene homolog 1",
+  "pocket": "KLLGKGTFGKVILYAMKILHTLTENRVLQNSRPFLTALKYSCFVMEYANGGELFFHLSRLHSEKNVVYRDLKLENLMLITDFGLC"
+ },
+ "AKT2": {
+  "uniprot": "P31751",
+  "family": "Akt",
+  "group": "AGC",
+  "full_name": "v-akt murine thymoma viral oncogene homolog 2",
+  "pocket": "KLLGKGTFGKVILYAMKILHTVTESRVLQNTRPFLTALKYACFVMEYANGGELFFHLSRYLHSRDVVYRDIKLENLMLITDFGLC"
+ },
+ "AKT3": {
+  "uniprot": "Q9Y243",
+  "family": "Akt",
+  "group": "AGC",
+  "full_name": "v-akt murine thymoma viral oncogene homolog 3",
+  "pocket": "KLLGKGTFGKVILYAMKILHTLTESRVLKNTRPFLTSLKYSCFVMEYVNGGELFFHLSRYLHSGKIVYRDLKLENLMLITDFGLC"
+ },
+ "CRIK": {
+  "uniprot": "O14578",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "citron rho-interacting serine/threonine kinase",
+  "pocket": "SLVGCGHFAEVQVYAMKVMFFEEERNILSRSTPWIPQLQYAYLVMEYQPGGDLLSLLNRSVHLMGYVHRDIKPENILVLVDFGSA"
+ },
+ "DMPK1": {
+  "uniprot": "Q09013",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "dystrophia myotonica protein kinase",
+  "pocket": "KVIGRGAFSEVAVYAMKIMCFREERDVLVNGDRWITQLHFAYLVMEYYVGGDLLTLLSKSVHRLGYVHRDIKPDNILLLADFGSC"
+ },
+ "MRCKa": {
+  "uniprot": "Q5VT25",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "CDC42 binding protein kinase alpha",
+  "pocket": "KVIGRGAFGEVAVFAMKILCFREERDVLVNGDKWITTLHYAYLVMDYYVGGDLLTLLSKSVHQLHYVHRDIKPDNILMLADFGSC"
+ },
+ "MRCKb": {
+  "uniprot": "Q9Y5S2",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "CDC42 binding protein kinase beta",
+  "pocket": "KVIGRGAFGEVAVYAMKILCFREERDVLVNGDQWITALHYAYLVMDYYVGGDLLTLLSKSIHQLHYVHRDIKPDNVLLLADFGSC"
+ },
+ "DMPK2": {
+  "uniprot": "Q6DT37",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "CDC42 binding protein kinase gamma",
+  "pocket": "KVIGRGAFGEVTVFAMKMLCFREERDVLVKGDRWVTTLHYAYLVMDYYAGGDLLTLLSRSLHQLGYVHRDVKPDNVLLLADFGSC"
+ },
+ "ROCK1": {
+  "uniprot": "Q13464",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "Rho associated coiled-coil containing protein kinase 1",
+  "pocket": "KVIGRGAFGEVQLYAMKLLFFWEERDIMAFANPWVVQLFYAYMVMEYMPGGDLVNLMSNAIHSMGFIHRDVKPDNMLLLADFGTC"
+ },
+ "ROCK2": {
+  "uniprot": "O75116",
+  "family": "DMPK",
+  "group": "AGC",
+  "full_name": "Rho associated coiled-coil containing protein kinase 2",
+  "pocket": "KVIGRGAFGEVQLYAMKLLFFWEERDIMAFANPWVVQLFYAYMVMEYMPGGDLVNLMSNAIHSMGLIHRDVKPDNMLLLADFGTC"
+ },
+ "BARK1": {
+  "uniprot": "P25098",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "adrenergic, beta, receptor kinase 1",
+  "pocket": "RIIGRGGFGEVYGYAMKCLLALNERIMLSLVSPFIVCMSYASFILDLMNGGDLHYHLSQHMHNRFVVYRDLKPANILLISDLGLA"
+ },
+ "BARK2": {
+  "uniprot": "P35626",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "adrenergic, beta, receptor kinase 2",
+  "pocket": "RIIGRGGFGEVYGYAMKCLLALNERIMLSLVSPFIVCMTYACFILDLMNGGDLHYHLSQHMHNRFVVYRDLKPANILLISDLGLA"
+ },
+ "GPRK4": {
+  "uniprot": "P32298",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "G protein-coupled receptor kinase 4",
+  "pocket": "RVLGKGGFGEVCAYACKKLMALNEKRILEKVQRFVVSLAYACLVLTIMNGGDLKFHIYNDLQRERIVYRDLKPENILLISDLGLA"
+ },
+ "GPRK5": {
+  "uniprot": "P34947",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "G protein-coupled receptor kinase 5",
+  "pocket": "RVLGKGGFGEVCAYACKRLMALNEKQILEKVNQFVVNLAYACLVLTIMNGGDLKFHIYNDLHRENTVYRDLKPENILLISDLGLA"
+ },
+ "GPRK6": {
+  "uniprot": "P43250",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "G protein-coupled receptor kinase 6",
+  "pocket": "RVLGKGGFGEVCAYACKKLMALNEKQILEKVNRFVVSLAYACLVLTLMNGGDLKFHIYHDLHRERIVYRDLKPENILLISDLGLA"
+ },
+ "RHOK": {
+  "uniprot": "Q15835",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "G protein-coupled receptor kinase 1",
+  "pocket": "RVLGKGGFGEVSAYACKKLGAMVEKKILMKVHRFIVSLAYACLVMTIMNGGDIRYHIYNHLHQRRIVYRDLKPENVLLISDLGLA"
+ },
+ "GPRK7": {
+  "uniprot": "Q8WTQ7",
+  "family": "GRK",
+  "group": "AGC",
+  "full_name": "G protein-coupled receptor kinase 7",
+  "pocket": "RVLGKGGFGEVCAYACKKLMALLEKEILEKVSPFIVSLAYACLVMSLMNGGDLKFHIYNHLHELGIVYRDMKPENVLLLSDLGLA"
+ },
+ "MAST1": {
+  "uniprot": "Q9Y2H9",
+  "family": "MAST",
+  "group": "AGC",
+  "full_name": "microtubule associated serine/threonine kinase 1",
+  "pocket": "KLISNGAYGAVYLFAMKKIQAFVERDILTFAEPFVVGMFCSCMVMEYVEGGDCATLLKNYLHNYGIVHRDLKPDNLLILTDFGLS"
+ },
+ "MAST3": {
+  "uniprot": "O60307",
+  "family": "MAST",
+  "group": "AGC",
+  "full_name": "microtubule associated serine/threonine kinase 3",
+  "pocket": "KLISNGAYGAVYLFAIKKIQVFVERDILTFAEPFVVSMFCSCMVMEYVEGGDCATLLKNYLHNYGIVHRDLKPDNLLILTDFGLS"
+ },
+ "MAST2": {
+  "uniprot": "Q6P0Q8",
+  "family": "MAST",
+  "group": "AGC",
+  "full_name": "microtubule associated serine/threonine kinase 2",
+  "pocket": "KLISNGAYGAVFLFAMKKIQAFVERDILTFAEPFVVSMFCSCMVMEYVEGGDCATLLKNYLHNYGIVHRDLKPDNLLILTDFGLS"
+ },
+ "MAST4": {
+  "uniprot": "O15021",
+  "family": "MAST",
+  "group": "AGC",
+  "full_name": "microtubule associated serine/threonine kinase family member 4",
+  "pocket": "KLISNGAYGAVYFFAMKKIQAFVERDILTFAEPFVVSMYCSCMVMEYVEGGDCATLMKNYLHNYGIVHRDLKPDNLLVLTDFGLS"
+ },
+ "MASTL": {
+  "uniprot": "Q96GX5",
+  "family": "MAST",
+  "group": "AGC",
+  "full_name": "microtubule associated serine/threonine kinase like",
+  "pocket": "KPISRGAFGKVYLYAVKVVQVQAERDALALSKPFIVHLYYSYLVMEYLIGGDVKSLLHIYLHRHGIIHRDLKPDNMLILTDFGLS"
+ },
+ "LATS1": {
+  "uniprot": "O95835",
+  "family": "NDR",
+  "group": "AGC",
+  "full_name": "large tumor suppressor kinase 1",
+  "pocket": "KTLGIGAFGEVCLYATKTLHVKAERDILAEADEWVVRLYYSYFVMDYIPGGDMMSLLIRSVHKMGFIHRDIKPDNILILTDFGLC"
+ },
+ "NDR1": {
+  "uniprot": "Q15208",
+  "family": "NDR",
+  "group": "AGC",
+  "full_name": "serine/threonine kinase 38",
+  "pocket": "KVIGRGAFGEVRLYAMKILHIRAERDILVEADLWVVKMFYSYLIMEFLPGGDMMTLLMKSIHQLGFIHRDIKPDNLLLLSDFGLC"
+ },
+ "NDR2": {
+  "uniprot": "Q9Y2H1",
+  "family": "NDR",
+  "group": "AGC",
+  "full_name": "serine/threonine kinase 38 like",
+  "pocket": "KVIGRGAFGEVRLYAMKILHIRAERDILVEADAWVVKMFYSYLIMEFLPGGDMMTLLMKAIHQLGFIHRDIKPDNLLLLSDFGLC"
+ },
+ "LATS2": {
+  "uniprot": "Q9NRM7",
+  "family": "NDR",
+  "group": "AGC",
+  "full_name": "large tumor suppressor kinase 2",
+  "pocket": "KTLGIGAFGEVCLYAMKTLHVKAERDILAEADEWVVKLYYSYFVMDYIPGGDMMSLLIRSVHKMGFIHRDIKPDNILILTDFGLC"
+ },
+ "PDK1": {
+  "uniprot": "O15530",
+  "family": "PDK1",
+  "group": "AGC",
+  "full_name": "3-phosphoinositide dependent protein kinase 1",
+  "pocket": "KILGEGSFSTVVLYAIKILYVTRERDVMSRLDPFFVKLYFTYFGLSYAKNGELLKYIRKYLHGKGIIHRDLKPENILLITDFGTA"
+ },
+ "PKACa": {
+  "uniprot": "P17612",
+  "family": "PKA",
+  "group": "AGC",
+  "full_name": "protein kinase cAMP-activated catalytic subunit alpha",
+  "pocket": "KTLGTGSFGRVMLYAMKILHTLNEKRILQAVNPFLVKLEFSYMVMEYVPGGEMFSHLRRYLHSLDLIYRDLKPENLLIVTDFGFA"
+ },
+ "PKACb": {
+  "uniprot": "P22694",
+  "family": "PKA",
+  "group": "AGC",
+  "full_name": "protein kinase cAMP-activated catalytic subunit beta",
+  "pocket": "KTLGTGSFGRVMLYAMKILHTLNEKRILQAVNPFLVRLEYAYMVMEYVPGGEMFSHLRRYLHSLDLIYRDLKPENLLIVTDFGFA"
+ },
+ "PKACg": {
+  "uniprot": "P22612",
+  "family": "PKA",
+  "group": "AGC",
+  "full_name": "protein kinase cAMP-activated catalytic subunit gamma",
+  "pocket": "RTLGMGSFGRVMLYAMKILHILNEKRILQAIDPFLVKLQFSYLVMEYVPGGEMFSRLQRYLHSLDLIHRDLKPENLLIVTDFGFA"
+ },
+ "PRKX": {
+  "uniprot": "P51817",
+  "family": "PKA",
+  "group": "AGC",
+  "full_name": "protein kinase, X-linked",
+  "pocket": "ATVGTGTFGRVHLFALKVMHVHNEKSVLKEVSPFLIRLFWTYMLMEYVPGGELFSYLRNYLHSKEIVYRDLKPENILLLTDFGFA"
+ },
+ "PRKY": {
+  "uniprot": "O43930",
+  "family": "PKA",
+  "group": "AGC",
+  "full_name": "protein kinase, Y-linked, pseudogene",
+  "pocket": "VTMGTGTFGRVHLFALKVMHVHNEKSVLKEVSPFLIRLFWTYMLMEYVPGGELFSYLRNYLHSKEIVYRDLKPENILLLTDFGFA"
+ },
+ "PKCa": {
+  "uniprot": "P17252",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C alpha",
+  "pocket": "MVLGKGSFGKVMLYAIKILCTMVEKRVLALLDPFLTQLHSCYFVMEYVNGGDLMYHIQQFLHKRGIIYRDLKLDNVMLIADFGMC"
+ },
+ "PKCb": {
+  "uniprot": "P05771",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C beta",
+  "pocket": "MVLGKGSFGKVMLYAVKILCTMVEKRVLALPGPFLTQLHSCYFVMEYVNGGDLMYHIQQFLQSKGIIYRDLKLDNVMLIADFGMC"
+ },
+ "PKCg": {
+  "uniprot": "P05129",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C gamma",
+  "pocket": "MVLGKGSFGKVMLYAIKILCTLVEKRVLALGGHFLTQLHSTYFVMEYVTGGDLMYHIQQFLHNQGIIYRDLKLDNVMLITDFGMC"
+ },
+ "PKCd": {
+  "uniprot": "Q05655",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C delta",
+  "pocket": "KVLGKGSFGKVLLFAIKALCTMVEKRVLTLAAPFLTHLICTFFVMEFLNGGDLMYHIQDFLHSKGIIYRDLKLDNVLLIADFGMC"
+ },
+ "PKCt": {
+  "uniprot": "Q04759",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C theta",
+  "pocket": "KMLGKGSFGKVFLFAIKALCTMVEKRVLSLAWPFLTHMFCTFFVMEYLNGGDLMYHIQSFLHSKGIVYRDLKLDNILLIADFGMC"
+ },
+ "PKCe": {
+  "uniprot": "Q02156",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C epsilon",
+  "pocket": "KVLGKGSFGKVMLYAVKVLCTMTEKRILALARPYLTQLYCCFFVMEYVNGGDLMFQIQRFLHQHGVIYRDLKLDNILLLADFGMC"
+ },
+ "PKCh": {
+  "uniprot": "P24723",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C eta",
+  "pocket": "RVLGKGSFGKVMLYAVKVLCTMTEKRILSLARPFLTQLFCCFFVMEFVNGGDLMFHIQKFLHDKGIIYRDLKLDNVLLLADFGMC"
+ },
+ "PKCi": {
+  "uniprot": "P41743",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C iota",
+  "pocket": "RVIGRGSYAKVLLYAMKVVWVQTEKHVFEQASPFLVGLHSCFFVIEYVNGGDLMFHMQRYLHERGIIYRDLKLDNVLLLTDYGMC"
+ },
+ "PKCz": {
+  "uniprot": "Q05513",
+  "family": "PKC",
+  "group": "AGC",
+  "full_name": "protein kinase C zeta",
+  "pocket": "RVIGRGSYAKVLLYAMKVVWVQTEKHVFEQASPFLVGLHSCFLVIEYVNGGDLMFHMQRFLHERGIIYRDLKLDNVLLLTDYGMC"
+ },
+ "PKG1": {
+  "uniprot": "Q13976",
+  "family": "PKG",
+  "group": "AGC",
+  "full_name": "protein kinase, cGMP-dependent, type I",
+  "pocket": "DTLGVGGFGRVELFAMKILHIRSEKQIMQGAHDFIVRLYRTYMLMEACLGGELWTILRDYLHSKGIIYRDLKPENLILLVDFGFA"
+ },
+ "PKG2": {
+  "uniprot": "Q13237",
+  "family": "PKG",
+  "group": "AGC",
+  "full_name": "protein kinase, cGMP-dependent, type II",
+  "pocket": "ATLGVGGFGRVELFAMKCIHVYSEKRILEELCPFIVKLYRTYMLLEACLGGELWSILRDYLHRLGIIYRDLKPENLILLVDFGFA"
+ },
+ "PKN1": {
+  "uniprot": "Q16512",
+  "family": "PKN",
+  "group": "AGC",
+  "full_name": "protein kinase N1",
+  "pocket": "AVLGRGHFGKVLLFAIKALSLMCEKRILAAVTPFLVNLFGCCFVMEYSAGGDLMLHIHSFLHEHKIVYRDLKLDNLLLIADFGLC"
+ },
+ "PKN2": {
+  "uniprot": "Q16513",
+  "family": "PKN",
+  "group": "AGC",
+  "full_name": "protein kinase N2",
+  "pocket": "AVLGRGHFGKVLLFAIKALSLMCEKRIFETVNPFLVNLFACCFVMEYAAGGDLMMHIHTYLHEHKIVYRDLKLDNLLLIADFGLC"
+ },
+ "PKN3": {
+  "uniprot": "Q6P5Z2",
+  "family": "PKN",
+  "group": "AGC",
+  "full_name": "protein kinase N3",
+  "pocket": "AVLGRGHFGKVLLYAIKALSLYCEKRILEAVGPFLLSLLACCFVTEFVPGGDLMMQIHEFLHEKKIIYRDLKLDNLLLIADFGLC"
+ },
+ "MSK2": {
+  "uniprot": "O75676",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A4",
+  "pocket": "KVLGTGAYGKVFLYAMKVLHTRTERSVLELVRPFLVTLHYAHLILDYVSGGEMFTHLYQHLHKLGIIYRDLKLENVLLLTDFGLS"
+ },
+ "MSK2-b": {
+  "uniprot": "O75676",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A4 (2nd domain)",
+  "pocket": "PALGQGSFSVCRRFAVKILNTQREVAALRLCQPNVVNLHEVYLVLELLRGGELLEHIRKMHEEAGVVHRDLKPENILYIIDFGFA"
+ },
+ "MSK1": {
+  "uniprot": "O75582",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A5",
+  "pocket": "KVLGTGAYGKVFLYAMKVLHTRTERQVLEHIRPFLVTLHYAHLILDYINGGELFTHLSQHLHKLGIIYRDIKLENILLLTDFGLS"
+ },
+ "MSK1-b": {
+  "uniprot": "O75582",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A5 (2nd domain)",
+  "pocket": "KPLGEGSFSICRKFAVKIINTQKEITALKLCEPNIVKLHEVFLVMELLNGGELFERIKKHMHDVGVVHRDLKPENLLFIIDFGFA"
+ },
+ "p70S6K": {
+  "uniprot": "P23443",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase B1",
+  "pocket": "RVLGKGGYGKVFQFAMKVLHTKAERNILEEVKPFIVDLIYAYLILEYLSGGELFMQLERHLHQKGIIYRDLKPENIMLLTDFGLC"
+ },
+ "p70S6Kb": {
+  "uniprot": "Q9UBS0",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase B2",
+  "pocket": "RVLGKGGYGKVFQYAMKVLHTRAERNILESVKPFIVELAYAYLILECLSGGELFTHLERHLHSQGIIYRDLKPENIMLLTDFGLC"
+ },
+ "RSK1": {
+  "uniprot": "Q15349",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A2",
+  "pocket": "KVLGQGSYGKVFLYAMKVLRSKMERDILAEVNPFIVKLHYAYLILDFLRGGDLFTRLSKHLHSLGIIYRDLKPENILLITDFGLS"
+ },
+ "RSK3": {
+  "uniprot": "Q15418",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A1",
+  "pocket": "KVLGQGSFGKVFLYAMKVLRTKMERDILADVNPFVVKLHYAYLILDFLRGGDLFTRLSKHLHSLGIIYRDLKPENILLLTDFGLS"
+ },
+ "RSK2": {
+  "uniprot": "P51812",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A3",
+  "pocket": "KVLGQGSFGKVFLYAMKVLRTKMERDILVEVNPFIVKLHYAYLILDFLRGGDLFTRLSKHLHSLGIIYRDLKPENILLLTDFGLS"
+ },
+ "RSK4": {
+  "uniprot": "Q9UK32",
+  "family": "RSK",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase A6",
+  "pocket": "KVLGQGSFGKVFLYAMKVLRTKMERDILVEVNPFIVKLHYAYLILDFLRGGDVFTRLSKHLHQLGIVYRDLKPENILLLTDFGLS"
+ },
+ "RSK1-b": {
+  "uniprot": "Q15349",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A2 (2nd domain)",
+  "pocket": "EDIGVGSYSVCKRYAVKIIDPSEEIEILLRYGPNIITLKDVYLVMELMRGGELLDRILRYLHSQGVVHRDLKPSNILYVCDFGFA"
+ },
+ "RSK3-b": {
+  "uniprot": "Q15418",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A1 (2nd domain)",
+  "pocket": "ETIGVGSYSECKRYAVKVIDPSEEIEILLRYGPNIITLKDVYLVTELMRGGELLDKILRYLHSQGVVHRDLKPSNILYICDFGFA"
+ },
+ "RSK2-b": {
+  "uniprot": "P51812",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A3 (2nd domain)",
+  "pocket": "EDIGVGSYSVCKRFAVKIIDPTEEIEILLRYGPNIITLKDVYVVTELMKGGELLDKILRYLHAQGVVHRDLKPSNILYICDFGFA"
+ },
+ "RSK4-b": {
+  "uniprot": "Q9UK32",
+  "family": "RSKb",
+  "group": "CAMK",
+  "full_name": "ribosomal protein S6 kinase A6 (2nd domain)",
+  "pocket": "EDIGVGSYSVCKRFAVKIIDPSEEIEILMRYGPNIITLKDVYLVTDLMKGGELLDRILKYLHCQGVVHRDLKPSNILYICDFGFA"
+ },
+ "RSKL1": {
+  "uniprot": "Q96S38",
+  "family": "RSKL",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase C1",
+  "pocket": "-------------GANEYILLFTDQTDDLAKETSLFQRDSEHQIFEDLD-KKLALASRFALHREGIVCRDLNPNNILLLTYFSRW"
+ },
+ "RSKL2": {
+  "uniprot": "Q9Y6S9",
+  "family": "RSKL",
+  "group": "AGC",
+  "full_name": "ribosomal protein S6 kinase like 1",
+  "pocket": "QLRGCRVVGVIEKFVVKSLMVSRERLTIIPHGPYMTKLLRYFLHLEHVQGGTLWSHLLSALHEQGVLCRDLHPGNLLLLTYFGQW"
+ },
+ "SgK494": {
+  "uniprot": "Q96LW2",
+  "family": "RSKR",
+  "group": "AGC",
+  "full_name": "Uncharacterized serine/threonine-protein kinase SgK494",
+  "pocket": "GLVAKGSFGTVLKFAVKVVQCKEEVSIQRQINPFVHSLGDSFIMCSYC-STDLYSLWSAYLHDLGIMHRDVKMENILLLTDFGLS"
+ },
+ "SGK1": {
+  "uniprot": "O00141",
+  "family": "SGK",
+  "group": "AGC",
+  "full_name": "serum/glucocorticoid regulated kinase 1",
+  "pocket": "KVIGKGSFGKVLLYAVKVLHIMSERNVLLKNVPFLVGLHFSYFVLDYINGGELFYHLQRYLHSLNIVYRDLKPENILLLTDFGLC"
+ },
+ "SGK2": {
+  "uniprot": "Q9HBY8",
+  "family": "SGK",
+  "group": "AGC",
+  "full_name": "serum/glucocorticoid regulated kinase 2",
+  "pocket": "KVIGKGNYGKVLLYAVKVLHIMAERSVLLKNVPFLVGLRYSYFVLDYVNGGELFFHLQRYLHSLNIIYRDLKPENILLLTDFGLC"
+ },
+ "SGK3": {
+  "uniprot": "Q96BR1",
+  "family": "SGK",
+  "group": "AGC",
+  "full_name": "serum/glucocorticoid regulated kinase family member 3",
+  "pocket": "KVIGKGSFGKVLLYAVKVLHIMAERNVLLKNVPFLVGLHYSYFVLDFVNGGELFFHLQRYLHSIKIVYRDLKPENILLLTDFGLC"
+ },
+ "YANK2": {
+  "uniprot": "Q9NY57",
+  "family": "YANK",
+  "group": "AGC",
+  "full_name": "serine/threonine kinase 32B",
+  "pocket": "RAIGKGSFGKVCIYAMKYMNVFRELQIMQGLEPFLVNLWYSFMVVDLLLGGDLRYHLQQYLQRYHIIHRDIKPDNILLITDFNIA"
+ },
+ "YANK1": {
+  "uniprot": "Q8WU08",
+  "family": "YANK",
+  "group": "AGC",
+  "full_name": "serine/threonine kinase 32A",
+  "pocket": "RAIGKGSFGKVCIYAMKYMNVFKELQIMQGLEPFLVNLWYSFMVVDLLLGGDLRYHLQQYLQNQRIIHRDMKPDNILLITDFNIA"
+ },
+ "YANK3": {
+  "uniprot": "Q86UX6",
+  "family": "YANK",
+  "group": "AGC",
+  "full_name": "serine/threonine kinase 32C",
+  "pocket": "RAIGKGSFGKVCIYAMKYMNVFRELEILQEIEVFLVNLWYSFMVVDLLLGGDLRYHLQQYLRGQHIIHRDVKPDNILLLTDFNIA"
+ },
+ "ADCK3": {
+  "uniprot": "Q8NI60",
+  "family": "ABC1",
+  "group": "Atypical",
+  "full_name": "Atypical kinase COQ8A, mitochondrial",
+  "pocket": "RPFAAASIGQVHLVAMKIQDYQREAACARKFRFYVPEIVDEVLTTELVSGFPLDQAEGLELFEFNFMQTDPNWSNFFYLLDFGAT"
+ },
+ "ADCK4": {
+  "uniprot": "Q96D53",
+  "family": "ABC1",
+  "group": "Atypical",
+  "full_name": "Atypical kinase COQ8B, mitochondrial",
+  "pocket": "VPFAAASIGQVHQVAVKIQDYRREAACAQNFRFRVPAVVKETRVLGMELGVPLDQCQGLELFEFRFMQTDPNWANFLYLLDFGAS"
+ },
+ "ADCK1": {
+  "uniprot": "Q86TW2",
+  "family": "ABC1",
+  "group": "Atypical",
+  "full_name": "Uncharacterized aarF domain-containing protein kinase 1",
+  "pocket": "TPLGTASLAQVHKVAVKVQDFLNEGRNAEKVSLKVPRIHWDERVLLMEFGQVNDRDYMEFVNG--FVHCDPHPGNVLVLLDHGLY"
+ },
+ "ADCK5": {
+  "uniprot": "Q3MIX3",
+  "family": "ABC1",
+  "group": "Atypical",
+  "full_name": "Uncharacterized aarF domain-containing protein kinase 5",
+  "pocket": "QPIAAASLAQVHRVAVKVQDFENEGRNAERCAVVVPRVHWDKRVLTADFCKVNDVEAIRFYTG--FIHSDPHPGNVLVLLDHGLY"
+ },
+ "ADCK2": {
+  "uniprot": "Q7Z695",
+  "family": "ABC1",
+  "group": "Atypical",
+  "full_name": "Uncharacterized aarF domain-containing protein kinase 2",
+  "pocket": "GSNAGVSRAQVPGVAVKVLDLRYEAQNLEHFQVKFPTPLRPREVLVETYVSSYQQAGIPMIFVDNFVHADLHPGNILVLLDAGIV"
+ },
+ "ATM": {
+  "uniprot": "Q13315",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Serine-protein kinase ATM",
+  "pocket": "LAGGVNLPKIIDCQLVKGRDLRQDAVMQQVFQLTICTYKVVSGVLEWCTTVPIGEFLVNVGYI--LGLGDRHVQNILIHIDLGVA"
+ },
+ "ATR": {
+  "uniprot": "Q13535",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase ATR",
+  "pocket": "LASLQKPKKISLKMMCKPKDLRKDCRLMEFNSLHIRTYAVICGIIEWVNTAGLRPILTKVGYI--LGLGDRHGENILFHVDFNCL"
+ },
+ "DNAPK": {
+  "uniprot": "Q9H6X2",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Anthrax toxin receptor 1",
+  "pocket": "MASLRRPKRIIIRFLVKGGDLRQDQRVEQLFQLQLRTYSVVLGLIEWLEKDLLLNTMSQSHWI--LGIGDRHLNNFMVGIDFGHA"
+ },
+ "FRAP": {
+  "uniprot": "P42345",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase mTOR",
+  "pocket": "LQVITSKQRPRKLFLLKGHDLRQDERVMQLFGLSIQRYAVISGLIGWVPCDTLHALIRDVGYI--LGLGDRHPSNLMLHIDFGDC"
+ },
+ "SMG1": {
+  "uniprot": "Q96Q15",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase SMG1",
+  "pocket": "LPTKTKPKKLLFLYLFKGLDLHLDERIMQFLSFHARHYSVTSGLIQWVDATPLFGLYKRVGYI--IGLGDRHLDNVLIHIDYNVC"
+ },
+ "TRRAP": {
+  "uniprot": "Q9Y4A5",
+  "family": "PIKK",
+  "group": "Atypical",
+  "full_name": "Transformation/transcription domain-associated protein",
+  "pocket": "VQKHNTAARRLYIYLVMNDESRREERVLQLLRFFTVPRVVAMRLVEDNPVEIYKQRCAKAEFV--LHLNRLNPEMLQITIGVSGP"
+ },
+ "RIOK1": {
+  "uniprot": "Q9BRS2",
+  "family": "RIO",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase RIO1",
+  "pocket": "GCISTGKEANVYHRAIKIYWAEKEMRNLIRLNIPCPEPIMLVLVMSFIGAPLLKNVQLSMYQDARLVHADLSEFNMLYIIDVSQS"
+ },
+ "RIOK2": {
+  "uniprot": "Q9BVS4",
+  "family": "RIO",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase RIO2",
+  "pocket": "NQMGVGKESDIYIFALKLHSAMKEFAYMKALYFPVPKPIDYAVVMELINGYPLCQIHHVLANHG-LIHGDFNEFNLILMIDFPQM"
+ },
+ "RIOK3": {
+  "uniprot": "O14730",
+  "family": "RIO",
+  "group": "Atypical",
+  "full_name": "Serine/threonine-protein kinase RIO3",
+  "pocket": "GCISTGKESVVFHCAIKVFWAEKEMHNLARMQIPCPTVVLLILVMSFIGAPKLKEVKLNLYHECTLVHADLSEYNMLWLIDVSQS"
+ },
+ "CaMK4": {
+  "uniprot": "Q16566",
+  "family": "CAMK1",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase IV",
+  "pocket": "SELGRGATSIVYRYALKVLIVRTEIGVLLRLSPNIIKLKEISLVLELVTGGELFDRIVEYLHENGIVHRDLKPENLLYIADFGLS"
+ },
+ "CaMK1a": {
+  "uniprot": "Q14012",
+  "family": "CAMK1",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase I",
+  "pocket": "DVLGTGAFSEVILVAIKCISMENEIAVLHKIKPNIVALDDIYLIMQLVSGGELFDRIVEYLHDLGIVHRDLKPENLLYISDFGLS"
+ },
+ "CaMK1d": {
+  "uniprot": "Q8IU85",
+  "family": "CAMK1",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin dependent protein kinase ID",
+  "pocket": "ETLGTGAFSEVVLFAVKCISIENEIAVLRKIKENIVALEDIYLVMQLVSGGELFDRIVEYLHRMGIVHRDLKPENLLYISDFGLS"
+ },
+ "CaMK1g": {
+  "uniprot": "Q96NX5",
+  "family": "CAMK1",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin dependent protein kinase IG",
+  "pocket": "EVLGSGAFSEVFLFALKCISLENEIAVLKKIKENIVTLEDIYLVMQLVSGGELFDRILEYLHENGIVHRDLKPENLLYITDFGLS"
+ },
+ "CaMK1b": {
+  "uniprot": "Q6P2M8",
+  "family": "CAMK1",
+  "group": "CAMK",
+  "full_name": "pregnancy up-regulated nonubiquitous CaM kinase",
+  "pocket": "ERLGSGAFSEVVLVALKCILVENEIAVLRRISPNIVALEDVYLAMELVTGGELFDRIMEYLHSLGIVHRDLKPENLLYVSDFGLS"
+ },
+ "CaMK2a": {
+  "uniprot": "Q9UQM7",
+  "family": "CAMK2",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase II alpha",
+  "pocket": "EELGKGAFSVVRRYAAKIIKLEREARICRLLKPNIVRLHDSYLIFDLVTGGELFEDIVAHCHQMGVVHRDLKPENLLLLADFGLA"
+ },
+ "CaMK2b": {
+  "uniprot": "Q13554",
+  "family": "CAMK2",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase II beta",
+  "pocket": "EDIGKGAFSVVRRYAAKIIKLEREARICRLLKSNIVRLHDSYLVFDLVTGGELFEDIVAHCHQMGVVHRDLKPENLLLLADFGLA"
+ },
+ "CaMK2d": {
+  "uniprot": "Q13557",
+  "family": "CAMK2",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase II delta",
+  "pocket": "EELGKGAFSVVRRYAAKIIKLEREARICRLLKPNIVRLHDSYLVFDLVTGGELFEDIVAHCHLNGIVHRDLKPENLLLLADFGLA"
+ },
+ "CaMK2g": {
+  "uniprot": "Q13555",
+  "family": "CAMK2",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent protein kinase II gamma",
+  "pocket": "EELGKGAFSVVRRYAAKIIKLEREARICRLLKPNIVRLHDSYLVFDLVTGGELFEDIVAHIHQHDIVHRDLKPENLLLLADFGLA"
+ },
+ "AMPKa1": {
+  "uniprot": "Q13131",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "protein kinase AMP-activated catalytic subunit alpha 1",
+  "pocket": "DTLGVGTFGKVKVVAVKILKIRREIQNLKLFRPHIIKLYQVFMVMEYVSGGELFDYICKYCHRHMVVHRDLKPENVLLIADFGLS"
+ },
+ "AMPKa2": {
+  "uniprot": "P54646",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "protein kinase AMP-activated catalytic subunit alpha 2",
+  "pocket": "DTLGVGTFGKVKIVAVKILKIKREIQNLKLFRPHIIKLYQVFMVMEYVSGGELFDYICKYCHRHMVVHRDLKPENVLLIADFGLS"
+ },
+ "BRSK2": {
+  "uniprot": "Q8IWQ3",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "BR serine/threonine kinase 2",
+  "pocket": "KTLGKGQTGLVKLVAIKIVKVEREIAILKLIEPHVLKLHDVYLVLEHVSGGELFDYLVKFCHSHSICHRDLKPENLLLIADFGMA"
+ },
+ "BRSK1": {
+  "uniprot": "Q8TDC3",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "BR serine/threonine kinase 1",
+  "pocket": "KTLGKGQTGLVKLVAIKIVKVEREIAILKLIEPHVLKLHDVYLVLEHVSGGELFDYLVKFCHSYSICHRDLKPENLLLIADFGMA"
+ },
+ "CHK1": {
+  "uniprot": "O14757",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "checkpoint kinase 1",
+  "pocket": "QTLGEGAYGEVQLVAVKIVNIKKEICINKMLNENVVKFYGHYLFLEYCSGGELFDRIEPYLHGIGITHRDIKPENLLLISDFGLA"
+ },
+ "HUNK": {
+  "uniprot": "P57058",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "hormonally up-regulated Neu-associated kinase",
+  "pocket": "RKLGEGSFAKVREVAIKVINLRREGQIQQMIRPNITQLLDIYLVMELCPGGNLMHKIYEHLHRAGVVHRDLKIENLLLLIDFGLS"
+ },
+ "LKB1": {
+  "uniprot": "Q15831",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "serine/threonine kinase 11",
+  "pocket": "DLLGEGSYGKVKERAVKILNVKKEIQLLRRLRKNVIQLVDVYMVMEYCVCGMQEMLDSVYLHSQGIVHKDIKPGNLLLISDLGVA"
+ },
+ "MARK2": {
+  "uniprot": "Q7KZI7",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "microtubule affinity regulating kinase 2",
+  "pocket": "KTIGKGNFAKVKLVAVKIIKLFREVRIMKVLNPNIVKLFEVYLVMEYASGGEVFDYLVAYCHQKFIVHRDLKAENLLLIADFGFS"
+ },
+ "MARK1": {
+  "uniprot": "Q9P0L2",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "microtubule affinity regulating kinase 1",
+  "pocket": "KTIGKGNFAKVKLVAVKIIKLFREVRIMKILNPNIVKLFEVYLVMEYASGGEVFDYLVAYCHQKYIVHRDLKAENLLLIADFGFS"
+ },
+ "MARK3": {
+  "uniprot": "P27448",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "microtubule affinity regulating kinase 3",
+  "pocket": "KTIGKGNFAKVKLVAIKIIKLFREVRIMKILNPNIVKLFEVYLIMEYASGGEVFDYLVAYCHQKRIVHRDLKAENLLLIADFGFS"
+ },
+ "MARK4": {
+  "uniprot": "Q96L34",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "microtubule affinity regulating kinase 4",
+  "pocket": "RTIGKGNFAKVKLVAIKIIKLFREVRIMKGLNPNIVKLFEVYLVMEYASAGEVFDYLVSYCHQKNIVHRDLKAENLLLIADFGFS"
+ },
+ "MELK": {
+  "uniprot": "Q14680",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "maternal embryonic leucine zipper kinase",
+  "pocket": "ETIGTGGFAKVKLVAIKIMRIKTEIEALKNLRQHICQLYHVFMVLEYCPGGELFDYIISYVHSQGYAHRDLKPENLLFLIDFGLC"
+ },
+ "NIM1": {
+  "uniprot": "Q8IY84",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "NIM1 serine/threonine protein kinase",
+  "pocket": "GEIGSGNFSQVKLVAIKILLLSREISSMEKLHPNIIRLYEVHLVMEYAGGGELFGKISTHMHENQIIHRDLKAENVFYVGDFGFS"
+ },
+ "NuaK1": {
+  "uniprot": "O60285",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "NUAK family, SNF1-like kinase, 1",
+  "pocket": "ETLGKGTYGKVKRVAIKSIHIRREIEIMSSLNPHIISIYEVVIIMEYASKGELYDYISEYCHKNGVVHRDLKLENILLIADFGLS"
+ },
+ "NuaK2": {
+  "uniprot": "Q9H093",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "NUAK family, SNF1-like kinase, 2",
+  "pocket": "ETLGKGTYGKVKKVAIKSIHIRREIEIMSSLNPHIIAIHEVVIVMEYASRGDLYDYISEYCHQNRVVHRDLKLENILLIADFGLS"
+ },
+ "PASK": {
+  "uniprot": "Q96RG2",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "PAS domain containing serine/threonine kinase",
+  "pocket": "SPLGSGAFGFVWTVVVKFIKVTLEIAILSRVEANIIKVLDIQLVMEKHGSGLDLFAFIDYLRLKDIIHRDIKDENIVILIDFGSA"
+ },
+ "QIK": {
+  "uniprot": "Q9H0K1",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "salt inducible kinase 2",
+  "pocket": "GTLGKGNFAVVKLVAIKIIKIYREVQIMKMLDPHIIKLYQVYLVTEYAKNGEIFDYLANYCHGRKIVHRDLKAENLLLIADFGFG"
+ },
+ "QSK": {
+  "uniprot": "Q9Y2K2",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "SIK family kinase 3",
+  "pocket": "RTIGKGNFAVVKRVAIKIIKIFREVQIMKMLCPHIIRLYQVYLVTEYASGGEIFDHLVAFCHCRNIVHRDLKAENLLLIADFGFS"
+ },
+ "SIK": {
+  "uniprot": "P57059",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "salt inducible kinase 1",
+  "pocket": "RTLGKGNFAVVKLVAIKIIKIYREVQLMKLLNPHIIKLYQVYIVTEFAKNGEMFDYLTSYCHDHHIVHRDLKTENLLLLADFGFG"
+ },
+ "SNRK": {
+  "uniprot": "Q9NRH2",
+  "family": "CAMKL",
+  "group": "CAMK",
+  "full_name": "SNF related kinase",
+  "pocket": "KTLGRGHFAVVKLVAVKVIHLFQEVRCMKLVQPNIVRLYEVYLILELGDGGDMFDYIMKYCHKLHVVHRDLKPENVVFLTDFGFS"
+ },
+ "STK33": {
+  "uniprot": "Q9BYT3",
+  "family": "CAMK-Unique",
+  "group": "CAMK",
+  "full_name": "serine/threonine kinase 33",
+  "pocket": "RILGKGSFGIVIEWAIKKVLLEREVNILKSVKEHIIHLEQVYLVMELCEDGELKEILDRYLHNNDIVHRDLKLENIMVVTDFGLA"
+ },
+ "VACAMKL": {
+  "uniprot": "Q8NCB2",
+  "family": "CAMK-Unique",
+  "group": "CAMK",
+  "full_name": "CaM kinase-like vesicle-associated",
+  "pocket": "QVIKTEEFCEIFRHTCKKFAAKNEIGILKMVKPNILQLVDVFIFLELATGREVFDWILDYLHSLKIVHRNLKLENLVYISDFHLA"
+ },
+ "CASK": {
+  "uniprot": "O14936",
+  "family": "CASK",
+  "group": "CAMK",
+  "full_name": "calcium/calmodulin-dependent serine protein kinase (MAGUK family)",
+  "pocket": "EVIGKGPFSVVRRFAVKIVDLKREASICHMLKPHIVELLETYMVFEFMDGADLCFEIVKYCHDNNIIHRDVKPHCVLLLGGFGVA"
+ },
+ "DAPK1": {
+  "uniprot": "P53355",
+  "family": "DAPK",
+  "group": "CAMK",
+  "full_name": "death-associated protein kinase 1",
+  "pocket": "EELGSGQFAVVKKYAAKFIDIEREVSILKEIQPNVITLHEVILILELVAGGELFDFLAEYLHSLQIAHFDLKPENIMLIIDFGLA"
+ },
+ "DAPK3": {
+  "uniprot": "O43293",
+  "family": "DAPK",
+  "group": "CAMK",
+  "full_name": "death-associated protein kinase 3",
+  "pocket": "EELGSGQFAIVRKYAAKFIEIEREVNILREIRPNIITLHDIVLILELVSGGELFDFLAEYLHSKRIAHFDLKPENIMLLIDFGIA"
+ },
+ "DAPK2": {
+  "uniprot": "Q9UIK4",
+  "family": "DAPK",
+  "group": "CAMK",
+  "full_name": "death-associated protein kinase 2",
+  "pocket": "EELGSGQFAIVKKYAAKFIEIEREVSILRQVLHNVITLHDVVLILELVSGGELFDFLAQYLHTKKIAHFDLKPENIMLLIDFGLA"
+ },
+ "DRAK2": {
+  "uniprot": "O94768",
+  "family": "DAPK",
+  "group": "CAMK",
+  "full_name": "serine/threonine kinase 17b",
+  "pocket": "KELGRGKFAVVRQYAAKFLEILHEIAVLELAKPRVINLHEVILILEYAAGGEIFSLCLPYLHQNNIVHLDLKPQNILLIVDFGMS"
+ },
+ "DRAK1": {
+  "uniprot": "Q9UEE5",
+  "family": "DAPK",
+  "group": "CAMK",
+  "full_name": "serine/threonine kinase 17a",
+  "pocket": "RELGRGKFAVVRKFAAKFMEIIHEIAVLELAQPWVINLHEVILVLEYAAGGEIFDQCVAFLHTRDVVHLDLKPQNILLIVDFGLS"
+ },
+ "DCLK1": {
+  "uniprot": "O15075",
+  "family": "DCAMKL",
+  "group": "CAMK",
+  "full_name": "doublecortin like kinase 1",
+  "pocket": "RTIGDGNFAVVKEYALKIIMIQNEVSILRRVKPNIVLLIEEYLVMELVKGGDLFDAITSYLHSLNIVHRDIKPENLLVLGDFGLA"
+ },
+ "DCLK3": {
+  "uniprot": "Q9C098",
+  "family": "DCAMKL",
+  "group": "CAMK",
+  "full_name": "doublecortin like kinase 3",
+  "pocket": "RVIGDGNFAVVKEYAMKIIMVDSEILIIQSLSPNIVKLHEVYLILEYVQGGDLFDAIIEHMHDKSIVHRDLKPENLLVLADFGLA"
+ },
+ "DCLK2": {
+  "uniprot": "Q8N568",
+  "family": "DCAMKL",
+  "group": "CAMK",
+  "full_name": "doublecortin like kinase 2",
+  "pocket": "KVIGDGNFAVVKEFALKIILIENEVSILRRVKPNIIMLVEEFLVMELVKGGDLFDAITSYLHGLSIVHRDIKPENLLVLGDFGLA"
+ },
+ "MAPKAPK3": {
+  "uniprot": "Q16644",
+  "family": "MAPKAPK",
+  "group": "CAMK",
+  "full_name": "mitogen-activated protein kinase-activated protein kinase 3",
+  "pocket": "QVLGLGVNGKVLECALKLLKARQEVDHHWQASPHIVCILDVLIIMECMEGGELFSRIQEFLHSHNIAHRDVKPENLLYLTDFGFA"
+ },
+ "MAPKAPK5": {
+  "uniprot": "Q8IW41",
+  "family": "MAPKAPK",
+  "group": "CAMK",
+  "full_name": "mitogen-activated protein kinase-activated protein kinase 5",
+  "pocket": "QKLGAGISGPVRVFALKILKARNEVRLHMMCAPNIVQIIEVLIVMEMMEGGELFHRISQHCHLLNIAHRDLKPENLLFLCDFGFA"
+ },
+ "MAPKAPK2": {
+  "uniprot": "P49137",
+  "family": "MAPKAPK",
+  "group": "CAMK",
+  "full_name": "mitogen-activated protein kinase-activated protein kinase 2",
+  "pocket": "QVLGLGINGKVLQFALKMLKARREVELHWRASPHIVRIVDVLIVMECLDGGELFSRIQDYLHSINIAHRDVKPENLLYLTDFGFA"
+ },
+ "MNK2": {
+  "uniprot": "Q9HBH9",
+  "family": "MAPKAPK",
+  "group": "CAMK",
+  "full_name": "MAP kinase interacting serine/threonine kinase 2",
+  "pocket": "DVLGEGAHARVQTYAVKIIRVFREVEMLYQCQRNVLELIEFYLVFEKMRGGSILSHIHKFLHNKGIAHRDLKPENILCICDFDLG"
+ },
+ "MNK1": {
+  "uniprot": "Q9BUB5",
+  "family": "MAPKAPK",
+  "group": "CAMK",
+  "full_name": "MAP kinase interacting serine/threonine kinase 1",
+  "pocket": "ELLGEGAYAKVQGYAVKIIRVFREVETLYQCQKNILELIEFYLVFEKLQGGSILAHIQKFLHTKGIAHRDLKPENILCICDFDLG"
+ },
+ "smMLCK": {
+  "uniprot": "Q15746",
+  "family": "MLCK",
+  "group": "CAMK",
+  "full_name": "myosin light chain kinase",
+  "pocket": "ERLGSGKFGQVFRWAGKFFNIRQEISIMNCLHPKLVQCVDAVMVLEIVSGGELFERIIDYIHKQGIVHLDLKPENIMCLIDFGLA"
+ },
+ "TTN": {
+  "uniprot": "Q8WZ42",
+  "family": "MLCK",
+  "group": "CAMK",
+  "full_name": "titin",
+  "pocket": "EDLGRGEFGIVHRYMAKFVLVKKEISILNIARRNILHLHESVMIFEFISGLDIFERINTFLHSHNIGHFDIRPENIIYIIEFGQA"
+ },
+ "skMLCK": {
+  "uniprot": "Q9H1R3",
+  "family": "MLCK",
+  "group": "CAMK",
+  "full_name": "myosin light chain kinase 2",
+  "pocket": "EALGGGKFGAVCTLAAKVIMVLLEIEVMNQLNRNLIQLYAAVLFMEYIEGGELFERIVDFMHKMRVLHLDLKPENILCIIDFGLA"
+ },
+ "caMLCK": {
+  "uniprot": "Q32MK0",
+  "family": "MLCK",
+  "group": "CAMK",
+  "full_name": "myosin light chain kinase 3",
+  "pocket": "EVLGGGRFGQVHRLAAKIIDVKNEINIMNQLSVNLIQLYDATLVMEYVDGGELFDRITDYLHQHYILHLDLKPENILCIIDFGLA"
+ },
+ "SgK085": {
+  "uniprot": "Q86YV6",
+  "family": "MLCK",
+  "group": "CAMK",
+  "full_name": "myosin light chain kinase family member 4",
+  "pocket": "EILGGGRFGQVHKLAAKIIEVKNEISVMNQLDANLIQLYDAVLVMEYVDGGELFDRIIDHMHQMYILHLDLKPENILCIIDFGLA"
+ },
+ "PHKg1": {
+  "uniprot": "Q16816",
+  "family": "PHK",
+  "group": "CAMK",
+  "full_name": "phosphorylase kinase, gamma 1 (muscle)",
+  "pocket": "EILGRGVSSVVRRYAVKVIATLKEVDILRKVSPNIIQLKDTFLVFDLMKRGELFDYLTETLHKLNIVHRDLKPENILLLTDFGFS"
+ },
+ "PHKg2": {
+  "uniprot": "P15735",
+  "family": "PHK",
+  "group": "CAMK",
+  "full_name": "phosphorylase kinase, gamma 2 (testis)",
+  "pocket": "DVIGRGVSSVVRRFAVKIMATRRETHILRQVAPHIITLIDSFLVFDLMRKGELFDYLTEFLHANNIVHRDLKPENILLLSDFGFS"
+ },
+ "PIM1": {
+  "uniprot": "P11309",
+  "family": "PIM",
+  "group": "CAMK",
+  "full_name": "Pim-1 proto-oncogene, serine/threonine kinase",
+  "pocket": "PLLGSGGFGSVYSVAIKHVRVPMEVVLLKKVSSGVIRLLDWVLILERPEVQDLFDFITEHCHNCGVLHRDIKDENILILIDFGSG"
+ },
+ "PIM2": {
+  "uniprot": "Q9P1W9",
+  "family": "PIM",
+  "group": "CAMK",
+  "full_name": "Pim-2 proto-oncogene, serine/threonine kinase",
+  "pocket": "PLLGKGGFGTVFAVAIKVITCPLEVALLWKVGPGVIRLLDWMLVLERPLAQDLFDYITEHCHSRGVVHRDIKDENILILIDFGSG"
+ },
+ "PIM3": {
+  "uniprot": "Q86V86",
+  "family": "PIM",
+  "group": "CAMK",
+  "full_name": "Pim-3 proto-oncogene, serine/threonine kinase",
+  "pocket": "AVLGSGGFGTVYAVAVKHVTVPLEVVLLRKVGRGVIRLLDWLLVLERPEAQDLFDFITEHCHSCGVVHRDIKDENLLVLIDFGSG"
+ },
+ "PKD1": {
+  "uniprot": "Q15139",
+  "family": "PKD",
+  "group": "CAMK",
+  "full_name": "protein kinase D1",
+  "pocket": "EVLGSGQFGIVYGVAIKIIQLRNEVAILQNLHPGVVNLECMFVVMEKLHGDMLEMILSSHLHFKNIVHCDLKPENVLLLCDFGFA"
+ },
+ "PKD3": {
+  "uniprot": "O94806",
+  "family": "PKD",
+  "group": "CAMK",
+  "full_name": "protein kinase D3",
+  "pocket": "EVLGSGQFGIVYGVAIKVIQLRNEVAILQNLHPGIVNLECMFVVMEKLHGDMLEMILSSNLHFKNIVHCDLKPENVLLLCDFGFA"
+ },
+ "PKD2": {
+  "uniprot": "Q9BZL6",
+  "family": "PKD",
+  "group": "CAMK",
+  "full_name": "protein kinase D2",
+  "pocket": "EVLGSGQFGVVYGVAVKVIQLRNEVAILQSLRPGIVNLECMFVVMEKLHGDMLEMILSSHLHFKNIVHCDLKPENVLLLCDFGFA"
+ },
+ "PSKH1": {
+  "uniprot": "P11801",
+  "family": "PSK",
+  "group": "CAMK",
+  "full_name": "protein serine kinase H1",
+  "pocket": "ALIGRGSFSRVVRYAIKMIVCESELRVLRRVRANIIQLVEVYMVMELATGGELFDRIIAYLHALGITHRDLKPENLLYITDFGLA"
+ },
+ "PSKH2": {
+  "uniprot": "Q96QS6",
+  "family": "PSK",
+  "group": "CAMK",
+  "full_name": "protein serine kinase H2",
+  "pocket": "ALIGTGSFSRVVRFAIKVMACVSELSVLRRVSRYIVQLMEIYMVMELATGGELFDRLIAYLHALQITHRNLKPENLLYITDFGLA"
+ },
+ "CHK2": {
+  "uniprot": "O96017",
+  "family": "RAD53",
+  "group": "CAMK",
+  "full_name": "checkpoint kinase 2",
+  "pocket": "KTLGSGACGEVKLVAIKIINVETEIEILKKLNPCIIKIKNFYIVLELMEGGELFDKVVGYLHENGIIHRDLKPENVLLITDFGHS"
+ },
+ "SgK495": {
+  "uniprot": "Q8N2I9",
+  "family": "SgK495",
+  "group": "CAMK",
+  "full_name": "serine/threonine kinase 40",
+  "pocket": "-------------------------------------------------NLQHYVIKEKALHQKNIVHRDLKLGNMVLITNFCLG"
+ },
+ "Trb1": {
+  "uniprot": "Q96RU8",
+  "family": "Trbl",
+  "group": "CAMK",
+  "full_name": "tribbles pseudokinase 1",
+  "pocket": "LLLPLAEREHVSRLRCKVFYQDKIRPYIQLPSSNITGIVEVYVFFEKDF-GDMHSYVRSHCHQSAIVLGDLKLRKFVFLRLESLE"
+ },
+ "Trb2": {
+  "uniprot": "Q92519",
+  "family": "Trbl",
+  "group": "CAMK",
+  "full_name": "tribbles pseudokinase 2",
+  "pocket": "LLLEPLEGDHVFRLVCKVFYQESLAPCFCLSASNINQITEIYVFFERSY-GDMHSFVRTHCHDGGLVLRDLKLRKFIFVKLESLE"
+ },
+ "Trb3": {
+  "uniprot": "Q96RU7",
+  "family": "Trbl",
+  "group": "CAMK",
+  "full_name": "tribbles pseudokinase 3",
+  "pocket": "VLLEPEEGGRAYQYTCKVYALAVLEPYARLPPKHVARPTEVYAFFTRTH-GDMHSLVRSHCHQHGLVLRDLKLCRFVFLVLENLE"
+ },
+ "Obscn": {
+  "uniprot": "Q5VST9",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "obscurin, cytoskeletal calmodulin and titin-interacting RhoGEF",
+  "pocket": "EEIGRGVFGFVKRCAAKFIQAYRERDILAALSPLVTGLLDQILILELCSSEELLDRLYRYLHSHGVLHLDIKPSNILMICDFGFA"
+ },
+ "Obscn-b": {
+  "uniprot": "Q5VST9",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "obscurin, cytoskeletal calmodulin and titin-interacting RhoGEF (2nd domain)",
+  "pocket": "TQIQRGRFSVVRQLAAKIIAVLREYEALKGLRPHLAQLHAAVLILELCSGPELLPCLAEYLHNQHILHLDLRSENMIIVVDLGNA"
+ },
+ "SPEG": {
+  "uniprot": "Q15772",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "SPEG complex locus",
+  "pocket": "QEIGRGAFSYLRRFAAKFISARREARLLARLQDCVLYFHEAVIVTELCT-EELLERIARYLHQSHVLHLDVKPENLLVICDFGNA"
+ },
+ "SPEG-b": {
+  "uniprot": "Q15772",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "SPEG complex locus (2nd domain)",
+  "pocket": "EEKARGRFGVVRAFVAKIVRVLQEYEVLRTLHERIMSLHEAVLIAESCGNRELLCGLSDYLHGHHVLHLDIKPDNLLLIVDFGSA"
+ },
+ "Trio": {
+  "uniprot": "O75962",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "trio Rho guanine nucleotide exchange factor",
+  "pocket": "AELGRGRFSVVKKVATKFVQVTHELGILQSLQPLLVGLLDTILVLEMADQGRLLDCVVRYLHNCRIAHLDLKPENILVLADFGDA"
+ },
+ "Trad": {
+  "uniprot": "O60229",
+  "family": "Trio",
+  "group": "CAMK",
+  "full_name": "kalirin, RhoGEF kinase",
+  "pocket": "NEIGRGRFSIVKKVAVKFVQAAHEAALLQHLQPQYITLHDTILILELMDDGRLLDYLMNYLHNCRVAHLDIKPENLLILIDLEDA"
+ },
+ "TSSK2": {
+  "uniprot": "Q96PF2",
+  "family": "TSSK",
+  "group": "CAMK",
+  "full_name": "testis specific serine kinase 2",
+  "pocket": "INLGKGSYAKVKSVAVKIIFLPREMDILATVNGSIIKTYEIYIIMELGVQGDLLEFIKCYCHDLDIVHRDLKCENLLLLSDFGFS"
+ },
+ "TSSK3": {
+  "uniprot": "Q96PN8",
+  "family": "TSSK",
+  "group": "CAMK",
+  "full_name": "testis specific serine kinase 3",
+  "pocket": "KTIGEGTYSKVKEVAIKVIFLPRELQIVRTLDKNIIQVYEMCLVMELAEGGDVFDCVLNYCHGCGVAHRDLKCENALLLTDFGFA"
+ },
+ "TSSK1": {
+  "uniprot": "Q9BXA7",
+  "family": "TSSK",
+  "group": "CAMK",
+  "full_name": "testis specific serine kinase 1B",
+  "pocket": "INLGEGSYAKVKSVAIKIIFLPREIEILAMLNCSIIKTYEIYIVMELAVQGDLLELIKTYCHDLDVVHRDLKCDNLLLLSDFSFS"
+ },
+ "SSTK": {
+  "uniprot": "Q9BXA6",
+  "family": "TSSK",
+  "group": "CAMK",
+  "full_name": "testis specific serine kinase 6",
+  "pocket": "RTIGEGSYSKVKVVAIKVVFLPRELSILRGVRPHIVHVFEFYIVMEAAA-TDLLQAVQRYLHDHHLVHRDLKCENVLLLTDFGFG"
+ },
+ "TSSK4": {
+  "uniprot": "Q6SA08",
+  "family": "TSSK",
+  "group": "CAMK",
+  "full_name": "testis specific serine kinase 4",
+  "pocket": "KAIGHGSYGSVYEVAVKIIFLPREIQVMKVLRKYLINFYRAYIILELAQGGDVLEWIQRYLHSKSIVHRDLKLENLLLISDFGFA"
+ },
+ "CK1a": {
+  "uniprot": "P48729",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 alpha 1",
+  "pocket": "RKIGSGSFGDIYLVAVKLEQLLYESKLYKILQVGIPHIRWYVLVMDLLG-PSLEDLFNFYVHTKNFIHRDIKPDNFLMLIDFGLA"
+ },
+ "CK1a2": {
+  "uniprot": "Q8N752",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 alpha 1 like",
+  "pocket": "RKIGSGSFGDVYLVAVKLEQLLYESKLYTILQVGIPHMHWYVLVMDLLG-PSLEDLFNFYVHTKNFLHRDIKPDNFLMLIDFGLA"
+ },
+ "CK1d": {
+  "uniprot": "P48730",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 delta",
+  "pocket": "RKIGSGSFGDIYLVAIKLEQLHIESKIYKMMQVGIPTIRWCVMVMELLG-PSLEDLFNFYIHSKNFIHRDVKPDNFLMIIDFGLA"
+ },
+ "CK1e": {
+  "uniprot": "P49674",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 epsilon",
+  "pocket": "RKIGSGSFGDIYLVAIKLEQLHIESKFYKMMQVGIPSIKWCVMVMELLG-PSLEDLFNFYIHSKNFIHRDVKPDNFLMIIDFGLA"
+ },
+ "CK1g2": {
+  "uniprot": "P78368",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 gamma 2",
+  "pocket": "KKIGCGNFGELRLVAIKLEQLHLEYRFYKQLSEGVPQVYYFAMVLELLG-PSLEDLFDLYVHTKSLIYRDVKPENFLVIIDFGLA"
+ },
+ "CK1g3": {
+  "uniprot": "Q9Y6M4",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 gamma 3",
+  "pocket": "KKIGCGNFGELRLVAIKLEQLHLEYRFYKQLGDGIPQVYYFAMVLELLG-PSLEDLFDLYVHSKNLIYRDVKPENFLIIIDFGLA"
+ },
+ "CK1g1": {
+  "uniprot": "Q9HCP0",
+  "family": "CK1",
+  "group": "CK1",
+  "full_name": "casein kinase 1 gamma 1",
+  "pocket": "KKIGCGNFGELRLVAIKLEQLHLEYRFYKQLGEGLPQVYYFAMVLELLG-PSLEDLFDLYVHSKNLIYRDVKPENFLIIIDFGLA"
+ },
+ "TTBK1": {
+  "uniprot": "Q5TCY1",
+  "family": "TTBK",
+  "group": "CK1",
+  "full_name": "tau tubulin kinase 1",
+  "pocket": "KKIGGGGFGEIYEVALKVEVLKMEVAVLKKLQDHVCRFIGCYVVMQLQG-RNLADLRRSAIHSVGFLHRDIKPSNFAMMLDFGLA"
+ },
+ "TTBK2": {
+  "uniprot": "Q6IQ55",
+  "family": "TTBK",
+  "group": "CK1",
+  "full_name": "tau tubulin kinase 2",
+  "pocket": "RKIGGGGFGEIYDVALKVEVLKMEVAVLKKLQDHVCRFIGCYVVMQLQG-RNLADLRRSSIHSVGFLHRDIKPSNFAMMLDFGLA"
+ },
+ "VRK1": {
+  "uniprot": "Q99986",
+  "family": "VRK",
+  "group": "CK1",
+  "full_name": "vaccinia related kinase 1",
+  "pocket": "LPIGQGGFGCIYLCVVKVEPLFTELKFYQRAALGVPKYWGSFMIMDRFG-SDLQKIYEAYIHEHEYVHGDIKASNLLLLVDYGLA"
+ },
+ "VRK2": {
+  "uniprot": "Q86Y07",
+  "family": "VRK",
+  "group": "CK1",
+  "full_name": "vaccinia related kinase 2",
+  "pocket": "KKIGSGGFGLIYLHVVKVEPLFSELKFYQRVALGIPLFYGSFMVMERLG-IDLQKISGQYIHENEYVHGDIKAANLLLLADYGLS"
+ },
+ "VRK3": {
+  "uniprot": "Q8IV63",
+  "family": "VRK",
+  "group": "CK1",
+  "full_name": "vaccinia related kinase 3",
+  "pocket": "SFQTRDNQGILYEFSLKLDLQVNKWKKLYSTPLAIPTCMGFFLVLPSLG-RSLQSALDVFLHENEYVHGNVTAENIFVLAGYGFA"
+ },
+ "CCRK": {
+  "uniprot": "Q8IZL9",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 20",
+  "pocket": "GRIGEGAHGIVFKVALKKVQALREIKALQEMEQYVVQLKAVVLAFEFML-SDLAEVVRHFCHANNIVHRDLKPANLLIIADFGLA"
+ },
+ "CDC2": {
+  "uniprot": "P06493",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 1",
+  "pocket": "EKIGEGTYGVVYKVAMKKITAIREISLLKELRPNIVSLQDVYLIFEFLS-MDLKKYLDSFCHSRRVLHRDLKPQNLLILADFGLA"
+ },
+ "CDK2": {
+  "uniprot": "P24941",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 2",
+  "pocket": "EKIGEGTYGVVYKVALKKITAIREISLLKELNPNIVKLLDVYLVFEFLH-QDLKKFMDAFCHSHRVLHRDLKPQNLLILADFGLA"
+ },
+ "CDK3": {
+  "uniprot": "Q00526",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 3",
+  "pocket": "EKIGEGTYGVVYKVALKKITAIREISLLKELKPNIVRLLDVYLVFEFLS-QDLKKYMDSFCHSHRVIHRDLKPQNLLILADFGLA"
+ },
+ "CDK10": {
+  "uniprot": "Q15131",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 10",
+  "pocket": "NRIGEGTYGIVYRVALKKVSSLREITLLLRLRPNIVELKEVFLVMGYCE-QDLASLLENYLHRNFIIHRDLKVSNLLMTADFGLA"
+ },
+ "CDK4": {
+  "uniprot": "P11802",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 4",
+  "pocket": "AEIGVGAYGTVYKVALKSVSTVREVALLRRLEPNVVRLMDVTLVFEHVD-QDLRTYLDKFLHANCIVHRDLKPENILVLADFGLA"
+ },
+ "CDK6": {
+  "uniprot": "Q00534",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 6",
+  "pocket": "AEIGEGAYGKVFKVALKRVSTIREVAVLRHLEPNVVRLFDVTLVFEHVD-QDLTTYLDKFLHSHRVVHRDLKPQNILVLADFGLA"
+ },
+ "CDK5": {
+  "uniprot": "Q00535",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 5",
+  "pocket": "EKIGEGTYGTVFKVALKRVSALREICLLKELKKNIVRLHDVTLVFEFCD-QDLKKYFDSFCHSRNVLHRDLKPQNLLILADFGLA"
+ },
+ "CDK7": {
+  "uniprot": "P50613",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 7",
+  "pocket": "DFLGEGQFATVYKVAIKKITALREIKLLQELSPNIIGLLDASLVFDFME-TDLEVIIKDYLHQHWILHRDLKPNNLLLLADFGLA"
+ },
+ "CDK8": {
+  "uniprot": "P49336",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 8",
+  "pocket": "CKVGRGTYGHVYKYALKQISACREIALLRELKPNVISLQKVWLLFDYAE-HDLWHIIKFYLHANWVLHRDLKPANILVIADMGFA"
+ },
+ "CDK11": {
+  "uniprot": "Q9BWU1",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 19",
+  "pocket": "CKVGRGTYGHVYKYALKQISACREIALLRELKPNVIALQKVWLLFDYAE-HDLWHIIKFYLHANWVLHRDLKPANILVIADMGFA"
+ },
+ "CDK9": {
+  "uniprot": "P50750",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 9",
+  "pocket": "AKIGQGTFGEVFKVALKKVTALREIKILQLLKENVVNLIEIYLVFDFCE-HDLAGLLSNYIHRNKILHRDMKAANVLILADFGLA"
+ },
+ "CHED": {
+  "uniprot": "Q14004",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 13",
+  "pocket": "GIIGEGTYGQVYKVALKKVTAIREIKILRQLTQSIINMKEIYLVFEYMD-HDLMGLLESYCHKKNFLHRDIKCSNILLLADFGLA"
+ },
+ "CRK7": {
+  "uniprot": "Q9NYV4",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 12",
+  "pocket": "GIIGEGTYGQVYKVALKKVTAIREIKILRQLIRSVVNMKEIYLVFEYMD-HDLMGLLESYCHKKNFLHRDIKCSNILLLADFGLA"
+ },
+ "PCTAIRE1": {
+  "uniprot": "Q00536",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 16",
+  "pocket": "DKLGEGTYATVYKVALKEITAIREVSLLKDLKANIVTLHDITLVFEYLD-KDLKQYLDDYCHRQKVLHRDLKPQNLLILADFGLA"
+ },
+ "PCTAIRE2": {
+  "uniprot": "Q00537",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 17",
+  "pocket": "EKLGEGTYATVYKVALKEITAIREVSLLKDLKANIVTLHDITLVFEYLD-KDLKQYMDDYCHRRKVLHRDLKPQNLLILADFGLA"
+ },
+ "PCTAIRE3": {
+  "uniprot": "Q07002",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 18",
+  "pocket": "DKLGEGTYATVFKVALKEITAIREVSLLKNLKANIVTLHDLTLVFEYLD-SDLKQYLDHYCHHRKILHRDLKPQNLLILADFGLA"
+ },
+ "PFTAIRE1": {
+  "uniprot": "O94921",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 14",
+  "pocket": "EKLGEGSYATVYKVALKVITAIREASLLKGLKANIVLLHDITLVFEYVH-TDLCQYMDKYIHQRYILHRDLKPQNLLILADFGLA"
+ },
+ "PFTAIRE2": {
+  "uniprot": "Q96Q40",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 15",
+  "pocket": "EKLGEGSYATVYKVALKVITAIREASLLKGLKANIVLLHDITFVFEYMH-TDLAQYMSQYIHHQHVLHRDLKPQNLLILADFGLA"
+ },
+ "PITSLRE": {
+  "uniprot": "P21127",
+  "family": "CDK",
+  "group": "CMGC",
+  "full_name": "cyclin-dependent kinase 11B",
+  "pocket": "NRIEEGTYGVVYRVALKRLTSLREINTILKAQPNIVTVREIYIVMNYVE-HDLKSLMETHLHDNWILHRDLKTSNLLLVGDFGLA"
+ },
+ "CDKL5": {
+  "uniprot": "O76039",
+  "family": "CDKL",
+  "group": "CMGC",
+  "full_name": "cyclin dependent kinase like 5",
+  "pocket": "GVVGEGAYGVVLKVAIKKFTTLRELKMLRTLKENIVELKEAYLVFEYVE-KNMLELLEEWCHKNDIVHRDIKPENLLILCDFGFA"
+ },
+ "CDKL1": {
+  "uniprot": "Q00532",
+  "family": "CDKL",
+  "group": "CMGC",
+  "full_name": "cyclin dependent kinase like 1",
+  "pocket": "GKIGEGSYGVVFKVAIKKFIALREIRMLKQLKPNLVNLLEVHLVFEYCD-HTVLHELDRFCHKHNCIHRDVKPENILILCDFGFA"
+ },
+ "CDKL2": {
+  "uniprot": "Q92772",
+  "family": "CDKL",
+  "group": "CMGC",
+  "full_name": "cyclin dependent kinase like 2",
+  "pocket": "GLVGEGSYGMVMKVAIKKFIAMREIKLLKQLRENLVNLLEVYLVFEFVD-HTILDDLELFCHSHNIIHRDIKPENILVLCDFGFA"
+ },
+ "CDKL3": {
+  "uniprot": "Q8IVW4",
+  "family": "CDKL",
+  "group": "CMGC",
+  "full_name": "cyclin dependent kinase like 3",
+  "pocket": "GKVGEGSYGTVMKVAIKIFIAMREIKFLKQFHENLVNLIEVHLVFEFID-HTVLDELQHYLHSNNIIHRDIKPENILVLCDFGFA"
+ },
+ "CDKL4": {
+  "uniprot": "Q5MAI5",
+  "family": "CDKL",
+  "group": "CMGC",
+  "full_name": "cyclin dependent kinase like 4",
+  "pocket": "AKTGEGSYGVVFKVAVKKFIALREIRMLKQLKPNLVNLIEVHLVFEYCD-HTLLNELERFCHIHNCIHRDIKPENILIICDFGFA"
+ },
+ "CK2a1": {
+  "uniprot": "P68400",
+  "family": "CK2",
+  "group": "CMGC",
+  "full_name": "casein kinase 2 alpha 1",
+  "pocket": "RKLGRGKYSEVFEVVVKILKIKREIKILENLRPNIITLADIALVFEHVN-NTDFKQ--LYCHSMGIMHRDVKPHNVMILIDWGLA"
+ },
+ "CK2a2": {
+  "uniprot": "P19784",
+  "family": "CK2",
+  "group": "CMGC",
+  "full_name": "casein kinase 2 alpha 2",
+  "pocket": "RKLGRGKYSEVFEVVVKILKIKREVKILENLRTNIIKLIDTALVFEYIN-NTDFKQLYQYCHSKGIMHRDVKPHNVMILIDWGLA"
+ },
+ "CLK1": {
+  "uniprot": "P49759",
+  "family": "CLK",
+  "group": "CMGC",
+  "full_name": "CDC like kinase 1",
+  "pocket": "DTLGEGAFGKVVEVAVKIVAARSEIQVLEHLNFRCVQMLEWCIVFELLG-LSTYDFIKEFLHSNKLTHTDLKPENILFVVDFGSA"
+ },
+ "CLK2": {
+  "uniprot": "P49760",
+  "family": "CLK",
+  "group": "CMGC",
+  "full_name": "CDC like kinase 2",
+  "pocket": "STLGEGTFGRVVQVALKIIAARLEINVLEKINNLCVQMFDWCISFELLG-LSTFDFLKDFLHDNKLTHTDLKPENILFVVDFGSA"
+ },
+ "CLK3": {
+  "uniprot": "P49761",
+  "family": "CLK",
+  "group": "CMGC",
+  "full_name": "CDC like kinase 3",
+  "pocket": "GNLGEGTFGKVVEVALKIIAARLEINVLKKIKFLCVLMSDWCIAFELLG-KNTFEFLKEFLHENQLTHTDLKPENILFVADFGSA"
+ },
+ "CLK4": {
+  "uniprot": "Q9HAZ1",
+  "family": "CLK",
+  "group": "CMGC",
+  "full_name": "CDC like kinase 4",
+  "pocket": "DTLGEGAFGKVVEVAVKIVAARSEIQVLEHLNFRCVQMLEWCIVFELLG-LSTYDFIKEFLHHNKLTHTDLKPENILFVVDFGSA"
+ },
+ "DYRK1A": {
+  "uniprot": "Q13627",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "dual specificity tyrosine phosphorylation regulated kinase 1A",
+  "pocket": "SLIGKGSFGQVVKVAIKIIQAQIEVRLLELMNYYIVHLKRHCLVFEMLS-YNLYDLLRNATPELSIIHCDLKPENILLIVDFGSS"
+ },
+ "DYRK1B": {
+  "uniprot": "Q9Y463",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "dual specificity tyrosine phosphorylation regulated kinase 1B",
+  "pocket": "SLIGKGSFGQVVKVAIKIIQAQIELRLLELMNYYIVHLKRHCLVFELLS-YNLYDLLRNATPELSIIHCDLKPENILLIVDFGSS"
+ },
+ "DYRK3": {
+  "uniprot": "O43781",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "dual specificity tyrosine phosphorylation regulated kinase 3",
+  "pocket": "KIIGKGSFGQVARVALKMVQAAEEIRILEHLKMNVIHMLESCMAFELLS-IDLYELIKKALHKNKIIHCDLKPENILLVIDFGSS"
+ },
+ "DYRK2": {
+  "uniprot": "Q92630",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "dual specificity tyrosine phosphorylation regulated kinase 2",
+  "pocket": "KVIGKGSFGQVVKVALKMVQAAEEIRILEHLRMNVIHMLENCMTFELLS-MNLYELIKKALHKNRIIHCDLKPENILLVIDFGSS"
+ },
+ "DYRK4": {
+  "uniprot": "Q9NR20",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "dual specificity tyrosine phosphorylation regulated kinase 4",
+  "pocket": "ETIGKGSFGQVAKVALKIIQALMELKILEALRYNVVHMKDFCITFELLG-INLYELMKNMLSVEKIIHCDLKPENIVLVIDFGSS"
+ },
+ "HIPK3": {
+  "uniprot": "Q9H422",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "homeodomain interacting protein kinase 3",
+  "pocket": "DFLGRGTFGQVVKVAIKILQGQIEVSILARLSYNFVRAYECCLVFEMLE-QNLYDFLKQKLKSLGLIHADLKPENIMLVIDFGSA"
+ },
+ "HIPK2": {
+  "uniprot": "Q9H2X6",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "homeodomain interacting protein kinase 2",
+  "pocket": "EFLGRGTFGQVVKVAIKILQGQIEVSILARLSYNFVRAYECCLVFEMLE-QNLYDFLKQKLKSLGLIHADLKPENIMLVIDFGSA"
+ },
+ "HIPK4": {
+  "uniprot": "Q8NE63",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "homeodomain interacting protein kinase 4",
+  "pocket": "EVLGKGTFGEVAKVAIKILIIKNELKLLHCMRPEEAHVIRFYLVFELLE-QNLFEFQKERLKELAIIHADLKPENIMLVIDFGSA"
+ },
+ "HIPK1": {
+  "uniprot": "Q86Z02",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "homeodomain interacting protein kinase 1",
+  "pocket": "EFLGRGTFGQVAKVAIKILQGQIEVSILSRLSYNFVRSYECCLVFEMLE-QNLYDFLKQKLKSLGLIHADLKPENIMLVIDFGSA"
+ },
+ "PRP4": {
+  "uniprot": "Q13523",
+  "family": "DYRK",
+  "group": "CMGC",
+  "full_name": "pre-mRNA processing factor 4B",
+  "pocket": "GYTGQGVFSNVVRVAVKIITGLKELEFLKKLNFHCLRLFRHCLVFEPLS-MNLREVLKKLLKRCNILHADIKPDNILVLCDFGSA"
+ },
+ "GSK3A": {
+  "uniprot": "P49840",
+  "family": "GSK",
+  "group": "CMGC",
+  "full_name": "glycogen synthase kinase 3 alpha",
+  "pocket": "KVIGNGSFGVVYQVAIKKVFKNRELQIMRKLDCNIVRLRYFNLVLEYVP-ETVYRVARHYIHSQGVCHRDIKPQNLLVLCDFGSA"
+ },
+ "GSK3B": {
+  "uniprot": "P49841",
+  "family": "GSK",
+  "group": "CMGC",
+  "full_name": "glycogen synthase kinase 3 beta",
+  "pocket": "KVIGNGSFGVVYQVAIKKVFKNRELQIMRKLDCNIVRLRYFNLVLDYVP-ETVYRVARHYIHSFGICHRDIKPQNLLLLCDFGSA"
+ },
+ "Erk2": {
+  "uniprot": "P28482",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 1",
+  "pocket": "SYIGEGAYGMVCSVAIKKIRTLREIKILLRFRENIIGINDIYIVQDLME-TDLYKLLKTYIHSANVLHRDLKPSNLLLICDFGLA"
+ },
+ "Erk1": {
+  "uniprot": "P27361",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 3",
+  "pocket": "QYIGEGAYGMVSSVAIKKIRTLREIQILLRFRENVIGIRDIYIVQDLME-TDLYKLLKSYIHSANVLHRDLKPSNLLIICDFGLA"
+ },
+ "Erk4": {
+  "uniprot": "P31152",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 4",
+  "pocket": "QPLGFGVNGLVLSVAVKKIHALREIKIIRRLDDNIVKVYEVYIVQEYME-TDLARLLEQYIHSANVLHRDLKPANIFIIGDFGLA"
+ },
+ "Erk3": {
+  "uniprot": "Q16659",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 6",
+  "pocket": "KPLGCGGNGLVFSVAIKKIHALREIKIIRRLDDNIVKVFEIYIVQEYME-TDLANVLEQYIHSANVLHRDLKPANLFIIGDFGLA"
+ },
+ "Erk5": {
+  "uniprot": "Q13164",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 7",
+  "pocket": "ETIGNGAYGVVSSVAIKKIRTLRELKILKHFKDNIIAIKDIYVVLDLME-SDLHQIIHSYMHSAQVIHRDLKPSNLLVIGDFGMA"
+ },
+ "Erk7": {
+  "uniprot": "Q8TD08",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 15",
+  "pocket": "RQLGQGAYGIVWKVAIKKIRTFREITLLQEFGPNIISLLDVYLVFEFMD-TDLNAVIRKFLHSGHVVHRDQKPSNVLLLCDFGLA"
+ },
+ "JNK1": {
+  "uniprot": "P45983",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 8",
+  "pocket": "KPIGSGAQGIVCAVAIKKLRAYRELVLMKCVNKNIIGLLNVYIVMELMD-ANLCQVIQMHLHSAGIIHRDLKPSNIVVILDFGLA"
+ },
+ "JNK2": {
+  "uniprot": "P45984",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 9",
+  "pocket": "KPIGSGAQGIVCAVAVKKLRAYRELVLLKCVNKNIISLLNVYLVMELMD-ANLCQVIHMHLHSAGIIHRDLKPSNIVVILDFGLA"
+ },
+ "JNK3": {
+  "uniprot": "P53779",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 10",
+  "pocket": "KPIGSGAQGIVCAVAIKKLRAYRELVLMKCVNKNIISLLNVYLVMELMD-ANLCQVIQMHLHSAGIIHRDLKPSNIVVILDFGLA"
+ },
+ "NLK": {
+  "uniprot": "Q9UBE8",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "nemo-like kinase",
+  "pocket": "RPIGYGAFGVVWSVALKKMRVFRELKMLCFFKDNVLSALDIYVVTELMQ-SDLHKIIVSYLHSAGILHRDIKPGNLLVICDFGLA"
+ },
+ "p38a": {
+  "uniprot": "Q16539",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 14",
+  "pocket": "SPVGSGAYGSVCAVAVKKLRTYRELRLLKHMKENVIGLLDVYLVTHLMG-ADLNNIVKCYIHSADIIHRDLKPSNLAVILDFGLA"
+ },
+ "p38b": {
+  "uniprot": "Q15759",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 11",
+  "pocket": "RPVGSGAYGSVCSVAVKKLRTYRELRLLKHLKENVIGLLDVYLVTTLMG-ADLNNIVKCYIHSAGIIHRDLKPSNVAVILDFGLA"
+ },
+ "p38d": {
+  "uniprot": "O15264",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 13",
+  "pocket": "THVGSGAYGSVCSVAIKKLRAYRELLLLKHMQENVIGLLDVYLVMPFMQ-TDLQKIMGMYIHSAGVVHRDLKPGNLAVILDFGLA"
+ },
+ "p38g": {
+  "uniprot": "P53778",
+  "family": "MAPK",
+  "group": "CMGC",
+  "full_name": "mitogen-activated protein kinase 12",
+  "pocket": "QPVGSGAYGAVCSVAIKKLRAYRELRLLKHMRENVIGLLDVYLVMPFMG-TDLGKLMKHYIHAAGIIHRDLKPGNLAVILDFGLA"
+ },
+ "MAK": {
+  "uniprot": "P20794",
+  "family": "RCK",
+  "group": "CMGC",
+  "full_name": "male germ cell associated kinase",
+  "pocket": "RQLGDGTYGSVLMVAIKRMMNLREVKSLKKLNANVIKLKEVYFIFEYMK-ENLYQLMKDFIHKHGFFHRDMKPENLLCIADFGLA"
+ },
+ "MOK": {
+  "uniprot": "Q9UQ07",
+  "family": "RCK",
+  "group": "CMGC",
+  "full_name": "MOK protein kinase",
+  "pocket": "GKIGEGTFSEVMKYACKQMNNLREIQALRRLNPNILMLHEVALICELMD-MNIYELIRGHIHRNGIFHRDVKPENILILGDFGSC"
+ },
+ "ICK": {
+  "uniprot": "Q9UPZ9",
+  "family": "RCK",
+  "group": "CMGC",
+  "full_name": "intestinal cell (MAK-like) kinase",
+  "pocket": "RQLGDGTYGSVLLIAIKKMMNLREVKSLKKLNANVVKLKEVYFIFEYMK-ENLYQLIKEFIHKHGFFHRDLKPENLLCIADFGLA"
+ },
+ "SRPK1": {
+  "uniprot": "Q96SB4",
+  "family": "SRPK",
+  "group": "CMGC",
+  "full_name": "SRSF protein kinase 1",
+  "pocket": "RKLGWGHFSTVWLVAMKVVTALDEIRLLKSVREMVVQLLDDCMVFEVLG-HHLLKWIIKLHTKCRIIHTDIKPENILLIADLGNA"
+ },
+ "SRPK2": {
+  "uniprot": "P78362",
+  "family": "SRPK",
+  "group": "CMGC",
+  "full_name": "SRSF protein kinase 2",
+  "pocket": "RKLGWGHFSTVWLVAMKVVTALDEIKLLKCVRDMVVQLIDDCMVFEVLG-HHLLKWIIKLHSKCKIIHTDIKPENILMIADLGNA"
+ },
+ "MSSK1": {
+  "uniprot": "Q9UPE1",
+  "family": "SRPK",
+  "group": "CMGC",
+  "full_name": "SRSF protein kinase 3",
+  "pocket": "RKLGWGHFSTVWLVALKVVTAVDEIKLLKCVRETIVQLIDDCMVLEVLG-HQLLKWIIKLHTKCKIIHTDIKPENILLIADLGNA"
+ },
+ "AurA": {
+  "uniprot": "O14965",
+  "family": "Aur",
+  "group": "Other",
+  "full_name": "aurora kinase A",
+  "pocket": "RPLGKGKFGNVYLLALKVLQLRREVEIQSHLRPNILRLYGYYLILEYAPLGTVYRELQKYCHSKRVIHRDIKPENLLLIADFGWS"
+ },
+ "AurC": {
+  "uniprot": "Q9UQB9",
+  "family": "Aur",
+  "group": "Other",
+  "full_name": "aurora kinase C",
+  "pocket": "RPLGKGKFGNVYLVALKVLQLRREIEIQAHLQPNILRLYNYYLILEYAPRGELYKELQKYCHDKKVIHRDIKPENLLLIADFGWS"
+ },
+ "AurB": {
+  "uniprot": "Q96GD4",
+  "family": "Aur",
+  "group": "Other",
+  "full_name": "aurora kinase B",
+  "pocket": "RPLGKGKFGNVYLVALKVLQLRREIEIQAHLHPNILRLYNYYLILEYAPRGELYKELQKYCHGKKVIHRDIKPENLLLIADFGWS"
+ },
+ "BUB1": {
+  "uniprot": "O43683",
+  "family": "BUB",
+  "group": "Other",
+  "full_name": "BUB1 mitotic checkpoint serine/threonine kinase",
+  "pocket": "HLLGEGAFAQVYEFVLKVQIGTQLMERLKPSMHMFMKFYSAVLVGELYSYGTLLNAINLQVHDCEIIHGDIKPDNFILLIDLGQS"
+ },
+ "BUBR1": {
+  "uniprot": "O60566",
+  "family": "BUB",
+  "group": "Other",
+  "full_name": "BUB1 mitotic checkpoint serine/threonine kinase B",
+  "pocket": "IELGNEDYCIKRETVIKVSINLKLKERLN---DFDHFCSCYIVWHQYINCFTLQDLLQHMLHKAEIVHGDLSPRCLILIVDFSYS"
+ },
+ "PRPK": {
+  "uniprot": "Q96S44",
+  "family": "Bud32",
+  "group": "Other",
+  "full_name": "TP53 regulating kinase",
+  "pocket": "ELVKQGAEARVFRAVIKHRRTVQEARALLRCRAGISAPVVFCLYMEEIE-GSVTVRDYIRMHDEDLIHGDLTTSNMLLLIDFGLS"
+ },
+ "CaMKK2": {
+  "uniprot": "Q96RR4",
+  "family": "CAMKK",
+  "group": "Other",
+  "full_name": "calcium/calmodulin-dependent protein kinase kinase 2, beta",
+  "pocket": "DEIGKGSYGVVKLYAMKVLQVYQEIAILKKLDPNVVKLVEVYMVFELVNQGPVMEVPTLYLHYQKIIHRDIKPSNLLVIADFGVS"
+ },
+ "CaMKK1": {
+  "uniprot": "Q8N5S9",
+  "family": "CAMKK",
+  "group": "Other",
+  "full_name": "calcium/calmodulin-dependent protein kinase kinase 1, alpha",
+  "pocket": "DAYLQGAYGVVRLYAMKVLRVYQEIAILKKLDVNVVKLIEVLYLFDLLRKGPVMEVPCDYLHCQKIVHRDIKPSNLLLIADFGVS"
+ },
+ "CDC7": {
+  "uniprot": "O00311",
+  "family": "CDC7",
+  "group": "Other",
+  "full_name": "cell division cycle 7",
+  "pocket": "DKIGEGTFSSVYLIALKHLRIAAELQCLTVAGDNVMGVKYCVIAMPYLE-HESFLD--IRIHQFGIVHRDVKPSNFLYLVDFGLA"
+ },
+ "Haspin": {
+  "uniprot": "Q8TF76",
+  "family": "Haspin",
+  "group": "Other",
+  "full_name": "germ cell associated 2 (haspin)",
+  "pocket": "EKIGEGVFGEVFQVAIKIIEILPEIIISKELSEGFIGLNSVVLEFEFGG-IDLEQMRTKAEASLRFEHRDLHWGNVLLIIDYTLS"
+ },
+ "IKKa": {
+  "uniprot": "O15111",
+  "family": "IKK",
+  "group": "Other",
+  "full_name": "conserved helix-loop-helix ubiquitous kinase",
+  "pocket": "ERLGTGGFGNVCLIAIKSCRWCHEIQIMKKLNANVVKACDVLLAMEYCSGGDLRKLLNKYLHENKIIHRDLKPENIVLIIDLGYA"
+ },
+ "IKKb": {
+  "uniprot": "O14920",
+  "family": "IKK",
+  "group": "Other",
+  "full_name": "inhibitor of kappa light polypeptide gene enhancer in B-cells, kinase beta",
+  "pocket": "ERLGTGGFGNVIRIAIKQCRWCLEIQIMRRLTPNVVAARDVLLAMEYCQGGDLRKYLNQYLHENRIIHRDLKPENIVLIIDLGYA"
+ },
+ "IKKe": {
+  "uniprot": "Q14164",
+  "family": "IKK",
+  "group": "Other",
+  "full_name": "inhibitor of kappa light polypeptide gene enhancer in B-cells, kinase epsilon",
+  "pocket": "DLLGQGATASVYKVAVKVFVQVREFEVLRKLNQNIVKLFAVVLVMEYCSSGSLLSVLESHLRENGIVHRDIKPGNIMRLTDFGAA"
+ },
+ "TBK1": {
+  "uniprot": "Q9UHD2",
+  "family": "IKK",
+  "group": "Other",
+  "full_name": "TANK-binding kinase 1",
+  "pocket": "DILGQGATANVFRFAIKVFVQMREFEVLKKLNKNIVKLFAIVLIMEFCPCGSLYTVLEEHLRENGIVHRDIKPGNIMRLTDFGAA"
+ },
+ "IRE1": {
+  "uniprot": "O75460",
+  "family": "IRE",
+  "group": "Other",
+  "full_name": "endoplasmic reticulum to nucleus signaling 1",
+  "pocket": "DVLGHGAEGTIVYVAVKRIFADREVQLLRESDPNVIRYFCTYIAIELCAA-TLQEYVEQHLHSLNIVHRDLKPHNILIISDFGLC"
+ },
+ "IRE2": {
+  "uniprot": "Q76MJ5",
+  "family": "IRE",
+  "group": "Other",
+  "full_name": "endoplasmic reticulum to nucleus signaling 2",
+  "pocket": "DVLGRGAGGTFVFVAVKRLLVRREVQLLQESDPNVLRYFCTYIALELCRA-SLQEYVENHLHSLHIVHRDLKPGNILILSDFGLC"
+ },
+ "KIS": {
+  "uniprot": "Q8TAS1",
+  "family": "KIS",
+  "group": "Other",
+  "full_name": "U2AF homology motif (UHM) kinase 1",
+  "pocket": "SRLGSGSSASVYRGALKQFGFRKERAALEQLQRNIVTLYGVCLLLELLD-VSVSELLLYFLHHEGYVHADLKPRNILWLIDFGLS"
+ },
+ "MOS": {
+  "uniprot": "P00540",
+  "family": "MOS",
+  "group": "Other",
+  "full_name": "v-mos Moloney murine sarcoma viral oncogene homolog",
+  "pocket": "QRLGAGGFGSVYKVAIKQVRLASRRSFWAELNDNIVRVVAATIIMEFGGNVTLHQVIYGFLHSQSIVHLDLKPANILIISDFGCS"
+ },
+ "AAK1": {
+  "uniprot": "Q2M2I8",
+  "family": "NAK",
+  "group": "Other",
+  "full_name": "AP2 associated kinase 1",
+  "pocket": "EVLAEGGFAIVFLCALKRMVCKREIQIMRDLSKNIVGYIDSLILMDFCRGGQVVNLMNQHQCKTPIIHRDLKVENILLLCDFGSA"
+ },
+ "BIKE": {
+  "uniprot": "Q9NSY1",
+  "family": "NAK",
+  "group": "Other",
+  "full_name": "BMP2 inducible kinase",
+  "pocket": "ESLAEGGFSTVFLCALKRMVCKREITIMKELSKNIVGYLDCLILMEYCRAGQVVNQMNKHQCKTPIIHRDLKVENILLLCDFGSA"
+ },
+ "GAK": {
+  "uniprot": "O14976",
+  "family": "NAK",
+  "group": "Other",
+  "full_name": "cyclin G associated kinase",
+  "pocket": "RVLAEGGFAFVYEYALKRLAIIQEVCFMKKLSPNIVQFCSALLLTELCK-GQLVEFLKKHRQKPPIIHRDLKVENLLLLCDFGSA"
+ },
+ "MPSK1": {
+  "uniprot": "O75716",
+  "family": "NAK",
+  "group": "Other",
+  "full_name": "serine/threonine kinase 16",
+  "pocket": "QKLGEGGFSYVDLYALKRIEAQREADMHRLFNPNILRLVAYWLLLPFFKRGTLWNEIERAIHAKGYAHRDLKPTNILLLMDLGSM"
+ },
+ "NEK1": {
+  "uniprot": "Q96PY6",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 1",
+  "pocket": "QKIGEGSFGKAILYVIKEIESRREVAVLANMKPNIVQYRESYIVMDYCEGGDLFKRINAHVHDRKILHRDIKSQNIFLLGDFGIA"
+ },
+ "NEK3": {
+  "uniprot": "P51956",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 3",
+  "pocket": "RMIGEGSFGRALLFAMKEINSRKEAVLLAKMKPNIVAFKESYIVMEYCDGGDLMQKIKQHIHKKRVLHRDIKSKNIFLLGDFGSA"
+ },
+ "NEK5": {
+  "uniprot": "Q6P3R8",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 5",
+  "pocket": "KAIGQGAFGKAYLCVIKEIASKKEVILLEKMKPNIVAFFNSFIVMEYCDGGDLMKRINRHIHDRKILHRDIKAQNIFLLGDFGIA"
+ },
+ "NEK10": {
+  "uniprot": "Q6ZWH5",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 10",
+  "pocket": "DHLGSGAFGCVYKLAMKEVNIVSELTIIKEQLPNIVRYYKTYIVMELIEGAPLGEHFSSLHKEKRIVHRDLTPNNIMLVTDFGLA"
+ },
+ "NEK11": {
+  "uniprot": "Q8NG66",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 11",
+  "pocket": "QKLGSGSFGTVYLKVLKEIQANLEAQLLSKLDPAIVKFHASCIITEYCEGRDLDDKIQEYMHERRILHRDLKSKNVFLIGDFGVS"
+ },
+ "NEK2": {
+  "uniprot": "P51955",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 2",
+  "pocket": "YTIGTGSYGRCQKLVWKELMLVSEVNLLRELKPNIVRYYDRYIVMEYCEGGDLASVITKSDGGHTVLHRDLKPANVFLLGDFGLA"
+ },
+ "NEK4": {
+  "uniprot": "P51957",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 4",
+  "pocket": "RVVGKGSYGEVTLYVIKKLAAEQEAQLLSQLKPNIVTYKESYIVMGFCEGGDLYRKLKEYLHEKHILHRDLKTQNVFLVGDLGIA"
+ },
+ "NEK6": {
+  "uniprot": "Q9HC98",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 6",
+  "pocket": "KKIGRGQFSEVYKVALKKVDCVKEIGLLKQLNPNIIKYLDSNIVLELADAGDLSQMIKYHMHSRRVMHRDIKPANVFILGDLGLG"
+ },
+ "NEK7": {
+  "uniprot": "Q8TDX7",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 7",
+  "pocket": "KKIGRGQFSEVYRVALKKVDCIKEIDLLKQLNPNVIKYYASNIVLELADAGDLSRMIKHHMHSRRVMHRDIKPANVFILGDLGLG"
+ },
+ "NEK9": {
+  "uniprot": "Q8TD19",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 9",
+  "pocket": "RVLGRGAFGEATLVVWKEVDALNEIVILALLQDNIIAYYNHLIELEYCNGGNLYDKILRCIHKAGILHRDIKTLNIFLLGDYGLA"
+ },
+ "NEK8": {
+  "uniprot": "Q86SG6",
+  "family": "NEK",
+  "group": "Other",
+  "full_name": "NIMA related kinase 8",
+  "pocket": "RVVGRGAFGIVHLVIIKQIAAQNECQVLKLLNPNVIEYYENMIAMEYAPGGTLAEFIQKHVHTHLILHRDLKTQNILLIGDFGIS"
+ },
+ "SBK": {
+  "uniprot": "Q52WX2",
+  "family": "NKF1",
+  "group": "Other",
+  "full_name": "SH3 domain binding kinase 1",
+  "pocket": "RELGKGTYGKVDLMALKFVNFLREVSITNSLSPFIIKVFDVVFAQEYAPAGDLFDIIPPFMHGRQLVHRDIKPENVLLLADFGMT"
+ },
+ "SgK069": {
+  "uniprot": "P0C263",
+  "family": "NKF1",
+  "group": "Other",
+  "full_name": "SH3 domain binding kinase family member 2",
+  "pocket": "RPLGQGCYGRVLLLALKQLGFLYEFCVGLSLGSAIVTAYGISFLTEPVLHGDLMAFIQPYIHARGLVYRDLKPENVLVLTDFGHT"
+ },
+ "SgK110": {
+  "uniprot": "P0C264",
+  "family": "NKF1",
+  "group": "Other",
+  "full_name": "SH3 domain binding kinase family member 3",
+  "pocket": "RKLGSGSYGRVLLVALKLLTFLREFCVGRCVSPGLLQTLAGAFAQEYAPCGDLSGMLQEFLHSRGLVHADVKPDNVLVLGDLGLT"
+ },
+ "PINK1": {
+  "uniprot": "Q9BXM7",
+  "family": "NKF2",
+  "group": "Other",
+  "full_name": "PTEN induced putative kinase 1",
+  "pocket": "QSIGKGCSAAVYELAIKMMGSSSEAILNTMSQPNIIRVLRALPGALVDYPDVLPSRLHPHLVQQGIAHRDLKSDNILVIADFGCC"
+ },
+ "SgK269": {
+  "uniprot": "Q9H792",
+  "family": "NKF3",
+  "group": "Other",
+  "full_name": "pseudopodium enriched atypical kinase 1",
+  "pocket": "KPCCEAGDAVYYTYAVKICSKAKESQQYYHSLFNIQQDCGHPDDPEKDEDDMEETEEDAHLKPYHVTHCDLRLENLLLVSNFSQA"
+ },
+ "SgK223": {
+  "uniprot": "Q86YV5",
+  "family": "NKF3",
+  "group": "Other",
+  "full_name": "Tyrosine-protein kinase SgK223",
+  "pocket": "KPCCDSGDAIYYCYAVKICVASVPSSMLSSPDPPAQEQDCVREVPHQT-ASDFVRDSAAHLKEHGIIHRDLCLENLLLISNFLKA"
+ },
+ "CLIK1": {
+  "uniprot": "Q8TDR2",
+  "family": "NKF4",
+  "group": "Other",
+  "full_name": "serine/threonine kinase 35",
+  "pocket": "AEIGRGSYGVVYEVAVKKILALAEFWALTSLKGNKSSQLYLGYAEEPCYLWFVMEFCEGFLHKNHIVHRDLKPDNILIVADFGLS"
+ },
+ "CLIK1L": {
+  "uniprot": "Q8N165",
+  "family": "NKF4",
+  "group": "Other",
+  "full_name": "PDLIM1 interacting kinase 1 like",
+  "pocket": "REVGRGSYGVVYEVAVKKILALREFWALSSIKPNVIHLEECLQLVETSLKGEIAFDPRSFLHKNQIIHRDLKPDNILIVADFGLS"
+ },
+ "SgK307": {
+  "uniprot": "Q8IWB6",
+  "family": "NKF5",
+  "group": "Other",
+  "full_name": "testis expressed 14",
+  "pocket": "-------------VTVKELLLIAEQEHSSKLRPYLLQLMAVRLVYERITIGTLFSVLHEYLHFQGFIHRSLSSYAVHILTNLEYM"
+ },
+ "NRBP1": {
+  "uniprot": "Q9UHY1",
+  "family": "NRBP",
+  "group": "Other",
+  "full_name": "nuclear receptor binding protein 1",
+  "pocket": "EEVNQRNVPGIDSVVWNEVKVRAVFDNLIQLELNIVKFHKYIFITEYMSSGSLKQFLKKHSCDPPIIHGNLTCDTIFIIGSVAPD"
+ },
+ "NRBP2": {
+  "uniprot": "Q9NSY0",
+  "family": "NRBP",
+  "group": "Other",
+  "full_name": "nuclear receptor binding protein 2",
+  "pocket": "EQVNQGNMPGLQSVWNELHKIQTVFEQLVLVDPNIVKLHKYIFITEYVSSGSLKQFLKKHACSPPIIHGNLTSDTIFIIGSVWHR"
+ },
+ "RNAseL": {
+  "uniprot": "Q05823",
+  "family": "Other-Unique",
+  "group": "Other",
+  "full_name": "ribonuclease L",
+  "pocket": "YKIADTSEGGIYLVAVKTFRAQREVSCLQSSRSHLVTFYGSFVCVTLCEQ-TLEACLDVLHLSCGYTHQDLQPQNILILADFDKS"
+ },
+ "SgK396": {
+  "uniprot": "Q9BXU1",
+  "family": "Other-Unique",
+  "group": "Other",
+  "full_name": "serine/threonine kinase 31",
+  "pocket": "EPMKELSSKRPLVILLKGYAKVIERAATYHRAEAEGDSGLLYLMVPYYPRANLNAVQANTLHKADIIHGSLHQNNVFAVGDFDFT"
+ },
+ "SgK196": {
+  "uniprot": "Q9H5K3",
+  "family": "Other-Unique",
+  "group": "Other",
+  "full_name": "protein-O-mannose kinase",
+  "pocket": "KRVGEGAVKRVFLVALSQLDFLHGLQMLKSLQTHVVTLLGYTMLTEYHPLGSLSNLEETYLHHSPVGTRVMCDSNDLPANDLDAL"
+ },
+ "GCN2": {
+  "uniprot": "Q9P2K8",
+  "family": "PEK",
+  "group": "Other",
+  "full_name": "eukaryotic translation initiation factor 2 alpha kinase 4",
+  "pocket": "QLLGKGAFGAVIKYAVKRIRIKGEVTLLSRLHENIVRYYNALDSVEAAAPPPILSSSVEYIHEKGMIHRDLKPVNIFLIGDFGLA"
+ },
+ "GCN2-b": {
+  "uniprot": "Q9P2K8",
+  "family": "STE-Unique",
+  "group": "STE",
+  "full_name": "eukaryotic translation initiation factor 2 alpha kinase 4 (2nd domain)",
+  "pocket": "KCIGSDEQLGKLVVLLYEWGTETEFNSLVKLSPNVVRYLAMDILVEHISGVSLAAHLSHYLHSNSVVHKVLSASNVLVITDYSIS"
+ },
+ "HRI": {
+  "uniprot": "Q9BQI3",
+  "family": "PEK",
+  "group": "Other",
+  "full_name": "eukaryotic translation initiation factor 2 alpha kinase 1",
+  "pocket": "AILGKGGYGRVYKYAIKKIKVLREVKVLAGLQPNIVGYHTALSDQEEDREQCGVKNDESYIHNMGIVHRDLKPRNIFLIGDFGLA"
+ },
+ "PEK": {
+  "uniprot": "Q9NZJ5",
+  "family": "PEK",
+  "group": "Other",
+  "full_name": "eukaryotic translation initiation factor 2 alpha kinase 3",
+  "pocket": "QCLGRGGFGVVFEYAIKRIKVMREVKALAKLEPGIVRYFNAYIQMQLCRKENLKDWMNGFLHSKGLMHRDLKPSNIFFVGDFGLV"
+ },
+ "PKR": {
+  "uniprot": "P19525",
+  "family": "PEK",
+  "group": "Other",
+  "full_name": "eukaryotic translation initiation factor 2 alpha kinase 2",
+  "pocket": "ELIGSGGFGQVFKYVIKRVKAEREVKALAKLDVNIVHYNGCFIQMEFCDKGTLEQWIEKYIHSKKLIHRDLKPSNIFLIGDFGLV"
+ },
+ "PLK1": {
+  "uniprot": "P53350",
+  "family": "PLK",
+  "group": "Other",
+  "full_name": "polo like kinase 1",
+  "pocket": "RFLGKGGFAKCFEFAGKIVKMSMEISIHRSLAQHVVGFHGFFVVLELCRRRSLLELHKRYLHRNRVIHRDLKLGNLFLIGDFGLA"
+ },
+ "PLK3": {
+  "uniprot": "Q9H4B4",
+  "family": "PLK",
+  "group": "Other",
+  "full_name": "polo like kinase 3",
+  "pocket": "RLLGKGGFARCYEYAVKVIKILNEIELHRDLQRHIVRFSHHYIFLELCSRKSLAHIWKAYLHQRGILHRDLKLGNFFIVGDFGLA"
+ },
+ "PLK2": {
+  "uniprot": "Q9NYY3",
+  "family": "PLK",
+  "group": "Other",
+  "full_name": "polo like kinase 2",
+  "pocket": "KVLGKGGFAKCYEYAAKIIKIDKEIELHRILHKHVVQFYHYYILLEYCSRRSMAHILKAYLHEQEILHRDLKLGNFFIVGDFGLA"
+ },
+ "PLK4": {
+  "uniprot": "O00444",
+  "family": "PLK",
+  "group": "Other",
+  "full_name": "polo like kinase 4",
+  "pocket": "NLLGKGSFAGVYRVAIKMIRVQNEVKIHCQLKPSILELYNYYLVLEMCHNGEMNRYLKNYLHSHGILHRDLTLSNLLLIADFGLA"
+ },
+ "SCYL2": {
+  "uniprot": "Q6P3W7",
+  "family": "SCY1",
+  "group": "Other",
+  "full_name": "SCY1 like pseudokinase 2",
+  "pocket": "RHIASGGNGLAWKVAVFVFSLKRGVQQLTRLRPRLLTVQHPAFCTEPVF-ASLANVLGNLHSSVKMVHGNITPENIILIMGFDFC"
+ },
+ "SCYL3": {
+  "uniprot": "Q8IZE3",
+  "family": "SCY1",
+  "group": "Other",
+  "full_name": "SCY1 like pseudokinase 3",
+  "pocket": "---------AVYPASVFVYKVNKAAKHLKTLRPCLLRFLSCHLVTERV--QPLEVALETLHDRGHLTHNNVCLSSVFVLGGMETV"
+ },
+ "SCYL1": {
+  "uniprot": "Q96KG9",
+  "family": "SCY1",
+  "group": "Other",
+  "full_name": "SCY1 like pseudokinase 1",
+  "pocket": "--------WALHRVSIFVYVAKAAFKRFKTLRPNILAYIDGHVVTEAV--TPLGIYLKALVNDCSLIHNNVCMAAVFVLGGLDYM"
+ },
+ "SgK071": {
+  "uniprot": "Q8NE28",
+  "family": "SgK071",
+  "group": "Other",
+  "full_name": "serine/threonine kinase-like domain containing 1",
+  "pocket": "YQLNPGALGVNLVHVIKQVQALEELMPLLKLRAHISVYQELCLVMEFNE-LSFQEVIEDYLHHLDIIHRNLKPSNIILLQDLSSN"
+ },
+ "SgK493": {
+  "uniprot": "Q504Y2",
+  "family": "SgK493",
+  "group": "Other",
+  "full_name": "protein kinase domain containing, cytoplasmic",
+  "pocket": "QYMGSGYTKAVYRVALKAVKLLKEMVLLERLRPNVLQLYGYDTLTTITELGAPVEMIQLHSPLGSVTLLDFRPRQFVLVTDLDDA"
+ },
+ "SgK496": {
+  "uniprot": "Q6XUX3",
+  "family": "SgK496",
+  "group": "Other",
+  "full_name": "dual serine/threonine and tyrosine protein kinase",
+  "pocket": "QELGRGQYGVVYLCALKSVDLALEFHYMRSLPERLVDLHGSLLIMERLH-RDLYTGLKAFLHSQGLVHRDIKLKNVLLITDLGFC"
+ },
+ "Slob": {
+  "uniprot": "Q7Z7A4",
+  "family": "Slob",
+  "group": "Other",
+  "full_name": "PX domain containing serine/threonine kinase like",
+  "pocket": "KDIGWRIRKKYFLLVLSWADFQCLIKLLPSCLPYIYRVTFALLIRMFNEKGTLKDLIYKFLHDKGFPYGHLHASNVMLLLDLE--"
+ },
+ "TBCK": {
+  "uniprot": "Q8TEA7",
+  "family": "TBCK",
+  "group": "Other",
+  "full_name": "TBC1 domain containing kinase",
+  "pocket": "-------------LPHDVCKILGRFQILKTITPRLCQYVDIVVVAEHCE-RSLEDLLREYMNKHGIVHRALSPHNILLLAKFGLY"
+ },
+ "TLK1": {
+  "uniprot": "Q9UKI8",
+  "family": "TLK",
+  "group": "Other",
+  "full_name": "tousled like kinase 1",
+  "pocket": "HLLGRGGFSEVYKAAVKIHHACREYRIHKELDPRIVKLYDYCTVLEYCEGNDLDFYLKQNEIKPPIIHYDLKPGNILLITDFGLS"
+ },
+ "TLK2": {
+  "uniprot": "Q86UE8",
+  "family": "TLK",
+  "group": "Other",
+  "full_name": "tousled like kinase 2",
+  "pocket": "HLLGRGGFSEVYKVAVKIHHACREYRIHKELDPRIVKLYDYCTVLEYCEGNDLDFYLKQNEIKPPIIHYDLKPGNILLITDFGLS"
+ },
+ "PBK": {
+  "uniprot": "Q96KB5",
+  "family": "TOPK",
+  "group": "Other",
+  "full_name": "PDZ binding kinase",
+  "pocket": "QKLGFGTGVNVYLWAVKKIRLMDEAKILKSLHPNIVGYRAFCLAMEYGGEKSLNDLIEELHQEKKLLHGDIKSSNVVIICDVGVS"
+ },
+ "TTK": {
+  "uniprot": "P33981",
+  "family": "TTK",
+  "group": "Other",
+  "full_name": "TTK protein kinase",
+  "pocket": "KQIGSGGSSKVFQYAIKYVSYRNEIAYLNKLQDKIIRLYDYYMVMECGN-IDLNSWLKKTIHQHGIVHSDLKPANFLILIDFGIA"
+ },
+ "Fused": {
+  "uniprot": "Q9NRP7",
+  "family": "ULK",
+  "group": "Other",
+  "full_name": "serine/threonine kinase 36",
+  "pocket": "EMIGEGSFGRVYKVALKFINLQREIEIMRGLRPNIVHMLDSVVVTDYAE-GELFQILEDYLHSHRILHRDMKPQNILLLCDFGFA"
+ },
+ "ULK1": {
+  "uniprot": "O75385",
+  "family": "ULK",
+  "group": "Other",
+  "full_name": "unc-51 like autophagy activating kinase 1",
+  "pocket": "DLIGHGAFAVVFKVAVKCILLGKEIKILKELKENIVALYDFYLVMEYCNGGDLADYLHALLHSKGIIHRDLKPQNILLIADFGFA"
+ },
+ "ULK2": {
+  "uniprot": "Q8IYT8",
+  "family": "ULK",
+  "group": "Other",
+  "full_name": "unc-51 like autophagy activating kinase 2",
+  "pocket": "DLVGHGAFAVVFRVAIKSILLGKEIKILKELQENIVALYDVFLVMEYCNGGDLADYLQAILHSKGIIHRDLKPQNILLIADFGFA"
+ },
+ "ULK3": {
+  "uniprot": "Q6PHR2",
+  "family": "ULK",
+  "group": "Other",
+  "full_name": "unc-51 like kinase 3",
+  "pocket": "ERLGSGTYATVYKVAIKCVNLLTEIEILKGIRPHIVQLKDFYLIMEFCAGGDLSRFIHTFLHERNISHLDLKPQNILLLADFGFA"
+ },
+ "ULK4": {
+  "uniprot": "Q96C45",
+  "family": "ULK",
+  "group": "Other",
+  "full_name": "unc-51 like kinase 4",
+  "pocket": "EEIGRGSKTVVYKVAILCTEITNWVRLTREIKKNIVTFHEWWLVVELCTGGSLKTVIAQHLHKLGILFCDISPRKILLFSNFCLA"
+ },
+ "PIK3R4": {
+  "uniprot": "Q99570",
+  "family": "VPS15",
+  "group": "Other",
+  "full_name": "phosphoinositide-3-kinase regulatory subunit 4",
+  "pocket": "KSLGSTRFFKVARVVVKVFSYKQELEELKIR---LNSAQNCMLFRQYVR-DNLYDRISTQAHKSGVRHGDIKTENVMVLTDFASF"
+ },
+ "Wee1": {
+  "uniprot": "P30291",
+  "family": "WEE",
+  "group": "Other",
+  "full_name": "WEE1 G2 checkpoint kinase",
+  "pocket": "EKIGSGEFGSVFKYAIKRSNALREVYAHAVLGSHVVRYFSALIQNEYCNGGSLADAISEYIHSMSLVHMDIKPSNIFIIGDLGHV"
+ },
+ "MYT1": {
+  "uniprot": "Q99640",
+  "family": "WEE",
+  "group": "Other",
+  "full_name": "protein kinase, membrane associated tyrosine/threonine 1",
+  "pocket": "SRLGHGSYGEVFKYAVKRSRKLAEVGSHEKVGPCCVRLEQAYLQTELC-GPSLQQHCEAHLHSQGLVHLDVKPANIFLLGDFGLL"
+ },
+ "Wee1B": {
+  "uniprot": "P0C1S8",
+  "family": "WEE",
+  "group": "Other",
+  "full_name": "WEE1 homolog 2 (S. pombe)",
+  "pocket": "EKIGVGEFGTVYKYAIKRSSALHEVYAHAVLGPHVVRYYSSIIQNEYCNGGSLQAAISEYIHNSSMVHLDIKPSNIFIIGDLGHA"
+ },
+ "Wnk1": {
+  "uniprot": "Q9H4A3",
+  "family": "WNK",
+  "group": "Other",
+  "full_name": "WNK lysine deficient protein kinase 1",
+  "pocket": "IEIGRGSFKTVYKVAWCELRFKEEAEMLKGLQPNIVRFYDSVLVTELMTSGTLKTYLKRHTRTPPIIHRDLKCDNIFIIGDLGLA"
+ },
+ "Wnk4": {
+  "uniprot": "Q96J92",
+  "family": "WNK",
+  "group": "Other",
+  "full_name": "WNK lysine deficient protein kinase 4",
+  "pocket": "IEIGRGSFKTVYRVAWCELRFSEEVEMLKGLQPNIVRFYDSVLVTELMTSGTLKTYLRRHSRVPPILHRDLKCDNVFIIGDLGLA"
+ },
+ "Wnk3": {
+  "uniprot": "Q9BYP7",
+  "family": "WNK",
+  "group": "Other",
+  "full_name": "WNK lysine deficient protein kinase 3",
+  "pocket": "IELGRGAFKTVYKVAWCELRFKEEAEMLKGLQPNIVRFYDSVLVTELMTSGTLKTYLKRHTRTPPIIHRDLKCDNIFIIGDLGLA"
+ },
+ "Wnk2": {
+  "uniprot": "Q9Y3S1",
+  "family": "WNK",
+  "group": "Other",
+  "full_name": "WNK lysine deficient protein kinase 2",
+  "pocket": "IELGRGSFKTVYKVAWCELRFKEEAEMLKGLQPNIVRFYDFVLVTELMTSGTLKTYLKRHTRTPPIIHRDLKCDNIFIIGDLGLA"
+ },
+ "HSER": {
+  "uniprot": "P25092",
+  "family": "RGC",
+  "group": "RGC",
+  "full_name": "guanylate cyclase 2C",
+  "pocket": "DDKRRDTIQRLRQVILKDLKQKIELNKLLQIDYNLTKFYGTFGVIEYCERGSLREVLNDLHSSKTEVHGRLKSTNCVVITDFGCN"
+ },
+ "CYGF": {
+  "uniprot": "P51841",
+  "family": "RGC",
+  "group": "RGC",
+  "full_name": "guanylate cyclase 2F, retinal",
+  "pocket": "SEVQSGRSPRLSFVWLKKFRASDVFEMMKDLRENINPLLGFAIVTEFCSRGSLEDILTNYLHHREFVHGRLKSRNCVVVTDYGFN"
+ },
+ "CYGD": {
+  "uniprot": "Q02846",
+  "family": "RGC",
+  "group": "RGC",
+  "full_name": "guanylate cyclase 2D, membrane (retina-specific)",
+  "pocket": "SDIRSGPSQHLDSVWLKKFATKTAFSKLQELRENVALYLGLAVVSEHCTRGSLQDLLAQYLHHRGVAHGRLKSRNCIVITDHGHG"
+ },
+ "ANPa": {
+  "uniprot": "P16066",
+  "family": "RGC",
+  "group": "RGC",
+  "full_name": "natriuretic peptide receptor 1",
+  "pocket": "TLSGRGSNYGSLLVAVKRVKVLFELKHMRDVQEHLTRFVGACILTEYCPRGSLQDILENLHNGAICSHGNLKSSNCVVITDYGLE"
+ },
+ "ANPb": {
+  "uniprot": "P20594",
+  "family": "RGC",
+  "group": "RGC",
+  "full_name": "natriuretic peptide receptor 2",
+  "pocket": "TLSLRGSSYGSLMVAIKHVQVLFELKHMRDVQNHLTRFIGACIVTEYCPRGSLQDILENLHNSIISSHGSLKSSNCVVITDYGLA"
+ },
+ "MAP3K5": {
+  "uniprot": "Q99683",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 5",
+  "pocket": "VVLGKGTYGIVYAIAIKEIPLHEEIALHKHLKKNIVQYLGSKIFMEQVPGGSLSALLRSYLHDNQIVHRDIKGDNVLIISDFGTS"
+ },
+ "MAP3K6": {
+  "uniprot": "O95382",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 6",
+  "pocket": "LVLGKGTYGVVYAIAIKEIPLHEEIALHRRLRKNIVRYLGSKIFMEEVPGGSLSSLLRSYLHDNHIVHRDIKGDNVLIISDFGTS"
+ },
+ "MAP3K7": {
+  "uniprot": "Q6ZN16",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "Mitogen-activated protein kinase kinase kinase 15",
+  "pocket": "VVLGKGTYGIVYAIAIKEIPLHEEIALHKYLKRNIVQYLGSKIFMEQVPGGSLSALLRSYLHENQIVHRDIKGDNVLVISDFGTS"
+ },
+ "MAP3K1": {
+  "uniprot": "Q13233",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 1, E3 ubiquitin protein ligase",
+  "pocket": "QQIGLGAFSSCYQMAVKQVALREEIRMMSHLNPNIIRMLGANLFIEWMAGGSVAHLLSKYLHENQIIHRDVKGANLLIIADFGAA"
+ },
+ "MAP3K8": {
+  "uniprot": "Q56UN5",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 19",
+  "pocket": "EILGKGAYGTVYCIAVKQVKLQEEVDLLKALKVNIVAYLGTSIFMEFVPGGSISSIINRYLHENCVVHRDIKGNNVMLLIDFGCA"
+ },
+ "MAP3K3": {
+  "uniprot": "Q99759",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 3",
+  "pocket": "KLLGQGAFGRVYLLASKQVALECEIQLLKNLQERIVQYYGCTIFMEYMPGGSVKDQLKAYLHSNMIVHRDIKGANILRLGDFGAS"
+ },
+ "MAP3K2": {
+  "uniprot": "Q9Y2U5",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 2",
+  "pocket": "KLLGQGAFGRVYLLAVKQVALECEIQLLKNLLERIVQYYGCSIFMEYMPGGSIKDQLKAYLHSNMIVHRDIKGANILRLGDFGAS"
+ },
+ "MAP3K4": {
+  "uniprot": "Q9Y6R4",
+  "family": "STE11",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 4",
+  "pocket": "NKIGEGQYGKVYTMAMKEIETADELKIFEGIKPNLVRYFGVYIFMEYCDEGTLEEVSRLVLHEHGIVHRDIKGANIFLLGDFGCS"
+ },
+ "OSR1": {
+  "uniprot": "O95747",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "oxidative stress responsive 1",
+  "pocket": "EVIGSGATAVVQAVAIKRIELLKEIQAMSQCHPNIVSYYTSWLVMKLLSGGSVLDIIKHYLHKNGQIHRDVKAGNILLIADFGVS"
+ },
+ "STLK3": {
+  "uniprot": "Q9UEW8",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 39",
+  "pocket": "EVIGSGATAVVQAVAIKRIELLKEIQAMSQCSPNVVTYYTSWLVMKLLSGGSMLDIIKYYLHRNGQIHRDLKAGNILLIADFGVS"
+ },
+ "GCK": {
+  "uniprot": "P35557",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "glucokinase",
+  "pocket": "QRVGAGTYGDVYKAAVKIVSLQQEITILRECRPNVVAYIGSWICMEFCGGGSLQEIYHAHLHSQGKIHRDIKGANLLLLADFGVS"
+ },
+ "KHS2": {
+  "uniprot": "Q8IVH8",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase kinase 3",
+  "pocket": "QRIGSGTYGDVYKAAIKVIVVQQEIIMMKDCKPNIVAYFGSWICMEFCGGGSLQDIYHVYLHSKGKMHRDIKGANILLLADFGVS"
+ },
+ "KHS1": {
+  "uniprot": "Q9Y4K4",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase kinase 5",
+  "pocket": "QRVGSGTYGDVYKAAVKIILIQQEIFMVKECKCNIVAYFGSWICMEYCGGGSLQDIYHVYLHTKGKMHRDIKGANILLLADFGVA"
+ },
+ "HPK1": {
+  "uniprot": "Q92918",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase kinase 1",
+  "pocket": "QRLGGGTYGEVFKVALKMVTLQKEILILKTCRANIVAYHGSWICMEFCGAGSLQDIYQVYLHSQKKIHRDIKGANILILADFGIS"
+ },
+ "HGK": {
+  "uniprot": "O95819",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase kinase 4",
+  "pocket": "EVVGNGTYGQVYKAAIKVMEIKLEINMLKKYSRNIATYYGAWLVMEFCGAGSITDLVKNHLHIHHVIHRDIKGQNVLLLVDFGVS"
+ },
+ "TNIK": {
+  "uniprot": "Q9UKE5",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "TRAF2 and NCK interacting kinase",
+  "pocket": "ELVGNGTYGQVYKAAIKVMEIKQEINMLKKYSRNIATYYGAWLVMEFCGAGSVTDLIKNHLHQHKVIHRDIKGQNVLLLVDFGVS"
+ },
+ "NRK": {
+  "uniprot": "Q7Z2Y5",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "Nik related kinase",
+  "pocket": "KTIGLGTYGRIYLTAVKVMDLRTELNLLRKYSKNIVSFYGAWMVMELCAAGSVTDVVRMHLHAHRVIHRDIKGQNVLLLVDFGVS"
+ },
+ "MINK": {
+  "uniprot": "Q8N4C8",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "misshapen-like kinase 1",
+  "pocket": "EVVGNGTYGQVYKAAIKVMEIKQEINMLKKYSRNIATYYGAWLVMEFCGAGSVTDLVKNHLHAHKVIHRDIKGQNVLLLVDFGVS"
+ },
+ "MST2": {
+  "uniprot": "Q13188",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 3",
+  "pocket": "EKLGEGSYGSVFKVAIKQVEIIKEISIMQQCDPYVVKYYGSWIVMEYCGAGSVSDIIRLYLHFMRKIHRDIKAGNILLLADFGVA"
+ },
+ "MST1": {
+  "uniprot": "Q13043",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 4",
+  "pocket": "EKLGEGSYGSVYKVAIKQVEIIKEISIMQQCDPHVVKYYGSWIVMEYCGAGSVSDIIRLYLHFMRKIHRDIKAGNILLLADFGVA"
+ },
+ "MYO3A": {
+  "uniprot": "Q8NEV4",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "myosin IIIA",
+  "pocket": "ETIGKGTYGKVFKAAVKILEIEAEYNILKALSPNVVRFYGIWLVLELCSGGSVTDLVKGHLHNNKTIHRDVKGNNILLLVDFGVS"
+ },
+ "MYO3B": {
+  "uniprot": "Q8WXR4",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "myosin IIIB",
+  "pocket": "ETIGKGTYGKVYKAAVKILEIEAEYNILQFLPPNVVKFYGMWLVLELCNGGSVTELVKGHLHNNRIIHRDVKGNNILLLVDFGVS"
+ },
+ "PAK1": {
+  "uniprot": "Q13153",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 1",
+  "pocket": "EKIGQGASGTVYTVAIKQMLIINEILVMRENKPNIVNYLDSWVVMEYLAGGSLTDVVTEFLHSNQVIHRDIKSDNILLLTDFGFC"
+ },
+ "PAK2": {
+  "uniprot": "Q13177",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 2",
+  "pocket": "EKIGQGASGTVFTVAIKQILIINEILVMKELKPNIVNFLDSFVVMEYLAGGSLTDVVTEFLHANQVIHRDIKSDNVLLLTDFGFC"
+ },
+ "PAK3": {
+  "uniprot": "O75914",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 3",
+  "pocket": "EKIGQGASGTVYTVAIKQMLIINEILVMRENKPNIVNYLDSWVVMEYLAGGSLTDVVTEFLHSNQVIHRDIKSDNILLLTDFGFC"
+ },
+ "PAK4": {
+  "uniprot": "O96013",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 4",
+  "pocket": "IKIGEGSTGIVCIVAVKKMLLFNEVVIMRDYQENVVEMYNSWVVMEFLEGGALTDIVTHVLHAQGVIHRDIKSDSILLLSDFGFC"
+ },
+ "PAK6": {
+  "uniprot": "Q9NQU5",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 6",
+  "pocket": "VKIGEGSTGIVCLVAVKMMLLFNEVVIMRDYQFNVVEMYKSWVLMEFLQGGALTDIVSQYLHAQGVIHRDIKSDSILLLSDFGFC"
+ },
+ "PAK5": {
+  "uniprot": "Q9P286",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "p21 protein (Cdc42/Rac)-activated kinase 7",
+  "pocket": "IKIGEGSTGIVCIVAVKKMLLFNEVVIMRDYHDNVVDMYSSWVVMEFLEGGALTDIVTHYLHNQGVIHRDIKSDSILLLSDFGFC"
+ },
+ "LOK": {
+  "uniprot": "O94804",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 10",
+  "pocket": "GELGDGAFGKVYKAAAKVIDYIVEIEILATCDPYIVKLLGAWIMIEFCPGGAVDAIMLEFLHSKRIIHRDLKAGNVLMLADFGVS"
+ },
+ "SLK": {
+  "uniprot": "Q9H2G2",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "STE20 like kinase",
+  "pocket": "GELGDGAFGKVYKAAAKVIDYMVEIDILASCDPNIVKLLDAWILIEFCAGGAVDAVMLEYLHDNKIIHRDLKAGNILFLADFGVS"
+ },
+ "STLK6": {
+  "uniprot": "Q9C0K7",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "STE20-related kinase adaptor beta",
+  "pocket": "VEIGRGFDNLTSVVTIKITALQKAVILSHFFRPNITTYWTVWVISPFMAYGSASQLLRTYLHQNGCIHRSIKASHILILSGLSHL"
+ },
+ "STLK5": {
+  "uniprot": "Q7RTN6",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "STE20-related kinase adaptor alpha",
+  "pocket": "TVIGKGFEDLMTVVTVRRIFLQGELHVSKLFNPNIVPYRATWVVTSFMAYGSAKDLICTYIHHMGYVHRSVKASHILILSGLRSN"
+ },
+ "TAO2": {
+  "uniprot": "Q9UL54",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "TAO kinase 2",
+  "pocket": "REIGHGSFGAVYFVAIKKMDIIKEVRFLQKLRPNTIQYRGCWLVMEYCLGSASDLLEVHYLHSHNMIHRDVKAGNILLLGDFGSA"
+ },
+ "TAO3": {
+  "uniprot": "Q9H2K8",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "TAO kinase 3",
+  "pocket": "HEIGHGSFGAVYFVAIKKMDILKEVKFLRQLKPNTIEYKGCWLVMEYCLGSASDLLEVHYLHSHALIHRDIKAGNILLLADFGSA"
+ },
+ "TAO1": {
+  "uniprot": "Q7L7X3",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "TAO kinase 1",
+  "pocket": "REIGHGSFGAVYFVAIKKMDIIKEVKFLQRIKPNSIEYKGCWLVMEYCLGSASDLLEVHYLHSHTMIHRDIKAGNILLLADFGSA"
+ },
+ "MST3": {
+  "uniprot": "Q9Y6E0",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 24",
+  "pocket": "EKIGKGSFGEVFKVAIKIIDIQQEITVLSQCDPYVTKYYGSWIIMEYLGGGSALDLLEPYLHSEKKIHRDIKAANVLLLADFGVA"
+ },
+ "YSK1": {
+  "uniprot": "O00506",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine kinase 25",
+  "pocket": "DRIGKGSFGEVYKVAIKIIDIQQEITVLSQCDPYITRYFGSWIIMEYLGGGSALDLLKPYLHSERKIHRDIKAANVLLLADFGVA"
+ },
+ "MST4": {
+  "uniprot": "Q9P289",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "serine/threonine protein kinase 26",
+  "pocket": "ERIGKGSFGEVFKVAIKIIDIQQEITVLSQCDSYVTKYYGSWIIMEYLGGGSALDLLRAYLHSEKKIHRDIKAANVLLLADFGVA"
+ },
+ "MAP2K1": {
+  "uniprot": "Q02750",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 1",
+  "pocket": "SELGAGNGGVVFKMARKLIQIIRELQVLHECNPYIVGFYGASICMEHMDGGSLDQVLKKLREKHKIMHRDVKPSNILVLCDFGVS"
+ },
+ "MAP2K2": {
+  "uniprot": "P36507",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 2",
+  "pocket": "SELGAGNGGVVTKMARKLIQIIRELQVLHECNPYIVGFYGASICMEHMDGGSLDQVLKELREKHQIMHRDVKPSNILVLCDFGVS"
+ },
+ "MAP2K3": {
+  "uniprot": "P46734",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 3",
+  "pocket": "SELGRGAYGVVEKMAVKRIRLLMDLDINMRTVFYTVTFYGAWICMELMD-TSLDKFYRKLHSKLSVIHRDVKPSNVLIMCDFGIS"
+ },
+ "MAP2K6": {
+  "uniprot": "P52564",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 6",
+  "pocket": "MELGRGAYGVVEKMAVKRIRLLMDLDISMRTVPFTVTFYGAWICMELMD-TSLDKFYKQLHSKLSVIHRDVKPSNVLIMCDFGIS"
+ },
+ "MAP2K4": {
+  "uniprot": "P45985",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 4",
+  "pocket": "GEIGRGAYGSVNKMAVKRIQLLMDLDVVMRSSPYIVQFYGAWICMELMS-TSFDKFYKYLKENLKIIHRDIKPSNILLLCDFGIS"
+ },
+ "MAP2K5": {
+  "uniprot": "Q13163",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 5",
+  "pocket": "DTLGHGNGGTVYKLAVKVIQIMSELEILYKCDSYIIGFYGASICTEFMDGGSL-DVYRKYLWSLKILHRDVKPSNMLVLCDFGVS"
+ },
+ "MAP2K7": {
+  "uniprot": "O14733",
+  "family": "STE7",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase 7",
+  "pocket": "GEMGSGTCGQVWKIAVKQMRILMDLDVVLKSHPYIVQCFGTFIAMELMGTCAEKLKKRMLKEKHGVIHRDVKPSNILLLCDFGIS"
+ },
+ "COT": {
+  "uniprot": "P41279",
+  "family": "STE-Unique",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 8",
+  "pocket": "DFIPRGAFGKVYLMACKLIFKPSDVEIQACFRENIAELYGAHLFMEAGEGGSVLEKLESFLHSKKVIHHDIKPSNIVFLVDFGLS"
+ },
+ "NIK": {
+  "uniprot": "Q99558",
+  "family": "STE-Unique",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase 14",
+  "pocket": "LRLGRGSFGEVHRCAVKKVFRAEELMACAGLTPRIVPLYGANIFMELLEGGSLGQLVKEYLHSRRILHGDVKADNVLLLCDFGHA"
+ },
+ "ABL1": {
+  "uniprot": "P00519",
+  "family": "Abl",
+  "group": "TK",
+  "full_name": "ABL proto-oncogene 1, non-receptor tyrosine kinase",
+  "pocket": "HKLGGGQYGEVYEVAVKTLEFLKEAAVMKEIKPNLVQLLGVYIITEFMTYGNLLDYLREYLEKKNFIHRDLAARNCLVVADFGLS"
+ },
+ "ABL2": {
+  "uniprot": "P42684",
+  "family": "Abl",
+  "group": "TK",
+  "full_name": "ABL proto-oncogene 2, non-receptor tyrosine kinase",
+  "pocket": "HKLGGGQYGEVYVVAVKTLEFLKEAAVMKEIKPNLVQLLGVYIVTEYMPYGNLLDYLREYLEKKNFIHRDLAARNCLVVADFGLS"
+ },
+ "ACK": {
+  "uniprot": "Q07912",
+  "family": "Ack",
+  "group": "TK",
+  "full_name": "tyrosine kinase, non-receptor, 2",
+  "pocket": "EKLGDGSFGVVRRVAVKCLDFIREVNAMHSLDRNLIRLYGVKMVTELAPLGSLLDRLRKYLESKRFIHRDLAARNLLLIGDFGLM"
+ },
+ "TNK1": {
+  "uniprot": "Q13470",
+  "family": "Ack",
+  "group": "TK",
+  "full_name": "tyrosine kinase, non-receptor, 1",
+  "pocket": "ELLGSGCFGVVHRVAVKSLDFLREVSVMMNLEPHVLRLHGLQMVMELAPLGSLHARLTAYLGARGLVHRDLATRNLLLVADFGLV"
+ },
+ "ALK": {
+  "uniprot": "Q9UM73",
+  "family": "ALK",
+  "group": "TK",
+  "full_name": "anaplastic lymphoma receptor tyrosine kinase",
+  "pocket": "RGLGHGAFGEVYEVAVKTLDFLMEALIISKFNQNIVRCIGVFILLELMAGGDLKSFLREYLEENHFIHRDIAARNCLLIGDFGMA"
+ },
+ "LTK": {
+  "uniprot": "P29376",
+  "family": "ALK",
+  "group": "TK",
+  "full_name": "leukocyte receptor tyrosine kinase",
+  "pocket": "RALGHGAFGEVYEVAIKTLDFLMEALIISKFRQNIVRCVGLLILLELMSGGDMKSFLRHYLEENHFIHRDIAARNCLLIGDFGMA"
+ },
+ "AXL": {
+  "uniprot": "P30530",
+  "family": "Axl",
+  "group": "TK",
+  "full_name": "AXL receptor tyrosine kinase",
+  "pocket": "KTLGEGEFGAVMEVAVKTMDFLSEAVCMKEFDPNVMRLIGVVVILPFMKHGDLHSFLLYYLSTKRFIHRDLAARNCMLVADFGLS"
+ },
+ "TYRO3": {
+  "uniprot": "Q06418",
+  "family": "Axl",
+  "group": "TK",
+  "full_name": "TYRO3 protein tyrosine kinase",
+  "pocket": "RMLGKGEFGSVREVAVKMLEFLREAACMKEFDPHVAKLVGVMVILPFMKHGDLHAFLLAYLSSRNFIHRDLAARNCMLVADFGLS"
+ },
+ "MER": {
+  "uniprot": "Q12866",
+  "family": "Axl",
+  "group": "TK",
+  "full_name": "MER proto-oncogene, tyrosine kinase",
+  "pocket": "KILGEGEFGSVMEVAVKTMEFLSEAACMKDFSPNVIRLLGVMVILPFMKYGDLHTYLLYYLSNRNFLHRDLAARNCMLVADFGLS"
+ },
+ "CCK4": {
+  "uniprot": "Q13308",
+  "family": "CCK4",
+  "group": "TK",
+  "full_name": "protein tyrosine kinase 7 (inactive)",
+  "pocket": "TTLGKSEFGEVFLVLVKSLDFRRELEMFGKLNANVVRLLGLYMVLEYVDLGDLKQFLRIHLSNNRFVHKDLAARNCLVVSALGLS"
+ },
+ "CSK": {
+  "uniprot": "P41240",
+  "family": "Csk",
+  "group": "TK",
+  "full_name": "c-src tyrosine kinase",
+  "pocket": "QTIGKGEFGDVMLVAVKCIAFLAEASVMTQLRSNLVQLLGVYIVTEYMAKGSLVDYLRSYLEGNNFVHRDLAARNVLVVSDFGLT"
+ },
+ "CTK": {
+  "uniprot": "P42679",
+  "family": "Csk",
+  "group": "TK",
+  "full_name": "megakaryocyte-associated tyrosine kinase",
+  "pocket": "AQIGEGEFGAVLQVAVKNIAFLDETAVMTKMQENLVRLLGVYIVMEHVSKGNLVNFLRTYLESKKLVHRDLAARNILVVSDFGLA"
+ },
+ "DDR1": {
+  "uniprot": "Q08345",
+  "family": "DDR",
+  "group": "TK",
+  "full_name": "discoidin domain receptor tyrosine kinase 1",
+  "pocket": "EKLGEGQFGEVHLVAVKILDFLKEVKIMSRLKPNIIRLLGVCMITDYMENGDLNQFLSAYLATLNFVHRDLATRNCLVIADFGMS"
+ },
+ "DDR2": {
+  "uniprot": "Q16832",
+  "family": "DDR",
+  "group": "TK",
+  "full_name": "discoidin domain receptor tyrosine kinase 2",
+  "pocket": "EKLGEGQFGEVHLVAVKMLDFLKEIKIMSRLKPNIIHLLAVCMITEYMENGDLNQFLSRYLSSLNFVHRDLATRNCLVIADFGMS"
+ },
+ "EGFR": {
+  "uniprot": "P00533",
+  "family": "EGFR",
+  "group": "TK",
+  "full_name": "epidermal growth factor receptor",
+  "pocket": "KVLGSGAFGTVYKVAIKELEILDEAYVMASVDPHVCRLLGIQLITQLMPFGCLLDYVREYLEDRRLVHRDLAARNVLVITDFGLA"
+ },
+ "ErbB2": {
+  "uniprot": "P04626",
+  "family": "EGFR",
+  "group": "TK",
+  "full_name": "erb-b2 receptor tyrosine kinase 2",
+  "pocket": "KVLGSGAFGTVYKVAIKVLEILDEAYVMAGVGPYVSRLLGIQLVTQLMPYGCLLDHVREYLEDVRLVHRDLAARNVLVITDFGLA"
+ },
+ "ErbB3": {
+  "uniprot": "P21860",
+  "family": "EGFR",
+  "group": "TK",
+  "full_name": "erb-b2 receptor tyrosine kinase 3",
+  "pocket": "KVLGSGVFGTVHKVCIKVIAVTDHMLAIGSLDAHIVRLLGLQLVTQYLPLGSLLDHVRQYLEEHGMVHRNLAARNVLLVADFGVA"
+ },
+ "ErbB4": {
+  "uniprot": "Q15303",
+  "family": "EGFR",
+  "group": "TK",
+  "full_name": "erb-b2 receptor tyrosine kinase 4",
+  "pocket": "KVLGSGAFGTVYKVAIKILEFMDEALIMASMDPHLVRLLGVQLVTQLMPHGCLLEYVHEYLEERRLVHRDLAARNVLVITDFGLA"
+ },
+ "EphA2": {
+  "uniprot": "P29317",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A2",
+  "pocket": "KVIGAGEFGEVYKVAIKTLDFLGEAGIMGQFSHNIIRLEGVMIITEYMENGALDKFLREYLANMNYVHRDLAARNILVVSDFGLS"
+ },
+ "EphA1": {
+  "uniprot": "P21709",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A1",
+  "pocket": "TVIGEGEFGEVYRVAIKTLNFLREATIMGQFSPHILHLEGVMIITEFMENGALDAFLREYLSNHNYVHRDLAARNILVVSDFGLT"
+ },
+ "EphA3": {
+  "uniprot": "P29320",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A3",
+  "pocket": "KVVGAGEFGEVCSVAIKTLDFLGEASIMGQFDPNIIRLEGVMIVTEYMENGSLDSFLRKYLSDMGYVHRDLAARNILIVSDFGLS"
+ },
+ "EphA4": {
+  "uniprot": "P54764",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A4",
+  "pocket": "KVIGVGEFGEVCSVAIKTLDFLSEASIMGQFDPNIIHLEGVMIITEYMENGSLDAFLRKYLSDMSYVHRDLAARNILVVSDFGMS"
+ },
+ "EphA5": {
+  "uniprot": "P54756",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A5",
+  "pocket": "RVIGAGEFGEVCSVAIKTLDFLGEASIMGQFDPNIIHLEGVMIVTEYMENGSLDTFLKKYLSDMGYVHRDLAARNILIVSDFGLS"
+ },
+ "EphA7": {
+  "uniprot": "Q15375",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A7",
+  "pocket": "RVIGAGEFGEVCSVAIKTLDFLCEASIMGQFDPNVVHLEGVMIVIEFMENGALDAFLRKYLADMGYVHRDLAARNILVVSDFGLS"
+ },
+ "EphA8": {
+  "uniprot": "P29322",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A8",
+  "pocket": "KIIGSGDSGEVCYVAIKALDFLSEASIMGQFDPNIIRLEGVMIVTEYMENGSLDTFLRTYLSDLGYVHRDLAARNVLVVSDFGLS"
+ },
+ "EphB1": {
+  "uniprot": "P54762",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor B1",
+  "pocket": "EVIGAGEFGEVYKVAIKTLDFLSEASIMGQFDPNIIRLEGVMIITEFMENGALDSFLRQYLAEMNYVHRDLAARNILVVSDFGLS"
+ },
+ "EphB2": {
+  "uniprot": "P29323",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor B2",
+  "pocket": "QVIGAGEFGEVCSVAIKTLDFLSEASIMGQFDPNVIHLEGVMIITEFMENGSLDSFLRQYLADMNYVHRDLAARNILVVSDFGLS"
+ },
+ "EphB3": {
+  "uniprot": "P54753",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor B3",
+  "pocket": "EVIGAGEFGEVCRVAIKTLDFLSEASIMGQFDPNIIRLEGVMILTEFMENCALDSFLRLYLSEMNYVHRDLAARNILVVSDFGLS"
+ },
+ "EphB4": {
+  "uniprot": "P54760",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor B4",
+  "pocket": "EVIGAGEFGEVCRVAIKTLEFLSEASIMGQFEPNIIRLEGVMILTEFMENGALDSFLRLYLAEMSYVHRDLAARNILVVSDFGLS"
+ },
+ "EphB6": {
+  "uniprot": "O15197",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor B6",
+  "pocket": "EVIGTGSFGEVRQVAIQALTFLGRAAVLGQFQPNILRLEGVMVLTEFMELGPLDSFLRQYLSSFAFVHRSLSAHSVLVVARLGHS"
+ },
+ "EphA10": {
+  "uniprot": "Q5JZY3",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A10",
+  "pocket": "RSLGGGRFGELCCVAVHMLGFLAEALTLGQFDSHIVRLEGVMIVTEYMSHGALDGFLRRYLSEMGYVHRGLAARHVLVISGFGRG"
+ },
+ "EphA6": {
+  "uniprot": "Q9UF33",
+  "family": "Eph",
+  "group": "TK",
+  "full_name": "EPH receptor A6",
+  "pocket": "RVIGAGEFGEVCSVAIKTLDFLREASIMGQFDPNIIRLEGVAIGVEAFCPSFLRAGFLNYLSDMGYVHRDLAARNILVVSDFGLS"
+ },
+ "PYK2": {
+  "uniprot": "Q14289",
+  "family": "FAK",
+  "group": "TK",
+  "full_name": "protein tyrosine kinase 2 beta",
+  "pocket": "RILGEGFFGEVYEVAVKTCKFMSEAVIMKNLDPHIVKLIGIWIIMELYPYGELGHYLERYLESINCVHRDIAVRNILVLGDFGLS"
+ },
+ "FAK": {
+  "uniprot": "Q05397",
+  "family": "FAK",
+  "group": "TK",
+  "full_name": "protein tyrosine kinase 2",
+  "pocket": "RCIGEGQFGDVHQVAIKTCKFLQEALTMRQFDPHIVKLIGVWIIMELCTLGELRSFLQVYLESKRFVHRDIAARNVLVLGDFGLS"
+ },
+ "FER": {
+  "uniprot": "P16591",
+  "family": "Fer",
+  "group": "TK",
+  "full_name": "FER tyrosine kinase",
+  "pocket": "ELLGKGNFGEVYKVAVKTCKFLQEAKILKQYDPNIVKLIGVYIIMELVSGGDFLTFLRRYLESKNCIHRDLAARNCLVISDFGMS"
+ },
+ "FES": {
+  "uniprot": "P07332",
+  "family": "Fer",
+  "group": "TK",
+  "full_name": "FES proto-oncogene, tyrosine kinase",
+  "pocket": "EQIGRGNFGEVFSVAVKSCKFLQEARILKQYSPNIVRLIGVYIVMELVQGGDFLTFLRTYLESKCCIHRDLAARNCLVISDFGMS"
+ },
+ "FGFR1": {
+  "uniprot": "P11362",
+  "family": "FGFR",
+  "group": "TK",
+  "full_name": "fibroblast growth factor receptor 1",
+  "pocket": "KPLGEGCFGQVVLVAVKMLDLISEMEMMKMIGKNIINLLGAYVIVEYASKGNLREYLQAYLASKKCIHRDLAARNVLVIADFGLA"
+ },
+ "FGFR3": {
+  "uniprot": "P22607",
+  "family": "FGFR",
+  "group": "TK",
+  "full_name": "fibroblast growth factor receptor 3",
+  "pocket": "KPLGEGCFGQVVMVAVKMLDLVSEMEMMKMIGKNIINLLGAYVLVEYAAKGNLREFLRAYLASQKCIHRDLAARNVLVIADFGLA"
+ },
+ "FGFR2": {
+  "uniprot": "P21802",
+  "family": "FGFR",
+  "group": "TK",
+  "full_name": "fibroblast growth factor receptor 2",
+  "pocket": "KPLGEGCFGQVVMVAVKMLDLVSEMEMMKMIGKNIINLLGAYVIVEYASKGNLREYLRAYLASQKCIHRDLAARNVLVIADFGLA"
+ },
+ "FGFR4": {
+  "uniprot": "P22455",
+  "family": "FGFR",
+  "group": "TK",
+  "full_name": "fibroblast growth factor receptor 4",
+  "pocket": "KPLGEGCFGQVVRVAVKMLDLVSEMEVMKLIGKNIINLLGVYVIVECAAKGNLREFLRAYLESRKCIHRDLAARNVLVIADFGLA"
+ },
+ "IGF1R": {
+  "uniprot": "P08069",
+  "family": "InsR",
+  "group": "TK",
+  "full_name": "insulin like growth factor 1 receptor",
+  "pocket": "RELGQGSFGMVYEVAIKTVEFLNEASVMKEFN-HVVRLLGVLVIMELMTRGDLKSYLRSYLNANKFVHRDLAARNCMVIGDFGMT"
+ },
+ "INSR": {
+  "uniprot": "P06213",
+  "family": "InsR",
+  "group": "TK",
+  "full_name": "insulin receptor",
+  "pocket": "RELGQGSFGMVYEVAVKTVEFLNEASVMKGFT-HVVRLLGVLVVMELMAHGDLKSYLRSYLNAKKFVHRDLAARNCMVIGDFGMT"
+ },
+ "IRR": {
+  "uniprot": "P14616",
+  "family": "InsR",
+  "group": "TK",
+  "full_name": "insulin receptor-related receptor",
+  "pocket": "RELGQGSFGMVYEVALKTVEFLKEASVMKAFK-HVVRLLGVLVIMELMTRGDLKSHLRSYLAANKFVHRDLAARNCMVIGDFGMT"
+ },
+ "JAK1": {
+  "uniprot": "P23458",
+  "family": "JakA",
+  "group": "TK",
+  "full_name": "Janus kinase 1",
+  "pocket": "RDLGEGHFGKVELVAVKSLDLKKEIEILRNLYENIVKYKGIKLIMEFLPSGSLKEYLPKYLGSRQYVHRDLAARNVLVIGDFGLT"
+ },
+ "JAK2": {
+  "uniprot": "O60674",
+  "family": "JakA",
+  "group": "TK",
+  "full_name": "Janus kinase 2",
+  "pocket": "QQLGKGNFGSVEMVAVKKLDFEREIEILKSLQDNIVKYKGVKLIMEYLPYGSLRDYLQKYLGTKRYIHRDLATRNILVIGDFGLT"
+ },
+ "JAK3": {
+  "uniprot": "P52333",
+  "family": "JakA",
+  "group": "TK",
+  "full_name": "Janus kinase 3",
+  "pocket": "SQLGKGNFGSVELVAVKQLDFQREIQILKALHDFIVKYRGVRLVMEYLPSGCLRDFLQRYLGSRRCVHRDLAARNILVIADFGLA"
+ },
+ "JAK1-b": {
+  "uniprot": "P23458",
+  "family": "JakB",
+  "group": "TK",
+  "full_name": "Janus kinase 1 (2nd domain)",
+  "pocket": "EHLGRGTRTHIYSVILKVLLAFFEAASMMRQVKHIVYLYGVIMVEEFVEGGPLDLFMHRYLEDKDLVHGNVCTKNLLLLSDPGIP"
+ },
+ "JAK2-b": {
+  "uniprot": "O60674",
+  "family": "JakB",
+  "group": "TK",
+  "full_name": "Janus kinase 2 (2nd domain)",
+  "pocket": "ESLGQGTFTKIFKVLLKVLESFFEAASMMSKLKHLVLNYGVILVQEFVKFGSLDTYLKKFLEENTLIHGNVCAKNILLTGNPPFI"
+ },
+ "JAK3-b": {
+  "uniprot": "P52333",
+  "family": "JakB",
+  "group": "TK",
+  "full_name": "Janus kinase 3 (2nd domain)",
+  "pocket": "ENLGHGSFTKIYRVLLKVMSFLEAASLMSQVSRHLVLLHGVTMVQEFVHLGAIDMYLRKYLEDKGLPHGNVSARKVLLLSDPGVS"
+ },
+ "TYK2": {
+  "uniprot": "P29597",
+  "family": "JakA",
+  "group": "TK",
+  "full_name": "tyrosine kinase 2",
+  "pocket": "RDLGEGHFGKVSLVAVKALGWKQEIDILRTLYEHIIKYKGCQLVMEYVPLGSLRDYLPRYLHAQHYIHRDLAARNVLLIGDFGLA"
+ },
+ "TYK2-b": {
+  "uniprot": "P29597",
+  "family": "JakB",
+  "group": "TK",
+  "full_name": "tyrosine kinase 2 (2nd domain)",
+  "pocket": "SHLGQGTRTNVYEVVLKVLLAFYETASLMSQVTHLAFVHGVIMVTEYVEHGPLDVWLRRYLENKNLVHGNVCGRNILLLSDPGVG"
+ },
+ "LMR1": {
+  "uniprot": "Q6ZMQ8",
+  "family": "Lmr",
+  "group": "TK",
+  "full_name": "apoptosis-associated tyrosine kinase",
+  "pocket": "KEIGRGWFGKVFLVVVKELQFLEEVQPYRALKSNLLQCLAQLLVMEFCPLGDLKGYLRSHLHRNNFVHSDLALRNCLLIGDYGLA"
+ },
+ "LMR2": {
+  "uniprot": "Q8IWU2",
+  "family": "Lmr",
+  "group": "TK",
+  "full_name": "lemur tyrosine kinase 2",
+  "pocket": "QEIGNGWFGKVLLVIVKELTFLKNGEPYYILQPNILQCVGQLLVFEFCDLGDLKAYLRSAMHKLHFLHSDLALRNCFLVGDYGIG"
+ },
+ "LMR3": {
+  "uniprot": "Q96Q04",
+  "family": "Lmr",
+  "group": "TK",
+  "full_name": "lemur tyrosine kinase 3",
+  "pocket": "QEIGSGWFGKVILVVVKELKFISEAQPYRSLQPNVLQCLGLLLIMEFCQLGDLKRYLRAHLHSHNYVHSDLALRNCLLIGDYGLA"
+ },
+ "MET": {
+  "uniprot": "P08581",
+  "family": "Met",
+  "group": "TK",
+  "full_name": "MET proto-oncogene, receptor tyrosine kinase",
+  "pocket": "EVIGRGHFGCVYHCAVKSLQFLTEGIIMKDFSPNVLSLLGILVVLPYMKHGDLRNFIRNYLASKKFVHRDLAARNCMLVADFGLA"
+ },
+ "RON": {
+  "uniprot": "Q04912",
+  "family": "Met",
+  "group": "TK",
+  "full_name": "macrophage stimulating 1 receptor",
+  "pocket": "RVIGKGHFGVVYHCAIKSLAFLREGLLMRGLNPNVLALIGIHVLLPYMCHGDLLQFIRSYLAEQKFVHRDLAARNCMLVADFGLA"
+ },
+ "MUSK": {
+  "uniprot": "O15146",
+  "family": "Musk",
+  "group": "TK",
+  "full_name": "muscle, skeletal, receptor tyrosine kinase",
+  "pocket": "RDIGEGAFGRVFQVAVKMLDFQREAALMAEFDPNIVKLLGVCLLFEYMAYGDLNEFLRSYLSERKFVHRDLATRNCLVIADFGLS"
+ },
+ "FMS": {
+  "uniprot": "P07333",
+  "family": "PDGFR",
+  "group": "TK",
+  "full_name": "colony stimulating factor 1 receptor",
+  "pocket": "KTLGAGAFGKVVEVAVKMLALMSELKIMSHLGENIVNLLGALVITEYCCYGDLLNFLRRFLASKNCIHRDVAARNVLLIGDFGLA"
+ },
+ "FLT3": {
+  "uniprot": "P36888",
+  "family": "PDGFR",
+  "group": "TK",
+  "full_name": "fms related tyrosine kinase 3",
+  "pocket": "KVLGSGAFGKVMNVAVKMLALMSELKMMTQLGENIVNLLGAYLIFEYCCYGDLLNYLRSFLEFKSCVHRDLAARNVLVICDFGLA"
+ },
+ "KIT": {
+  "uniprot": "P10721",
+  "family": "PDGFR",
+  "group": "TK",
+  "full_name": "KIT proto-oncogene receptor tyrosine kinase",
+  "pocket": "KTLGAGAFGKVVEVAVKMLALMSELKVLSYLGMNIVNLLGALVITEYCCYGDLLNFLRRFLASKNCIHRDLAARNILLICDFGLA"
+ },
+ "PDGFRa": {
+  "uniprot": "P16234",
+  "family": "PDGFR",
+  "group": "TK",
+  "full_name": "platelet derived growth factor receptor alpha",
+  "pocket": "RVLGSGAFGKVVEVAVKMLALMSELKIMTHLGLNIVNLLGAYIITEYCFYGDLVNYLHKFLASKNCVHRDLAARNVLLICDFGLA"
+ },
+ "PDGFRb": {
+  "uniprot": "P09619",
+  "family": "PDGFR",
+  "group": "TK",
+  "full_name": "platelet derived growth factor receptor beta",
+  "pocket": "RTLGSGAFGQVVEVAVKMLALMSELKIMSHLGLNVVNLLGAYIITEYCRYGDLVDYLHRFLASKNCVHRDLAARNVLIICDFGLA"
+ },
+ "RET": {
+  "uniprot": "P07949",
+  "family": "Ret",
+  "group": "TK",
+  "full_name": "ret proto-oncogene",
+  "pocket": "KTLGEGEFGKVVKVAVKMLDLLSEFNVLKQVNPHVIKLYGALLIVEYAKYGSLRGFLREYLAEMKLVHRDLAARNILVISDFGLS"
+ },
+ "ROR1": {
+  "uniprot": "Q01973",
+  "family": "Ror",
+  "group": "TK",
+  "full_name": "receptor tyrosine kinase-like orphan receptor 1",
+  "pocket": "EELGECAFGKIYKVAIKTLEFQQEASLMAELHPNIVCLLGACMLFEYINQGDLHEFLIMYLSSHFFVHKDLAARNILIISDLGLS"
+ },
+ "ROR2": {
+  "uniprot": "Q01974",
+  "family": "Ror",
+  "group": "TK",
+  "full_name": "receptor tyrosine kinase-like orphan receptor 2",
+  "pocket": "EELGEDRFGKVYKVAIKTLEFRHEAMLRARLQPNVVCLLGVSMIFSYCSHGDLHEFLVMYLSSHHVVHKDLATRNVLVISDLGLF"
+ },
+ "RYK": {
+  "uniprot": "P34925",
+  "family": "Ryk",
+  "group": "TK",
+  "full_name": "receptor-like tyrosine kinase",
+  "pocket": "DVLQEGTFGRIFHAFVKTVMMLTESCKLRGLHRNLLPITHVMVILPYMNWGNLKLFLRQYLARREVIHKDLAARNCVIITDNALS"
+ },
+ "ROS": {
+  "uniprot": "P08922",
+  "family": "Sev",
+  "group": "TK",
+  "full_name": "ROS proto-oncogene 1 , receptor tyrosine kinase",
+  "pocket": "LLLGSGAFGEVYEVAVKTLEFLKEAHLMSKFNPNILKQLGVYIILELMEGGDLLTYLRKYLERMHFIHRDLAARNCLVIGDFGLA"
+ },
+ "FRK": {
+  "uniprot": "P42685",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "fyn-related Src family tyrosine kinase",
+  "pocket": "KRLGSGQFGEVWEVAVKTLDFLREAQIMKNLRPKLIQLYAVYIITELMRHGSLQEYLQNYLESRNYIHRDLAARNVLVVADFGLA"
+ },
+ "FGR": {
+  "uniprot": "P09769",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "FGR proto-oncogene, Src family tyrosine kinase",
+  "pocket": "RRLGTGCFGDVWLVAVKTLAFLEEAQVMKLLRDKLVQLYAVYIVTEFMCHGSLLDFLKNYMERMNYIHRDLRAANILVIADFGLA"
+ },
+ "FYN": {
+  "uniprot": "P06241",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "FYN proto-oncogene, Src family tyrosine kinase",
+  "pocket": "KRLGNGQFGEVWMVAIKTLSFLEEAQIMKKLKDKLVQLYAVYIVTEYMNKGSLLDFLKDYIERMNYIHRDLRSANILVIADFGLA"
+ },
+ "SRC": {
+  "uniprot": "P12931",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "SRC proto-oncogene, non-receptor tyrosine kinase",
+  "pocket": "VKLGQGCFGEVWMVAIKTLAFLQEAQVMKKLREKLVQLYAVYIVTEYMSKGSLLDFLKGYVERMNYVHRDLRAANILVVADFGLA"
+ },
+ "YES": {
+  "uniprot": "P07947",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "YES proto-oncogene 1, Src family tyrosine kinase",
+  "pocket": "VKLGQGCFGEVWMVAIKTLAFLQEAQIMKKLRDKLVPLYAVYIVTEFMSKGSLLDFLKEYIERMNYIHRDLRAANILVIADFGLA"
+ },
+ "BLK": {
+  "uniprot": "P51451",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "BLK proto-oncogene, Src family tyrosine kinase",
+  "pocket": "RKLGSGQFGEVWMVAIKTLAFLGEANVMKALQERLVRLYAVYIVTEYMARGCLLDFLKTYIERMNSIHRDLRAANILVIADFGLA"
+ },
+ "HCK": {
+  "uniprot": "P08631",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "HCK proto-oncogene, Src family tyrosine kinase",
+  "pocket": "KKLGAGQFGEVWMVAVKTMAFLAEANVMKTLQDKLVKLHAVYIITEFMAKGSLLDFLKSFIEQRNYIHRDLRAANILVIADFGLA"
+ },
+ "LCK": {
+  "uniprot": "P06239",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "LCK proto-oncogene, Src family tyrosine kinase",
+  "pocket": "ERLGAGQFGEVWMVAVKSLAFLAEANLMKQLQQRLVRLYAVYIITEYMENGSLVDFLKTFIEERNYIHRDLRAANILVIADFGLA"
+ },
+ "LYN": {
+  "uniprot": "P07948",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "LYN proto-oncogene, Src family tyrosine kinase",
+  "pocket": "KRLGAGQFGEVWMVAVKTLAFLEEANLMKTLQDKLVRLYAVYIITEYMAKGSLLDFLKSYIERKNYIHRDLRAANVLVIADFGLA"
+ },
+ "BRK": {
+  "uniprot": "Q13882",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "protein tyrosine kinase 6",
+  "pocket": "RKLGSGYFGEVFEVAIKVIMLQSEIQAMKKLRKHILALYAVYIITELMAKGSLLELLRDYLESQNYIHRDLAARNILVVGDFGLA"
+ },
+ "SRM": {
+  "uniprot": "Q9H3Y6",
+  "family": "Src",
+  "group": "TK",
+  "full_name": "src-related kinase lacking C-terminal regulatory tyrosine and N-terminal myristylation sites",
+  "pocket": "RKLGEGYFGEVWEVAIKVIDLAKEIQTLKGLRERLIRLHAVYIVTELMRKGNLQAFLGTYLEEQRVVHRDLAARNVLVVADFGLA"
+ },
+ "SYK": {
+  "uniprot": "P43405",
+  "family": "Syk",
+  "group": "TK",
+  "full_name": "spleen tyrosine kinase",
+  "pocket": "KELGSGNFGTVKKVAVKILELLAEANVMQQLDPYIVRMIGIMLVMEMAELGPLNKYLQQYLEESNFVHRDLAARNVLLISDFGLS"
+ },
+ "ZAP70": {
+  "uniprot": "P43403",
+  "family": "Syk",
+  "group": "TK",
+  "full_name": "zeta chain of T cell receptor associated protein kinase 70kDa",
+  "pocket": "IELGCGNFGSVRQVAIKVLEMMREAQIMHQLDPYIVRLIGVMLVMEMAGGGPLHKFLVGYLEEKNFVHRDLAARNVLLISDFGLS"
+ },
+ "BMX": {
+  "uniprot": "P51813",
+  "family": "Tec",
+  "group": "TK",
+  "full_name": "BMX non-receptor tyrosine kinase",
+  "pocket": "KELGSGQFGVVQLVAVKMIEFFQEAQTMMKLSPKLVKFYGVYIVTEYISNGCLLNYLRSFLESHQFIHRDLAARNCLVVSDFGMT"
+ },
+ "BTK": {
+  "uniprot": "Q06187",
+  "family": "Tec",
+  "group": "TK",
+  "full_name": "Bruton tyrosine kinase",
+  "pocket": "KELGTGQFGVVKYVAIKMIEFIEEAKVMMNLSEKLVQLYGVFIITEYMANGCLLNYLREYLESKQFLHRDLAARNCLVVSDFGLS"
+ },
+ "ITK": {
+  "uniprot": "Q08881",
+  "family": "Tec",
+  "group": "TK",
+  "full_name": "IL2 inducible T-cell kinase",
+  "pocket": "QEIGSGQFGLVHLVAIKTIDFIEEAEVMMKLSPKLVQLYGVCLVFEFMEHGCLSDYLRTYLEEACVIHRDLAARNCLVVSDFGMT"
+ },
+ "TEC": {
+  "uniprot": "P42680",
+  "family": "Tec",
+  "group": "TK",
+  "full_name": "tec protein tyrosine kinase",
+  "pocket": "RELGSGLFGVVRLVAIKAIDFIEEAKVMMKLTPKLVQLYGVYIVTEFMERGCLLNFLRQYLERNSFIHRDLAARNCLVVSDFGMA"
+ },
+ "TXK": {
+  "uniprot": "P42681",
+  "family": "Tec",
+  "group": "TK",
+  "full_name": "TXK tyrosine kinase",
+  "pocket": "KEIGSGQFGVVHLVAIKAIDFIEEAKVMMKLSSKLVQLYGVYIVTEFMENGCLLNYLREYLERNGYIHRDLAARNCLVISDFGMT"
+ },
+ "TIE2": {
+  "uniprot": "Q02763",
+  "family": "Tie",
+  "group": "TK",
+  "full_name": "TEK receptor tyrosine kinase",
+  "pocket": "DVIGEGNFGQVLKAAIKRMDFAGELEVLCKLGPNIINLLGAYLAIEYAPHGNLLDFLRKYLSQKQFIHRDLAARNILVIADFGLS"
+ },
+ "TIE1": {
+  "uniprot": "P35590",
+  "family": "Tie",
+  "group": "TK",
+  "full_name": "tyrosine kinase with immunoglobulin like and EGF like domains 1",
+  "pocket": "DLIGEGNFGQVIRAAIKMLDFAGELEVLCKLGPNIINLLGAYIAIEYAPYGNLLDFLRKYLSEKQFIHRDLAARNVLVIADFGLS"
+ },
+ "SuRTK106": {
+  "uniprot": "Q6J9G0",
+  "family": "TK-Unique",
+  "group": "TK",
+  "full_name": "serine/threonine/tyrosine kinase 1",
+  "pocket": "EQICSGSCGPIFRVILKALDFLGRIQFHQYLGKNLVQLEGCYMVLEDVAQGDLLSFLWTFLQEKHLFHGDVAARNILMLCGLGLA"
+ },
+ "TRKA": {
+  "uniprot": "P04629",
+  "family": "Trk",
+  "group": "TK",
+  "full_name": "neurotrophic tyrosine kinase, receptor, type 1",
+  "pocket": "WELGEGAFGKVFLVAVKALDFQREAELLTMLQQHIVRFFGVLMVFEYMRHGDLNRFLRSYLAGLHFVHRDLATRNCLVIGDFGMS"
+ },
+ "TRKB": {
+  "uniprot": "Q16620",
+  "family": "Trk",
+  "group": "TK",
+  "full_name": "neurotrophic tyrosine kinase, receptor, type 2",
+  "pocket": "RELGEGAFGKVFLVAVKTLDFHREAELLTNLQEHIVKFYGVIMVFEYMKHGDLNKFLRAYLASQHFVHRDLATRNCLVIGDFGMS"
+ },
+ "TRKC": {
+  "uniprot": "Q16288",
+  "family": "Trk",
+  "group": "TK",
+  "full_name": "neurotrophic tyrosine kinase, receptor, type 3",
+  "pocket": "RELGEGAFGKVFLVAVKALDFQREAELLTNLQEHIVKFYGVIMVFEYMKHGDLNKFLRAYLASQHFVHRDLATRNCLVIGDFGMS"
+ },
+ "FLT1": {
+  "uniprot": "P17948",
+  "family": "VEGFR",
+  "group": "TK",
+  "full_name": "fms related tyrosine kinase 1",
+  "pocket": "KSLGRGAFGKVVQVAVKMLALMTELKILTHIGLNVVNLLGAMVIVEYCKYGNLSNYLKSFLSSRKCIHRDLAARNILLICDFGLA"
+ },
+ "FLT4": {
+  "uniprot": "P35916",
+  "family": "VEGFR",
+  "group": "TK",
+  "full_name": "fms related tyrosine kinase 4",
+  "pocket": "RVLGYGAFGKVVEVAVKMLALMSELKILIHIGLNVVNLLGAMVIVEFCKYGNLSNFLRAFLASRKCIHRDLAARNILLICDFGLA"
+ },
+ "KDR": {
+  "uniprot": "P35968",
+  "family": "VEGFR",
+  "group": "TK",
+  "full_name": "kinase insert domain receptor",
+  "pocket": "KPLGRGAFGQVIEVAVKMLALMSELKILIHIGLNVVNLLGAMVIVEFCKFGNLSTYLRSFLASRKCIHRDLAARNILLICDFGLA"
+ },
+ "IRAK1": {
+  "uniprot": "P51617",
+  "family": "IRAK",
+  "group": "TKL",
+  "full_name": "interleukin 1 receptor associated kinase 1",
+  "pocket": "LKIGEGGFGCVYRYAVKRLSFLTEVEQLSRFRPNIVDFAGYCLVYGFLPNGSLEDRLHCHQDSPSLIHGDIKSSNVLLLGDFGLA"
+ },
+ "IRAK2": {
+  "uniprot": "O43187",
+  "family": "IRAK",
+  "group": "TKL",
+  "full_name": "interleukin 1 receptor associated kinase 2",
+  "pocket": "RKISQGTFADVYRFVFKKLFFQAELQICLRCCPNVLPVLGFSFIYPYMANGSLQDRLQGYLHGLEIIHSNVKSSNVLLLAHPMAH"
+ },
+ "IRAK3": {
+  "uniprot": "Q9Y616",
+  "family": "IRAK",
+  "group": "TKL",
+  "full_name": "interleukin 1 receptor associated kinase 3",
+  "pocket": "FLIGEGEIFEVYRYAVKLFRFLSELEVLLLFHPNILELAAYCLIYPYMRNGTLFDRLQCNVQPCSVICGSISSANILLLTDFAMA"
+ },
+ "IRAK4": {
+  "uniprot": "Q9NWZ3",
+  "family": "IRAK",
+  "group": "TKL",
+  "full_name": "interleukin 1 receptor associated kinase 4",
+  "pocket": "NKMGEGGFGVVYKVAVKKLQFDQEIKVMAKCQENLVELLGFCLVYVYMPNGSLLDRLSCFLHENHHIHRDIKSANILLISDFGLA"
+ },
+ "LIMK1": {
+  "uniprot": "P53667",
+  "family": "LISK",
+  "group": "TKL",
+  "full_name": "LIM domain kinase 1",
+  "pocket": "EVLGKGCFGQAIKMVMKELTFLKEVKVMRCLEPNVLKFIGVNFITEYIKGGTLRGIIKSYLHSMNIIHRDLNSHNCLVVADFGLA"
+ },
+ "LIMK2": {
+  "uniprot": "P53671",
+  "family": "LISK",
+  "group": "TKL",
+  "full_name": "LIM domain kinase 2",
+  "pocket": "EVLGKGFFGQAIKMVMKELTFLTEVKVMRSLDPNVLKFIGVNLLTEYIEGGTLKDFLRSYLHSMCIIHRDLNSHNCLIVADFGLS"
+ },
+ "TESK1": {
+  "uniprot": "Q15569",
+  "family": "LISK",
+  "group": "TKL",
+  "full_name": "testis-specific kinase 1",
+  "pocket": "EKIGAGFFSEVYKMVLKMNNTLREVQLMNRLRPNILRFMGVHALTEYMNGGTLEQLLSSYLHSKGVFHRDLTSKNCLVVGDFGLA"
+ },
+ "TESK2": {
+  "uniprot": "Q96S53",
+  "family": "LISK",
+  "group": "TKL",
+  "full_name": "testis-specific kinase 2",
+  "pocket": "EKIGSGFFSEVFKMALKMNNMLKEVQLMNRLSPNILRFMGVHALTEYINSGNLEQLLDSYLHFKGIFHRDLTSKNCLIVADFGLA"
+ },
+ "LRRK1": {
+  "uniprot": "Q38SD2",
+  "family": "LRRK",
+  "group": "TKL",
+  "full_name": "leucine-rich repeat kinase 1",
+  "pocket": "SVLGQGGSGTVIYVAVKRFEFRQEASMLHALQPCIVALIGICFALELAPLSSLNTVLSEYLHKKNIIFCDLKSDNILVLSDYGIS"
+ },
+ "LRRK2": {
+  "uniprot": "Q5S007",
+  "family": "LRRK",
+  "group": "TKL",
+  "full_name": "leucine-rich repeat kinase 2",
+  "pocket": "ADHGDGSFGSVYRVAVKIFLLRQELVVLCHLHPSLISLLAAMLVMELASKGSLDRLLQQYLHSAMIIYRDLKPHNVLLIADYGIA"
+ },
+ "HH498": {
+  "uniprot": "Q59H18",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "TNNI3 interacting kinase",
+  "pocket": "EIIGSGSFGKVYKVAIKRYMFCREVSILCQLNPCVIQFVGAAIVTQYISGGSLFSLLHEHNLTQPIIHRDLNSHNILLVADFGES"
+ },
+ "ILK": {
+  "uniprot": "Q13418",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "integrin linked kinase",
+  "pocket": "TKLNENHSGELWKIVVKVLDFNEECPRLRIFSPNVLPVLGATLITHWMPYGSLYNVLHEHTLEPLIPRHALNSRSVMIISMADVK"
+ },
+ "DLK": {
+  "uniprot": "Q12852",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 12",
+  "pocket": "QWVGSGAQGAVFLVAVKKVLKETDIKHLRKLKPNIITFKGVCILMEFCAQGQLYEVLRAYLHLHKIIHRDLKSPNMLIISDFGTS"
+ },
+ "LZK": {
+  "uniprot": "O43283",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 13",
+  "pocket": "QWLGSGAQGAVFLVAIKKVQNETDIKHLRKLKPNIIAFKGVCIIMEYCAHGQLYEVLRAYLHLHKIIHRDLKSPNVLVISDFGTS"
+ },
+ "MLK1": {
+  "uniprot": "P80192",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 9",
+  "pocket": "EIIGIGGFGKVYRVAVKAANVRQEAKLFAMLKPNIIALRGVCLVMEFARGGPLNRVLSGDEAIVPIIHRDLKSSNILIITDFGLA"
+ },
+ "MLK2": {
+  "uniprot": "Q02779",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 10",
+  "pocket": "EIIGVGGFGKVYRVAVKAAQVCQEARLFGALQPNIIALRGACLVMEYARGGALSRVLAGNDAPVPIIHRDLKSINILIITDFGLA"
+ },
+ "MLK3": {
+  "uniprot": "Q16584",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 11",
+  "pocket": "EVIGIGGFGKVYRVAVKAASVRQEARLFAMLAPNIIALKAVCLVMEYAAGGPLSRALAGCEALVPVIHRDLKSNNILLITDFGLA"
+ },
+ "MLK4": {
+  "uniprot": "Q5TCX8",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "Mixed lineage kinase domain-like protein",
+  "pocket": "ELIGAGGFGQVYRVAVKAASVRREARLFAMLRPNIIELRGVCLVLEFARGGALNRALAAEEAFVPILHRDLKSSNILLITDFGLA"
+ },
+ "TAK1": {
+  "uniprot": "O43318",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "mitogen-activated protein kinase kinase kinase 7",
+  "pocket": "EVVGRGAFGVVCKVAIKQIAFIVELRQLSRVNPNIVKLYGACLVMEYAEGGSLYNVLHGSMQPKALIHRDLKPPNLLLICDFGTA"
+ },
+ "ZAK": {
+  "uniprot": "Q9NYL2",
+  "family": "MLK",
+  "group": "TKL",
+  "full_name": "Mitogen-activated protein kinase kinase kinase MLT",
+  "pocket": "ENCGGGSFGSVYRVAVKKLKIEKEAEILSVLSRNIIQFYGVGIVTEYASLGSLYDYINSMEAPVKVIHRDLKSRNVVIICDFGAS"
+ },
+ "KSR1": {
+  "uniprot": "Q8IVT5",
+  "family": "RAF",
+  "group": "TKL",
+  "full_name": "Kinase suppressor of ras 1",
+  "pocket": "EPIGQGRWGRVHRVAIRLLLFKKEVMNYRQTRENVVLFMGAAIITSFCKGRTLHSFVRDYLHAKGIVHKDLKSKNVFYITDFGLF"
+ },
+ "KSR2": {
+  "uniprot": "Q6VAB6",
+  "family": "RAF",
+  "group": "TKL",
+  "full_name": "kinase suppressor of ras 2",
+  "pocket": "ELIGKGRFGQVYHVAIRLIAFKREVMAYRQTRENVVLFMGAAIITSLCKGRTLYSVVRDYLHAKGILHKDLKSKNVFYITDFGLF"
+ },
+ "ARAF": {
+  "uniprot": "P10398",
+  "family": "RAF",
+  "group": "TKL",
+  "full_name": "A-Raf proto-oncogene, serine/threonine kinase",
+  "pocket": "KRIGTGSFGTVFRVAVKVLAFKNEMQVLRKTRVNILLFMGFAIITQWCEGSSLYHHLHVYLHAKNIIHRDLKSNNIFLIGDFGLA"
+ },
+ "BRAF": {
+  "uniprot": "P15056",
+  "family": "RAF",
+  "group": "TKL",
+  "full_name": "B-Raf proto-oncogene, serine/threonine kinase",
+  "pocket": "QRIGSGSFGTVYKVAVKMLAFKNEVGVLRKTRVNILLFMGYAIVTQWCEGSSLYHHLHIYLHAKSIIHRDLKSNNIFLIGDFGLA"
+ },
+ "RAF1": {
+  "uniprot": "P04049",
+  "family": "RAF",
+  "group": "TKL",
+  "full_name": "Raf-1 proto-oncogene, serine/threonine kinase",
+  "pocket": "TRIGSGSFGTVYKVAVKILAFRNEVAVLRKTRVNILLFMGYAIVTQWCEGSSLYKHLHVYLHAKNIIHRDMKSNNIFLIGDFGLA"
+ },
+ "RIPK1": {
+  "uniprot": "Q13546",
+  "family": "RIPK",
+  "group": "TKL",
+  "full_name": "receptor interacting serine/threonine kinase 1",
+  "pocket": "AELDSGGFGKVSLMIMKTVALLEEAKMMNRLRSRVVKLLGVSLVMEYMEKGNLMHVLKAYLHGKGVIHKDLKPENILVIADLGLA"
+ },
+ "RIPK2": {
+  "uniprot": "O43353",
+  "family": "RIPK",
+  "group": "TKL",
+  "full_name": "receptor interacting serine/threonine kinase 2",
+  "pocket": "RYLSRGASGTVSSVAVKHLDVLREAEILHKARSYILPILGIGIVTEYMPNGSLNELLHRHNMTPPLLHHDLKTQNILLIADFGLS"
+ },
+ "RIPK3": {
+  "uniprot": "Q9Y572",
+  "family": "RIPK",
+  "group": "TKL",
+  "full_name": "receptor interacting serine/threonine kinase 3",
+  "pocket": "ELVGKGGFGTVFRVAVKIVAISREVKAMASLDEFVLRLEGVALVTKFMENGSLSGLLQSHDQNPVLLHRDLKPSNVLLLADFGLS"
+ },
+ "ANKRD3": {
+  "uniprot": "P57078",
+  "family": "RIPK",
+  "group": "TKL",
+  "full_name": "receptor interacting serine/threonine kinase 4",
+  "pocket": "EKVGSGGFGQVYKLAIKCSELLEEAKKMEMAKRYILPVYGIGLVMEYMETGSLEKLLASHCMAPPLLHLDLKPANILLISDFGLA"
+ },
+ "SgK288": {
+  "uniprot": "Q8NFD2",
+  "family": "RIPK",
+  "group": "TKL",
+  "full_name": "ankyrin repeat and kinase domain containing 1",
+  "pocket": "RLVASGGFSQVFQYAIKCAYLIEEAAKMKKIKQHIVSIYGVGIVMEFMANGSLEKVLSTHSIKPPLLHLDLKPGNILLISDFGLS"
+ },
+ "ALK2": {
+  "uniprot": "Q04771",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type I",
+  "pocket": "ECVGKGRYGEVWRVAVKIFSWFRETELYNTVMENILGFIASWLITHYHEMGSLYDYLQLTQGKPAIAHRDLKSKNILVIADLGLA"
+ },
+ "ALK4": {
+  "uniprot": "P36896",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type IB",
+  "pocket": "EIIGKGRFGEVWRVAVKIFSWFREAEIYQTVMENILGFIAAWLVSDYHEHGSLFDYLNRTQGKPGIAHRDLKSKNILVIADLGLA"
+ },
+ "ALK1": {
+  "uniprot": "P37023",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type IL",
+  "pocket": "ECVGKGRYGEVWRVAVKIFSWFRETEIYNTVLDNILGFIASWLITHYHEHGSLYDFLQRTQGKPAIAHRDFKSRNVLVIADLGLA"
+ },
+ "BMPR1A": {
+  "uniprot": "P36894",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "bone morphogenetic protein receptor type 1A",
+  "pocket": "RQVGKGRYGEVWMVAVKVFSWFRETEIYQTVLENILGFIAAYLITDYHENGSLYDFLKCTQGKPAIAHRDLKSKNILIIADLGLA"
+ },
+ "BMPR1B": {
+  "uniprot": "O00238",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "bone morphogenetic protein receptor type 1B",
+  "pocket": "KQIGKGRYGEVWMVAVKVFSWFRETEIYQTVLENILGFIAAYLITDYHENGSLYDYLKSTQGKPAIAHRDLKSKNILVIADLGLA"
+ },
+ "TGFbR1": {
+  "uniprot": "P36897",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "transforming growth factor beta receptor I",
+  "pocket": "ESIGKGRFGEVWRVAVKIFSWFREAEIYQTVMENILGFIAAWLVSDYHEHGSLFDYLNRTQGKPAIAHRDLKSKNILVIADLGLA"
+ },
+ "ALK7": {
+  "uniprot": "Q8NER5",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type IC",
+  "pocket": "EIVGKGRFGEVWHVAVKIFSWFREAEIYQTVMENILGFIAAWLVSEYHEQGSLYDYLNRTQGKPAIAHRDIKSKNILVIADLGLA"
+ },
+ "ACTR2": {
+  "uniprot": "P27037",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type IIA",
+  "pocket": "EVKARGRFGCVWKVAVKIFSWQNEYEVYSLPGENILQFIGAWLITAFHEKGSLSDFLKADGHKPAISHRDIKSKNVLLIADFGLA"
+ },
+ "ACTR2B": {
+  "uniprot": "Q13705",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "activin A receptor type IIB",
+  "pocket": "EIKARGRFGCVWKVAVKIFSWQSEREIFSTPGENLLQFIAAWLITAFHDKGSLTDYLKGEGHKPSIAHRDFKSKNVLLLADFGLA"
+ },
+ "MISR2": {
+  "uniprot": "Q16671",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "anti-Mullerian hormone receptor type II",
+  "pocket": "QVIREGGHAVVWAVAIKAFQFQAERALYELPGDHIVRFITALLVLELHPKGSLCHYLTQGQYKPGIAHRDLSSQNVLIIGDLGLA"
+ },
+ "BMPR2": {
+  "uniprot": "Q13873",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "bone morphogenetic protein receptor type II",
+  "pocket": "ELIGRGRYGAVYKVAVKVFNFINEKNIYRVPLDNIARFIVGLLVMEYYPNGSLCKYLSLDHYKPAISHRDLNSRNVLVISDFGLS"
+ },
+ "TGFbR2": {
+  "uniprot": "P37173",
+  "family": "STKR",
+  "group": "TKL",
+  "full_name": "transforming growth factor beta receptor II",
+  "pocket": "TLVGKGRFAEVYKVAVKIFSWKTEKDIFSDINENILQFLTAWLITAFHAKGNLQEYLTRGRPKMPIVHRDLKSSNILVLCDFGLS"
+ },
+ "MLKL": {
+  "uniprot": "Q8NB16",
+  "family": "TKL-Unique",
+  "group": "TKL",
+  "full_name": "mixed lineage kinase domain-like",
+  "pocket": "ILLRENEVSTLYKVAIKVFTFNKEIKTMKKFEPNILRIFGISIVMEYCELGTLRELLDRHHSEAPELHGKIRSSNFLVLAGFELR"
+ },
+ "p110b": {
+  "uniprot": "P42338",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit beta isoform",
+  "pocket": "CKYMDSKMKPLWLVIFKNGDLRQDMLTLQMLRLRMLPYGCLSGLIEVVSSETIADIQLNASYV--LGIGDRHSDNIMVHIDFGHI"
+ },
+ "p110g": {
+  "uniprot": "P48736",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit gamma isoform",
+  "pocket": "CKVMASKKKPLWLIIFKHGDLRQDMLILQILRLCLLPYGCIIGMIEIVKATTIAKIQQSATFV--LGIGDRHNDNIMIHIDFGHI"
+ },
+ "p110d": {
+  "uniprot": "O00329",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform",
+  "pocket": "CTFMDSKMKPLWIIIFKNGDLRQDMLTLQMIQLRMTPYGCLTGLIEVVLSDTIANIQLNATYV--LGIGDRHSDNIMIHIDFGHF"
+ },
+ "p110a": {
+  "uniprot": "P42336",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit alpha isoform",
+  "pocket": "CRIMSSAKRPLWLIIFKNGDLRQDMLTLQIIRLRMLPYGCLVGLIEVVRSHTIMQIQCKATFI--LGIGDRHNSNIMVHIDFGHF"
+ },
+ "PIK3C3": {
+  "uniprot": "Q8NEB9",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 3-kinase catalytic subunit type 3",
+  "pocket": "ATLFKSALMPAQLVIFKHGDLRQDQLILQIISLKLTPYKVLHGFMQFIQSVPVAEVLDTITYI--LGVGDRHLDNLLLHIDFGYI"
+ },
+ "PI4K2A": {
+  "uniprot": "Q9BTU6",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 4-kinase type 2 alpha",
+  "pocket": "ERIYQGSSGSYFVAVFKPKGYLSEAGASLVDQNIVPRTKVVGSFQLFVEYKDADYWLRRLDYI--IRNTDRGNDNWLIAIDNGLA"
+ },
+ "PI4KB": {
+  "uniprot": "Q9UBF8",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 4-kinase beta",
+  "pocket": "VVLNSKDKAPYLIVIVKCGDLRQELLAFQVLKLWIKPYKILSGMIEPVVAVSIHQVKKQVCYL--LQVKDRHNGNILLHIDFGFI"
+ },
+ "PI4K2B": {
+  "uniprot": "Q8TCG2",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 4-kinase type 2 beta",
+  "pocket": "ERISQGSSGSYFVGVFKPKGYLSEAGAYLVDNSIVPKTKVVGSFQLFVEYKEAEYWLRKLDYI--IRNTDRGNDNWLVAIDNGLA"
+ },
+ "PIK3C2G": {
+  "uniprot": "O75747",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol-4-phosphate 3-kinase catalytic subunit type 2 gamma",
+  "pocket": "CSYFTSNALPLKIIIFKAGDLRQDMLVLQLIQMQMIIYRCLQGLVQMVPAVTLAKIHRHVTFI--LGVCDRHNDNIMLHIDFGKF"
+ },
+ "PIK3C2A": {
+  "uniprot": "O00443",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol-4-phosphate 3-kinase catalytic subunit type 2 alpha",
+  "pocket": "CSFFSSNAVPLKVVMFKVGDLRQDMLALQMIKLRMVIFKCLRGMVELVPSDTLRKIQVEATYV--LGICDRHNDNIMLHIDFGKF"
+ },
+ "PI4KAP2": {
+  "uniprot": "A4QPH2",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 4-kinase alpha pseudogene 2",
+  "pocket": "TPMQSAAKAPYLAAIFKLGPASQDMLALQIIDLFVFPYRVVCGVIECIPCTSRDQLGRQLLFL--LQIKDRHNGNIMLHIDFGFM"
+ },
+ "PIK3C2B": {
+  "uniprot": "O00750",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol-4-phosphate 3-kinase catalytic subunit type 2 beta",
+  "pocket": "CSYFNSNAVPLKLVIFKCGDLRQDMLTLQMIRMRMVIFRCFRGMVEMIPAETLRKIQVEATYV--LGICDRHNDNIMLHIDFGRF"
+ },
+ "PI4KA": {
+  "uniprot": "P42356",
+  "family": "PIK",
+  "group": "Atypical",
+  "full_name": "phosphatidylinositol 4-kinase alpha",
+  "pocket": "TPMQSAAKAPYLAAIFKVGDCRQDMLALQIIDLFVFPYRVVCGVIECIPCTSRDQLGRQLLFL--LQIKDRHNGNIMLHIDFGFM"
+ },
+ "CSNK2A3": {
+  "uniprot": "Q8NEV1",
+  "family": "CK2",
+  "group": "CMGC",
+  "full_name": "casein kinase 2 alpha 3",
+  "pocket": "RKLGRGKYSEVFEVVVKILKIKREIKILENLRPNIITLADIALVFEHVN-NTDFKQ--LYCHSMGIMHRDVKPHNVMILIDWGLA"
+ },
+ "Map4k2": {
+  "uniprot": "Q12851",
+  "family": "STE20",
+  "group": "STE",
+  "full_name": "mitogen-activated protein kinase kinase kinase kinase 2",
+  "pocket": "QRVGAGTYGDVYKAAVKIVSLQQEITILRECRPNVVAYIGSWICMEFCGGGSLQEIYHAHLHSQGKIHRDIKGANLLLLADFGVS"
+ },
+ "PAN3": {
+  "uniprot": "Q58A45",
+  "family": "PAN3",
+  "group": "Other",
+  "full_name": "PAN3 poly(A) specific ribonuclease subunit",
+  "pocket": "RIQKSSNFGYITSPYCLRRCM-VLVDMWKKIQSNIVTLREVAYDFHAGGETMMSRHFNDTIHTAGLACRVMDPTKILIVNCVGVF"
+ },
+ "PDPK2P": {
+  "uniprot": "Q6A1A2",
+  "family": "PDK1",
+  "group": "AGC",
+  "full_name": "3-phosphoinositide dependent protein kinase 2, pseudogene",
+  "pocket": "KILGEGSFSTVVLYAIKILYVTRERDVMSRLDPFFVKLYFTYFGLSYAKNGELLKYIRKYLHGKGIIHRDLKPENILLITDFGTA"
+ }
+}

@@ -184,6 +184,11 @@ jobs:
           # retry, so a test that starts needing them is visible rather than
           # quietly passing. Two attempts, because a flake that survives one
           # retry is worth looking at.
+          # ScreenshotCaptureTests is a tool, not a test: it drives the app to
+          # the screens an App Store listing needs and attaches the images. It
+          # asserts nothing about appearance, takes two and a half minutes, and
+          # needs the Core ML models, which are gitignored and so absent here.
+          # Run it deliberately with -only-testing when screenshots are wanted.
           xcodebuild test \
             -project BOFFIN.xcodeproj \
             -scheme BOFFIN \
@@ -191,6 +196,7 @@ jobs:
             -resultBundlePath "TestResults-${{ matrix.family }}.xcresult" \
             -retry-tests-on-failure \
             -test-iterations 2 \
+            -skip-testing:BOFFINUITests/ScreenshotCaptureTests \
             CODE_SIGNING_ALLOWED=NO \
           | xcbeautify
 

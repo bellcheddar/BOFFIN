@@ -35,6 +35,7 @@ struct SceneDeckView: View {
                     Button("Present") { model.present() }
                         .buttonStyle(.borderedProminent)
                         .font(.caption2)
+                        .minimumTouchTarget()
                         .accessibilityIdentifier("boffin.present-deck")
                 }
             }
@@ -79,6 +80,20 @@ struct SceneDeckView: View {
                         .foregroundStyle(.tertiary)
                 }
             }
+        }
+        // Mirror to the projector.
+        //
+        // Driven from here rather than from inside StructureViewerModel: the
+        // package would otherwise hold a reference to a shared singleton, and
+        // the module rule exists to stop exactly that. The deck is the one
+        // place that knows both what is loaded and which scene is showing.
+        .onChange(of: viewer.loadedData) { _, data in
+            guard let data else { return }
+            PresentationBridge.shared.load(
+                data, format: viewer.loadedFormat, title: viewer.source?.label ?? "")
+        }
+        .onChange(of: model.current) { _, _ in
+            PresentationBridge.shared.present(model.currentScene)
         }
         .fullScreenCover(isPresented: presenting) {
             PresentationView(model: model, viewer: viewer)

@@ -24,6 +24,15 @@ public enum StructureSource: Sendable, Hashable {
     case experimental(pdbID: String)
     case predicted(accession: String)
 
+    /// What to call this structure on screen.
+    public var label: String {
+        switch self {
+        case .bundled(let name): name
+        case .experimental(let id): id.uppercased()
+        case .predicted(let accession): accession.uppercased()
+        }
+    }
+
     public var isPrediction: Bool {
         if case .predicted = self { return true }
         return false

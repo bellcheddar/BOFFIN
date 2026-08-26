@@ -72,4 +72,16 @@ Datasets/pdb/*
 Datasets/codon/*.fna
 Datasets/pdblabels/
 !Datasets/pdb/MANIFEST.md
+
+# The staging directories under Datasets/ were not covered by the two rules
+# above, which match only the top level, so `Datasets/pfam`, `embeddings`,
+# `family` and `topology` sat untracked-but-not-ignored: 9 GB one `git add -A`
+# away from the history. The generated tables that the app actually ships are
+# committed copies under Packages/BoffinData/Sources/BoffinData/Resources/,
+# and these are the intermediates that produce them.
+Datasets/pfam/*
+Datasets/embeddings/*
+Datasets/family/*
+Datasets/topology/*
+!Datasets/*/MANIFEST.md
 Assets/

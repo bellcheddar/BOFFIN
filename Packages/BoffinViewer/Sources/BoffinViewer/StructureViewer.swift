@@ -39,6 +39,10 @@ public final class StructureViewerModel {
     /// Where the loaded structure came from, so the UI can label a prediction.
     public private(set) var source: StructureSource?
 
+    /// The bytes of the structure currently shown, for a second display.
+    public private(set) var loadedData: Data?
+    public private(set) var loadedFormat: LoadStructureCommand.StructureFormat = .binaryCIF
+
     /// Biological assemblies the structure declares, empty when it declares
     /// none.
     public private(set) var assemblies: [Assembly] = []
@@ -124,6 +128,13 @@ public final class StructureViewerModel {
     ) async {
         state = .loading
         self.source = source
+        // Retained so a second display can render the same structure. The two
+        // scenes have separate Mol* instances and one WebView cannot draw into
+        // another, so the bytes are what travels. Given back by
+        // `releaseUnderMemoryPressure`, which is what makes keeping them
+        // affordable.
+        self.loadedData = data
+        self.loadedFormat = format
         do {
             struct Reply: Decodable { let atomCount: Int }
             let reply = try await bridge.send(
@@ -231,6 +242,30 @@ public final class StructureViewerModel {
         try await bridge.send(PaintTrackCommand(title: title, residues: residues))
     }
 
+    /// Put the viewer into the state a saved scene describes.
+    ///
+    /// The deck could capture a scene and had no way to restore one: `record`
+    /// reads `representation` and `colourTheme` off the viewer, and nothing
+    /// ever wrote them back. Presenting a deck therefore advanced an index and
+    /// changed the caption while the structure on screen stayed exactly as the
+    /// user had last left it by hand.
+    ///
+    /// The scene's `selection` is deliberately not applied here. Highlighting
+    /// it needs the atom store the expression is evaluated against, which the
+    /// viewer does not hold, so applying it would need a parameter this call
+    /// site cannot supply. Reported rather than silently dropped: the return
+    /// value says whether anything was left unapplied.
+    @discardableResult
+    public func apply(_ scene: ViewerScene) async -> Bool {
+        if let representation = ViewerRepresentation(rawValue: scene.representation) {
+            await set(representation: representation)
+        }
+        if let theme = ViewerColourTheme(rawValue: scene.colourTheme) {
+            await set(colourTheme: theme)
+        }
+        return scene.selection == nil
+    }
+
     /// Build a biological assembly, or return to the deposited coordinates.
     public func set(assembly identifier: String?) async {
         do {
@@ -253,6 +288,7 @@ public final class StructureViewerModel {
     /// does not know why.
     public func releaseUnderMemoryPressure() async {
         guard case .loaded = state else { return }
+        loadedData = nil
         try? await bridge.send(ClearCommand())
         state = .ready
         assemblies = []

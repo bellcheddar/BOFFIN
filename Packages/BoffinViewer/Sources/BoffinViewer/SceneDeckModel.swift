@@ -29,6 +29,16 @@ public final class SceneDeckModel {
 
     public var isPresenting: Bool { current != nil }
 
+    /// The scene being shown, or `nil` when the deck is not presenting.
+    ///
+    /// Bounds-checked rather than subscripted: `current` is an index into an
+    /// array the user can delete from, and a deck emptied while presenting
+    /// would otherwise trap.
+    public var currentScene: ViewerScene? {
+        guard let current, scenes.indices.contains(current) else { return nil }
+        return scenes[current]
+    }
+
     /// Pencil annotations, keyed by the scene's own identity.
     ///
     /// **Keyed by id, not by index**, and that is the whole correctness

@@ -74,7 +74,51 @@ DEFAULT_BUCKET = 384
 #   would need one model per bucket, or a second model beside the batch-1 one at
 #   134 MB against a 200 MB bundle target.
 #
-# The configuration that works is batch 1 with enumerated sequence shapes, which
+# Re-examined 2026-08-26 on coremltools 9.0, and the conclusion changes shape.
+#
+# EnumeratedShapes with a batch still fails: it converts, then kills the process
+# with SIGTRAP on the first predict, at both iOS18 and iOS26 targets. What was
+# never tried is `RangeDim`, which is a different flexible-shape mechanism, and
+# it converts AND predicts at batch 8, at every length, on both targets.
+#
+# It is also 67.4 MB, the same as the batch-1 model, because batch is a runtime
+# dimension rather than weights. And `MLComputePlan` reports 98.8% ANE
+# residency for it -- the identical 746 of 755 operations, with the same nine
+# CPU fallbacks.
+#
+# None of which makes it faster. Measured per variant on this Mac:
+#
+#     bucket   batch 1   batch 8, traced at 384   batch 8, traced at 512
+#        256   9.53 ms                 27.62 ms                 27.58 ms
+#        384   31.01                   21.40  (1.45x)           55.51
+#        512   47.23                   89.16                    34.68  (1.36x)
+#
+# The win follows the shape the model was TRACED at and nothing else. A
+# RangeDim model is specialised at its default and every other length pays a
+# dynamic-shape penalty large enough to lose to batch 1 outright. Moving the
+# default from 384 to 512 moves the win with it, which is what makes this a
+# mechanism rather than an anomaly.
+#
+# Two things follow. Phase 2's conclusion, one model per bucket, is right after
+# all, but for a different reason than the one recorded: not that Core ML
+# refuses a batch, but that the only mechanism accepting one is fast at exactly
+# one length. And 98.8% residency is a PLAN, not a measurement of execution:
+# the same number describes a configuration that runs three times slower. It
+# answers "can these operations run on the Neural Engine", which is the
+# structural question the project's fatal risk depended on, and it does not
+# answer "how fast will they".
+#
+# The available win, if it is wanted, is one extra model traced at 384: 31.01
+# to 21.40 ms per variant, taking a 300-residue masked-marginal scan from 9.30
+# to 6.42 s on this Mac, for +67.4 MB against a 200 MB bundle target. Proteins
+# longer than 382 residues would fall back to batch 1 unchanged. That is a
+# bundle-size decision rather than an engineering one, so it is costed here and
+# not taken. Reproduce with:
+#
+#     convert_backbone.py --scoring-batch 8 --flexible range \
+#         --default-bucket 384 --suffix .batch8
+#
+# The configuration that ships is batch 1 with enumerated sequence shapes, which
 # is what Phase 2 proved at 98.8% ANE residency. The cost is a 9.37 s
 # masked-marginal scan on this Mac against a 6 s budget specified for iPhone
 # hardware, which remains unmeasured on device.
@@ -204,7 +248,31 @@ def main() -> int:
     parser.add_argument(
         "--precision", default="fp16", choices=["fp16", "fp32"],
         help="fp16 is the shipping configuration; fp32 is for diagnosing parity failures.")
+    parser.add_argument(
+        "--scoring-batch", type=int, default=SCORING_BATCH,
+        help="rows per prediction. Above 1 forces --flexible range, because "
+             "Core ML will not combine a batch with EnumeratedShapes.")
+    parser.add_argument(
+        "--flexible", default="enumerated", choices=["enumerated", "range"],
+        help="how sequence length varies. `enumerated` is the shipping "
+             "configuration and is fixed at batch 1; `range` is a RangeDim, "
+             "which is the only mechanism that accepts a batch dimension.")
+    parser.add_argument(
+        "--default-bucket", type=int, default=DEFAULT_BUCKET,
+        help="the shape the model is specialised at. With --flexible range "
+             "every OTHER length pays a dynamic-shape penalty, so this is not "
+             "a cosmetic default.")
+    parser.add_argument(
+        "--suffix", default="",
+        help="written to <model><suffix>.mlpackage, so a variant can be "
+             "benchmarked without overwriting the shipping model.")
     args = parser.parse_args()
+
+    if args.scoring_batch > 1 and args.flexible != "range":
+        raise SystemExit(
+            "a batch above 1 needs --flexible range: EnumeratedShapes with a "
+            "batch dimension converts, then kills the process with SIGTRAP on "
+            "the first predict (re-verified on coremltools 9.0, 2026-08-26)")
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -230,7 +298,8 @@ def main() -> int:
     # A DELIBERATELY PADDED example. See the module docstring: tracing without
     # padding bakes in the no-mask branch and silently breaks every real input.
     padding_index = alphabet.padding_idx
-    example = torch.full((SCORING_BATCH, DEFAULT_BUCKET), padding_index, dtype=torch.int64)
+    batch = args.scoring_batch
+    example = torch.full((batch, args.default_bucket), padding_index, dtype=torch.int64)
     example[:, 0] = alphabet.cls_idx
     real_residues = [alphabet.get_idx(c) for c in "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDK"]
     example[:, 1 : 1 + len(real_residues)] = torch.tensor(real_residues)
@@ -245,13 +314,24 @@ def main() -> int:
     print("converting ...")
     # Enumerated over sequence length only, with the batch FIXED. Enumerating
     # the batch too crashes predict: see the note on SCORING_BATCH.
-    enumerated = ct.EnumeratedShapes(
-        shapes=[[SCORING_BATCH, bucket] for bucket in BUCKETS],
-        default=[SCORING_BATCH, DEFAULT_BUCKET])
+    #
+    # `range` is the alternative that accepts a batch. It was not tried in
+    # Phase 2, which tested EnumeratedShapes three ways and concluded batching
+    # was unavailable; RangeDim is a different mechanism and it converts and
+    # predicts at batch 8. Whether it stays on the Neural Engine is the
+    # question that decides it, and that is what benchmark_ane.py answers.
+    if args.flexible == "range":
+        shape = ct.Shape(
+            shape=(batch, ct.RangeDim(min(BUCKETS), max(BUCKETS),
+                                      default=args.default_bucket)))
+    else:
+        shape = ct.EnumeratedShapes(
+            shapes=[[batch, bucket] for bucket in BUCKETS],
+            default=[batch, args.default_bucket])
 
     mlmodel = ct.convert(
         traced,
-        inputs=[ct.TensorType(name="tokens", shape=enumerated, dtype=np.int32)],
+        inputs=[ct.TensorType(name="tokens", shape=shape, dtype=np.int32)],
         outputs=[
             ct.TensorType(name="hidden_states", dtype=np.float16),
             ct.TensorType(name="logits", dtype=np.float16),
@@ -272,14 +352,14 @@ def main() -> int:
         f"ESM-2 {args.model} backbone. Outputs per-residue hidden states and "
         f"masked-token logits from one forward pass.")
     mlmodel.input_description["tokens"] = (
-        f"Padded token ids, ({SCORING_BATCH}, S) where S is one of {BUCKETS}, "
+        f"Padded token ids, ({batch}, S) where S is one of {BUCKETS}, "
         f"padding id {padding_index}. Embedding uses row 0; masked-marginal "
-        f"scoring uses all {SCORING_BATCH} rows.")
+        f"scoring uses all {batch} rows.")
     mlmodel.output_description["hidden_states"] = (
         f"Per-residue hidden states, ({{1}}, S, {model.embed_dim}).")
     mlmodel.output_description["logits"] = "Per-position vocabulary logits."
 
-    package = MODELS_DIR / f"{args.model}.mlpackage"
+    package = MODELS_DIR / f"{args.model}{args.suffix}.mlpackage"
     mlmodel.save(str(package))
     print(f"wrote {package.relative_to(ROOT)}")
 

@@ -1357,3 +1357,30 @@ structure is loaded is one edit rather than nine.
 
 Both idioms pass 22 of 22 locally on freshly erased simulators. If CI fails
 again it will now say what it saw.
+
+## Four CI failures, four symptoms, two causes (2026-08-26)
+
+| Attempt | Symptom | Cause |
+|---|---|---|
+| 1 | iPad: "no byres control" | **Real.** Form taller than the sheet; I ran only iPhone locally |
+| 2 | iPad: load outran a 60 s wait | **Real.** CI is ~3x slower than this machine |
+| 3 | iPad: load outran 180 s | Runner |
+| 4 | iPhone: "Timed out while requesting launch progress" | Runner |
+
+The first two were mine and are fixed. The last two are the simulator, and the
+fourth says so plainly: the app never started, so no test-side timeout or
+diagnostic could have helped. It is the same family as the "Application failed
+preflight checks" wedging that hit this machine three times in one session,
+recovered each time with `simctl shutdown all` and `erase`.
+
+CI now runs with `-retry-tests-on-failure -test-iterations 2`.
+
+**This does not paper over real failures**, which is the obvious objection. A
+deterministic failure fails every attempt, and xcodebuild reports which tests
+needed a retry, so a test that begins needing them is visible rather than
+quietly passing. Two attempts rather than more, because a flake surviving one
+retry is worth looking at rather than absorbing.
+
+The diagnostic loader from the previous commit stays regardless: if a structure
+genuinely fails to load, the failure now names what was on screen instead of
+only reporting that it waited.

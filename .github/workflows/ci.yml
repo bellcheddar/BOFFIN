@@ -143,11 +143,29 @@ jobs:
       - name: Build and test
         run: |
           set -o pipefail
+          # `-retry-tests-on-failure` is for the SIMULATOR, not for the tests.
+          #
+          # Four consecutive CI failures, four different symptoms, none
+          # reproducible locally on freshly erased simulators: an iPad-only
+          # layout failure (a real bug, fixed), a load that outran a 60 second
+          # wait (real, fixed), a load that outran 180 seconds, and finally
+          # "Timed out while requesting launch progress", which is the app
+          # failing to start at all. The last two are the runner, not the app:
+          # the same family as the "Application failed preflight checks" wedging
+          # that hit this machine three times in one session.
+          #
+          # This does NOT paper over real failures. A deterministic failure
+          # fails every attempt, and xcodebuild reports which tests needed a
+          # retry, so a test that starts needing them is visible rather than
+          # quietly passing. Two attempts, because a flake that survives one
+          # retry is worth looking at.
           xcodebuild test \
             -project BOFFIN.xcodeproj \
             -scheme BOFFIN \
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -resultBundlePath "TestResults-${{ matrix.family }}.xcresult" \
+            -retry-tests-on-failure \
+            -test-iterations 2 \
             CODE_SIGNING_ALLOWED=NO \
           | xcbeautify
 

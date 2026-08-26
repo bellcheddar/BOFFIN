@@ -577,13 +577,21 @@ final class SequenceStore {
     /// Mac over three runs, a fresh engine's first embedding took 50.9, 50.6
     /// and 49.9 seconds against 0.023, 0.023 and 0.018 for a warmed one.
     ///
-    /// Those figures are the DEVELOPMENT configuration and must not be quoted
-    /// as a user-facing saving: here `Models/` holds the raw `.mlpackage` from
-    /// the conversion pipeline, which Core ML compiles on load, and a shipping
-    /// build bundles a `.mlmodelc` compiled at build time instead. What a
-    /// shipped app was paying per analysis is the model load and the Neural
-    /// Engine's first-prediction cost, which is the cost `warmUp` names and
-    /// has not been measured on a device.
+    /// That 50 seconds was first written up here as a development-only
+    /// artefact, on the reasoning that this checkout holds the raw
+    /// `.mlpackage` which Core ML compiles on load while a shipping build
+    /// would bundle a precompiled `.mlmodelc`. **That was wrong, and
+    /// measuring it is what showed it.** A first embedding costs 51.90 s from
+    /// the `.mlpackage` and 50.75 s from a `.mlmodelc` compiled ahead of time
+    /// by `coremlcompiler`: the cost is the Neural Engine specialising the
+    /// graph on first load, not the package-to-compiled conversion, and
+    /// precompiling buys about a second of it.
+    ///
+    /// Which makes the launch warm-up load-bearing rather than a nicety. A
+    /// shipped build pays this too, so the only question is whether the user
+    /// pays it at launch, in the background, or on the first sequence they
+    /// paste. It has still not been measured on a phone, where it may well be
+    /// worse.
     private var engine: EmbeddingEngine?
 
     private func embeddingEngine(in bundle: URL) throws -> EmbeddingEngine {

@@ -122,7 +122,15 @@ DEFAULT_BUCKET = 384
 #
 # Measured end to end on CDK2's 298 positions, which is the case this file's
 # 9.37 s figure came from: 9.50 s at batch 1 against 6.90 s batched, 31.9 to
-# 23.1 ms per variant. Slightly short of the 1.45x microbenchmark because the
+# 23.1 ms per variant.
+#
+# Separately, and correcting what was written here first: the ~50 s a fresh
+# engine pays before its first embedding is NOT a development-only artefact of
+# holding raw `.mlpackage` files. Measured 2026-08-26, a first embedding costs
+# 51.90 s from the .mlpackage and 50.75 s from a .mlmodelc precompiled by
+# `coremlcompiler`. The cost is the Neural Engine specialising the graph on
+# first load, so shipping precompiled models buys about a second of it and the
+# launch warm-up is what actually moves it off the user's first sequence. Slightly short of the 1.45x microbenchmark because the
 # last batch of a scan is partial. The batched path is verified to produce a
 # bit-identical delta-LLR matrix, row by row, by ScoringModelTests.
 #

@@ -288,6 +288,7 @@
 				806273E1773108A36DFE7FBF /* Sources */,
 				D7158D0AE4168E774D943498 /* Frameworks */,
 				8BCC5793D466993997DE45AA /* Resources */,
+				A1C0DE0000000000000MODEL /* Copy Core ML models */,
 			);
 			buildRules = (
 			);
@@ -364,6 +365,24 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1C0DE0000000000000MODEL /* Copy Core ML models */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Core ML models";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"$SRCROOT/Tools/copy-models.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		43AE07D8B3A23047EFB1B81C /* Resources */ = {
@@ -493,6 +512,7 @@
 		6C182F2BF34A1F8B1CC082D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -529,10 +549,14 @@
 		7E76835A37038E624E6890E0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				PROVISIONING_PROFILE_SPECIFIER = "BOFFIN App Store";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Resources/Info.plist;

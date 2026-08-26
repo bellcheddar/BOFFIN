@@ -149,6 +149,30 @@ public enum Spacing {
     public static let minimumTouchTarget: CGFloat = 44
 }
 
+extension View {
+    /// Guarantees the receiver occupies at least `Spacing.minimumTouchTarget`
+    /// in both directions, and that the whole of that area is tappable.
+    ///
+    /// SwiftUI sizes a button from its label, so a `.caption` button is around
+    /// 19 points tall and a finger has to find it. The system does this for its
+    /// own bar chrome and not for anything in the content area, which is why
+    /// `Spacing.minimumTouchTarget` sat in this file with no callers while
+    /// nine controls across five tabs were under the minimum, the smallest of
+    /// them 15 points tall.
+    ///
+    /// `contentShape` is the load-bearing half. Growing the frame alone leaves
+    /// a borderless button's hit region the size of its text, so the control
+    /// would report 44 points to the accessibility tree and still refuse the
+    /// taps around its edge.
+    public func minimumTouchTarget() -> some View {
+        frame(
+            minWidth: Spacing.minimumTouchTarget,
+            minHeight: Spacing.minimumTouchTarget
+        )
+        .contentShape(Rectangle())
+    }
+}
+
 extension Color {
     /// Build from a 24-bit RGB literal, written as `0xRR_GG_BB`.
     init(hex: UInt32) {

@@ -36,6 +36,7 @@ struct NoSequenceView: View {
             VStack(spacing: Spacing.s) {
                 Button("Paste a sequence") { isShowingInput = true }
                     .buttonStyle(.borderedProminent)
+                    .minimumTouchTarget()
                     .accessibilityIdentifier("boffin.empty.paste")
 
                 // Deliberately a flow layout rather than an HStack: at the
@@ -58,6 +59,7 @@ struct NoSequenceView: View {
     private var exampleButtons: some View {
         ForEach(ExampleSequences.all) { example in
             Button("Load \(example.title)") { store.load(text: example.fasta) }
+                .minimumTouchTarget()
                 .accessibilityIdentifier("boffin.empty.example.\(example.id)")
         }
     }

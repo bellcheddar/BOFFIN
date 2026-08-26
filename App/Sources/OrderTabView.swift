@@ -52,15 +52,19 @@ struct OrderTabView: View {
         }
     }
 
+    /// The shared empty state, not a copy of it.
+    ///
+    /// This tab used to hand-roll its own, and the copy had drifted: no example
+    /// sequences, no accessibility identifier, and a button 28 points tall. Order
+    /// is the first tab a new user sees, so it was the one place with no way to
+    /// load a sequence without already having one to paste.
     private var emptyState: some View {
-        ContentUnavailableView {
-            Label("No sequence", systemImage: "text.alignleft")
-        } description: {
-            Text("Paste a sequence or FASTA record to see its properties and tracks.")
-        } actions: {
-            Button("Paste a sequence") { isShowingInput = true }
-                .buttonStyle(.borderedProminent)
-        }
+        NoSequenceView(
+            title: "No sequence",
+            systemImage: "text.alignleft",
+            promise: "Paste a sequence or FASTA record to see its properties and tracks.",
+            store: store
+        )
     }
 
     @ViewBuilder

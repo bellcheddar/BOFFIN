@@ -40,6 +40,7 @@
 		D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */; };
 		0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */; };
 		420D9554BDDF1D84569E4BA6 /* AnnotationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */; };
+		60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 		2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingUITests.swift; path = App/UITests/OnboardingUITests.swift; sourceTree = "<group>"; };
 		8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionBuilderView.swift; path = App/Sources/SelectionBuilderView.swift; sourceTree = "<group>"; };
 		C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnnotationCanvas.swift; path = App/Sources/AnnotationCanvas.swift; sourceTree = "<group>"; };
+		D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TouchTargetUITests.swift; path = App/UITests/TouchTargetUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +184,7 @@
 				CF3222BCE24F65F84CA0580A /* ProbeTests.swift */,
 				95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */,
 				1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */,
+				D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */,
 				2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */,
 				467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */,
 			);
@@ -395,6 +398,7 @@
 				86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */,
 				892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */,
 				123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */,
+				60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */,
 				D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */,
 				40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */,
 			);

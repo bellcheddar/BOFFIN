@@ -62,6 +62,7 @@ struct SceneDeckView: View {
             }
             .buttonStyle(.bordered)
             .font(.caption2)
+            .minimumTouchTarget()
             .accessibilityIdentifier("boffin.capture-scene")
 
             ForEach(Array(model.scenes.enumerated()), id: \.element.id) { index, scene in

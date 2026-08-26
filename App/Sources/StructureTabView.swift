@@ -131,6 +131,7 @@ struct StructureTabView: View {
                     Label("Load 1UBQ", systemImage: "square.and.arrow.down")
                         .font(.caption)
                 }
+                .minimumTouchTarget()
                 .accessibilityIdentifier("boffin.load-structure")
             }
 
@@ -160,6 +161,7 @@ struct StructureTabView: View {
             }
             .pickerStyle(.menu)
             .font(.caption)
+            .minimumTouchTarget()
 
             Picker("Colour", selection: themeBinding(model)) {
                 ForEach(ViewerColourTheme.allCases, id: \.rawValue) { option in
@@ -168,6 +170,7 @@ struct StructureTabView: View {
             }
             .pickerStyle(.menu)
             .font(.caption)
+            .minimumTouchTarget()
 
             assemblyControls(model)
             interactionControls(model)
@@ -227,12 +230,14 @@ struct StructureTabView: View {
                 Task { await model.fetch { try await StructureFetcher().rcsb(wanted) } }
             }
             .buttonStyle(.bordered).font(.caption2)
+            .minimumTouchTarget()
             .disabled(identifier.count != 4)
             Button("AlphaFold") {
                 let wanted = identifier
                 Task { await model.fetch { try await StructureFetcher().alphaFold(wanted) } }
             }
             .buttonStyle(.bordered).font(.caption2)
+            .minimumTouchTarget()
             .disabled(identifier.count < 6)
         }
     }
@@ -962,13 +967,13 @@ struct StructureTabView: View {
             let base =
                 value < mid
                 ? ScientificPalette.llrNegative : ScientificPalette.llrPositive
-            return packed(base, blendedWithWhiteBy: 1 - magnitude)
+            return packed(base, blendedWithNeutralBy: 1 - magnitude)
 
         case .sequential(let low, let high):
             let fraction = high > low ? ((value - low) / (high - low)) : 0
             let palette = ScientificPalette.sequential
             let position = min(max(fraction, 0), 1) * Double(palette.count - 1)
-            return packed(palette[Int(position.rounded())], blendedWithWhiteBy: 0)
+            return packed(palette[Int(position.rounded())], blendedWithNeutralBy: 0)
 
         case .categorical, .solid:
             // Neither is reachable from a continuous track, and a grey is a
@@ -977,21 +982,29 @@ struct StructureTabView: View {
         }
     }
 
-    /// A SwiftUI colour as 0xRRGGBB, optionally faded towards white.
+    /// A SwiftUI colour as 0xRRGGBB, optionally faded towards the neutral.
     ///
     /// The viewer takes an integer, so the colour has to be resolved rather
-    /// than passed as a `Color`. Fading towards white rather than lowering
-    /// opacity: the structure behind is dark, and a translucent red on a dark
-    /// background reads as a darker red rather than a paler one.
-    private static func packed(_ colour: Color, blendedWithWhiteBy amount: Double) -> Int {
+    /// than passed as a `Color`. Fading rather than lowering opacity: the
+    /// structure behind is dark, and a translucent red on a dark background
+    /// reads as a darker red rather than a paler one.
+    ///
+    /// Faded towards `ScientificPalette.llrNeutral`, not towards pure white.
+    /// The palette declares that neutral as the midpoint of the diverging
+    /// scale and, until this was written, nothing read it: this is the first
+    /// code that needs a midpoint colour, and inventing white here would have
+    /// left the declared one unused and the two subtly different.
+    private static func packed(_ colour: Color, blendedWithNeutralBy amount: Double) -> Int {
         let resolved = colour.resolve(in: EnvironmentValues())
+        let neutral = ScientificPalette.llrNeutral.resolve(in: EnvironmentValues())
         let fade = min(max(amount, 0), 1)
-        func channel(_ component: Float) -> Int {
-            let value = Double(component) + (1 - Double(component)) * fade
+        func channel(_ component: Float, _ towards: Float) -> Int {
+            let value = Double(component) + (Double(towards) - Double(component)) * fade
             return Int((min(max(value, 0), 1) * 255).rounded())
         }
-        return channel(resolved.red) << 16 | channel(resolved.green) << 8
-            | channel(resolved.blue)
+        return channel(resolved.red, neutral.red) << 16
+            | channel(resolved.green, neutral.green) << 8
+            | channel(resolved.blue, neutral.blue)
     }
 
     static func fixture(named name: String) -> URL? {

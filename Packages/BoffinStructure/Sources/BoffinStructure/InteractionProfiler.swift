@@ -61,19 +61,23 @@ public struct InteractionAssumptions: Sendable, Hashable {
                 + String(format: "%.1f", pH) + "."
         ]
         if hasExplicitHydrogens {
-            // Corrected 2026-08-26. This said the hydrogens "were used for
-            // donor geometry where present". They are not used at all: the
-            // hydrogen bond criterion is heavy-atom distance alone, and
-            // `hydrogenBondAngle` is declared and read nowhere.
+            // True again as of 2026-08-26, and it was not for months: the
+            // sentence claimed the hydrogens were used for donor geometry while
+            // nothing read them. It was corrected to say so, and then the
+            // capability was built, so it says this instead.
             //
-            // Worse than an ordinary stale comment, because this string IS the
-            // honesty mechanism. It exists so a reader can tell which criteria
-            // were applied, and it was overclaiming rigour in exactly the place
-            // built to prevent that.
+            // The caveat is the point. Most deposited hydrogens are PLACED by
+            // refinement software at idealised geometry rather than observed,
+            // so on those structures this filters contacts using a model's
+            // assumptions. A reader is entitled to know which of the two they
+            // are looking at, and the file does not say.
             lines.append(
-                "The structure contains explicit hydrogens, but they were NOT used: "
-                    + "bonds are called on heavy-atom distance alone, the same as for a "
-                    + "structure without them.")
+                "The structure contains explicit hydrogens, and donor-hydrogen-acceptor "
+                    + "angles below "
+                    + String(format: "%.0f", InteractionCriteria().hydrogenBondAngle)
+                    + " degrees were rejected. Note that hydrogens are usually placed by "
+                    + "refinement software rather than observed, so on such a structure "
+                    + "this filters on the refinement's assumptions.")
         } else {
             lines.append(
                 "The structure has NO hydrogens, so donor and acceptor roles are "
@@ -210,6 +214,69 @@ public enum InteractionProfiler {
                 SelectionEvaluator.metalResidues.contains(store.residueName[$0].uppercased())
             })
 
+        // Hydrogens attached to each heavy atom, when the structure has any.
+        //
+        // Marc's decision, 2026-08-26: use explicit hydrogens for donor
+        // geometry where a structure carries them. The trade is recorded on
+        // `hydrogenBondAngle` and in the assumptions statement, because most
+        // deposited hydrogens are placed by refinement software rather than
+        // observed, so this filters on a model's assumptions for those.
+        //
+        // Attachment by distance, not by connectivity: BinaryCIF carries no
+        // bond table for the polymer. 1.3 A comfortably spans the real bond
+        // lengths (O-H 0.98, N-H 1.01, C-H 1.09) and stops well short of the
+        // nearest non-bonded contact.
+        var hydrogensByHeavyAtom: [Int: [Int]] = [:]
+        if hasHydrogens {
+            let hydrogens = conformation.filter { store.element[$0].uppercased() == "H" }
+            for hydrogen in hydrogens {
+                var closest: Int?
+                var closestDistance = Double.greatestFiniteMagnitude
+                for heavy in conformation where store.element[heavy].uppercased() != "H" {
+                    guard let separation = store.distance(hydrogen, heavy) else { continue }
+                    if separation < closestDistance, separation <= 1.3 {
+                        closestDistance = separation
+                        closest = heavy
+                    }
+                }
+                // Attached to its NEAREST heavy atom only. A hydrogen between
+                // two polar atoms is bonded to one of them and merely close to
+                // the other, and assigning it to both would invent a donor.
+                if let closest { hydrogensByHeavyAtom[closest, default: []].append(hydrogen) }
+            }
+        }
+
+        /// Whether a donor-hydrogen-acceptor angle clears the criterion.
+        ///
+        /// Measured AT the hydrogen, between the vector back to its donor and
+        /// the vector on to the acceptor. A linear hydrogen bond is near 180
+        /// degrees, so the cutoff is a floor.
+        func donates(_ donor: Int, to acceptor: Int) -> Bool {
+            guard let attached = hydrogensByHeavyAtom[donor] else { return false }
+            return attached.contains { hydrogen in
+                let hx = Double(store.x[hydrogen])
+                let hy = Double(store.y[hydrogen])
+                let hz = Double(store.z[hydrogen])
+                let dx = Double(store.x[donor]) - hx
+                let dy = Double(store.y[donor]) - hy
+                let dz = Double(store.z[donor]) - hz
+                let ax = Double(store.x[acceptor]) - hx
+                let ay = Double(store.y[acceptor]) - hy
+                let az = Double(store.z[acceptor]) - hz
+
+                let donorLength = (dx * dx + dy * dy + dz * dz).squareRoot()
+                let acceptorLength = (ax * ax + ay * ay + az * az).squareRoot()
+                let lengths = donorLength * acceptorLength
+                guard lengths > 0 else { return false }
+                let cosine = (dx * ax + dy * ay + dz * az) / lengths
+                // Clamped before acos: three nearly collinear atoms put the
+                // cosine a hair outside [-1, 1] and acos(1.0000000001) is NaN,
+                // which would compare false and silently drop a perfect bond.
+                let angle = Foundation.acos(min(max(cosine, -1), 1)) * 180 / Double.pi
+                return angle >= criteria.hydrogenBondAngle
+            }
+        }
+
         var found: [Interaction] = []
         let widest = max(
             criteria.hydrophobicDistance,
@@ -238,10 +305,23 @@ public enum InteractionProfiler {
                             partnerAtom: partnerAtom, distance: separation))
                 }
 
-                // Hydrogen bond, by heavy-atom distance alone when the structure
-                // has no hydrogens. The angle criterion is not applied silently
-                // to a structure that cannot support it; the assumptions say so.
+                // Hydrogen bond.
+                //
+                // Heavy-atom distance alone when the structure has no
+                // hydrogens: the angle criterion is not applied silently to a
+                // structure that cannot support it, and the assumptions say so.
+                //
+                // Where hydrogens ARE present, one of the two atoms must
+                // actually donate at an acceptable angle. That also rejects
+                // acceptor-acceptor pairs, which distance alone accepts: two
+                // carbonyl oxygens 3 A apart are close, and neither can donate
+                // to the other.
+                let angleSatisfied =
+                    !hasHydrogens
+                    || donates(ligandAtom, to: partnerAtom)
+                    || donates(partnerAtom, to: ligandAtom)
                 if separation <= criteria.hydrogenBondDistance,
+                    angleSatisfied,
                     polarElements.contains(ligandElement),
                     polarElements.contains(proteinElement)
                 {

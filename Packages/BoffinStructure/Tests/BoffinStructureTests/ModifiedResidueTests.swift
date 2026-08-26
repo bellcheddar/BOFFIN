@@ -195,7 +195,7 @@ struct AssumptionsHonestyTests {
         #expect(hydrogens.count > 2000, "found \(hydrogens.count) hydrogens")
     }
 
-    @Test("The statement does not claim hydrogens were used, because they are not")
+    @Test("The statement names the cutoff and the caveat that makes it honest")
     func statementDoesNotOverclaim() {
         // This is the honesty mechanism, so it is the one string in the app
         // that must never overclaim. It said explicit hydrogens "were used for
@@ -204,11 +204,15 @@ struct AssumptionsHonestyTests {
         let withHydrogens = InteractionAssumptions(hasExplicitHydrogens: true, pH: 7.4)
         let statement = withHydrogens.statement
 
-        #expect(statement.contains("NOT used"), "the statement must say they are unused")
+        // Hydrogens are now genuinely used, so the statement says so and names
+        // the cutoff. What it must never do is claim more than the code does,
+        // which is what it did for months while nothing read the angle.
+        #expect(statement.contains("100 degrees"), "the cutoff belongs in the statement")
+        #expect(statement.contains("rejected"))
+        // And the caveat that makes it honest rather than merely accurate.
         #expect(
-            !statement.contains("were used for donor geometry"),
-            "the overclaiming sentence is back")
-        #expect(statement.contains("heavy-atom distance"))
+            statement.contains("refinement"),
+            "a reader must be told the hydrogens are usually placed, not observed")
     }
 
     @Test("Both statements name the pH and neither is silent")
@@ -221,5 +225,110 @@ struct AssumptionsHonestyTests {
             #expect(statement.contains("7.4"), "the assumed pH is part of the assumption")
             #expect(statement.count > 80, "a one-line disclaimer is not an assumption statement")
         }
+    }
+}
+
+@Suite("Hydrogen bond geometry")
+struct HydrogenBondAngleTests {
+
+    /// A donor, its hydrogen, and an acceptor, placed at a chosen angle.
+    ///
+    /// The angle is measured AT the hydrogen, between the vector back to the
+    /// donor and the vector on to the acceptor: a linear bond is 180 degrees
+    /// and the criterion is a floor.
+    private func geometry(angleAtHydrogen: Double) -> AtomStore {
+        var atoms = AtomStore()
+        // Donor nitrogen at the origin, hydrogen 1.0 A along +x.
+        atoms.append(
+            x: 0, y: 0, z: 0, element: "N", atomName: "N", residueName: "SER",
+            authorNumber: 1, chainID: "A", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: false, model: 1)
+        atoms.append(
+            x: 1.0, y: 0, z: 0, element: "H", atomName: "H", residueName: "SER",
+            authorNumber: 1, chainID: "A", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: false, model: 1)
+
+        // The acceptor sits 2.0 A from the hydrogen, rotated so that the angle
+        // donor-hydrogen-acceptor is the one asked for. At 180 degrees it lies
+        // straight ahead on +x; at 0 it would sit back on top of the donor.
+        let radians = angleAtHydrogen * Double.pi / 180
+        let x = 1.0 + 2.0 * -Foundation.cos(radians)
+        let y = 2.0 * Foundation.sin(radians)
+        atoms.append(
+            x: Float(x), y: Float(y), z: 0, element: "O", atomName: "O1",
+            residueName: "LIG", authorNumber: 2, chainID: "B", bFactor: 20,
+            occupancy: 1, altLoc: "", isHeteroatom: true, model: 1)
+        return atoms
+    }
+
+    private func hydrogenBonds(_ atoms: AtomStore) -> Int {
+        let ligand = Set((0..<atoms.count).filter { atoms.residueName[$0] == "LIG" })
+        return InteractionProfiler.profile(atoms, ligand: ligand)
+            .interactions.filter { $0.kind == .hydrogenBond }.count
+    }
+
+    @Test("A near-linear donor geometry is accepted")
+    func linearIsAccepted() {
+        // 175 degrees is an excellent hydrogen bond and must survive.
+        #expect(hydrogenBonds(geometry(angleAtHydrogen: 175)) == 1)
+    }
+
+    @Test("A bent geometry is rejected even though the heavy atoms are close")
+    func bentIsRejected() {
+        // The whole point of the criterion. At 60 degrees the donor and
+        // acceptor heavy atoms are still within the distance cutoff, so
+        // distance alone would call this a hydrogen bond. It is not one: the
+        // hydrogen is pointing somewhere else entirely.
+        let bent = geometry(angleAtHydrogen: 60)
+        #expect(hydrogenBonds(bent) == 0, "a 60 degree geometry was called a hydrogen bond")
+
+        // And the heavy atoms really are close enough that distance alone
+        // would have accepted it, or this test proves nothing.
+        let separation = bent.distance(0, 2) ?? .greatestFiniteMagnitude
+        #expect(
+            separation <= InteractionCriteria().hydrogenBondDistance,
+            "the donor and acceptor are \(separation) A apart, beyond the cutoff anyway")
+    }
+
+    @Test("Two acceptors with no hydrogen between them are not bonded")
+    func acceptorPairIsRejected() {
+        // Distance alone accepts this and it is chemically impossible: two
+        // carbonyl oxygens three angstroms apart are close, and neither can
+        // donate. Only reachable once hydrogens are present, because without
+        // them the profiler cannot tell a donor from an acceptor at all.
+        var atoms = AtomStore()
+        atoms.append(
+            x: 0, y: 0, z: 0, element: "O", atomName: "O", residueName: "SER",
+            authorNumber: 1, chainID: "A", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: false, model: 1)
+        atoms.append(
+            x: 3.0, y: 0, z: 0, element: "O", atomName: "O1", residueName: "LIG",
+            authorNumber: 2, chainID: "B", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: true, model: 1)
+        // A hydrogen somewhere else entirely, so the structure counts as
+        // having hydrogens without either oxygen carrying one.
+        atoms.append(
+            x: 20, y: 20, z: 20, element: "H", atomName: "HB", residueName: "SER",
+            authorNumber: 1, chainID: "A", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: false, model: 1)
+
+        #expect(hydrogenBonds(atoms) == 0, "two acceptors were bonded to each other")
+    }
+
+    @Test("A structure without hydrogens still uses distance alone")
+    func withoutHydrogensNothingChanges() {
+        // The behaviour every existing fixture depends on. Removing the
+        // hydrogen from the linear case must put the bond back, because the
+        // angle criterion cannot be applied and is not applied silently.
+        var atoms = AtomStore()
+        atoms.append(
+            x: 0, y: 0, z: 0, element: "N", atomName: "N", residueName: "SER",
+            authorNumber: 1, chainID: "A", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: false, model: 1)
+        atoms.append(
+            x: 3.0, y: 0, z: 0, element: "O", atomName: "O1", residueName: "LIG",
+            authorNumber: 2, chainID: "B", bFactor: 20, occupancy: 1, altLoc: "",
+            isHeteroatom: true, model: 1)
+        #expect(hydrogenBonds(atoms) == 1, "distance-only behaviour changed")
     }
 }

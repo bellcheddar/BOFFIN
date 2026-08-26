@@ -2132,3 +2132,37 @@ licensed the fix that breaks the second.
 Still open: no fixture has a residue numbered below 1, so the tokeniser's
 deliberate handling of negative residue numbers in expression tags remains
 unexercised against a real structure.
+
+---
+
+## Hydrogen bonds use explicit hydrogens (2026-08-26)
+
+The profiler's assumptions statement said explicit hydrogens "were used for
+donor geometry where present". Nothing read them: the criterion was heavy-atom
+distance alone and `hydrogenBondAngle` was declared and never used. The
+worst-placed of four claims found unsupported in three days, because that string
+is the mechanism built to prevent exactly this kind of overclaiming.
+
+It survived because the only profiling test uses CDK2, which has no hydrogens,
+so the branch shown for a structure with them had never been rendered. PETase
+carries 2,102 and has been in the fixture set throughout.
+
+Marc's decision: use them. Where a structure carries hydrogens, one of the two
+polar atoms must donate at a donor-hydrogen-acceptor angle of at least 100
+degrees, measured at the hydrogen. Attachment is by distance within 1.3 A to the
+NEAREST heavy atom, because BinaryCIF carries no bond table for the polymer, and
+a hydrogen between two polar atoms is bonded to one and merely close to the
+other.
+
+Two rejections that distance alone accepts, both chemically impossible: a bent
+geometry whose heavy atoms are still within the cutoff, and an
+acceptor-acceptor pair, which was unreachable before because without hydrogens
+a donor cannot be told from an acceptor.
+
+The statement now names the cutoff and the caveat that most deposited hydrogens
+are placed by refinement software rather than observed, so on such a structure
+this filters on the refinement's assumptions. A test asserts the caveat is
+present, not merely the cutoff: an accurate sentence that omitted it would be
+worse than the old wrong one, because it would be defensible.
+
+Structures without hydrogens are unchanged and still use distance alone.

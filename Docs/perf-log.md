@@ -1148,3 +1148,49 @@ filtering donor geometry on them would be filtering on a model's assumptions
 while reporting the result as a measurement. Whether BOFFIN should do that is a
 judgement about what the app is claiming, not a question about code, and it is
 recorded here rather than answered.
+
+## Hydrogen bonds now use explicit hydrogens (2026-08-26)
+
+Marc's decision, taken after the assumptions statement was found overclaiming:
+use explicit hydrogens for donor geometry where a structure carries them.
+
+### What changed
+
+`hydrogenBondAngle` had been declared and never read. It is now applied: where
+a structure has hydrogens, one of the two polar atoms must actually donate at a
+donor-hydrogen-acceptor angle of at least 100 degrees, measured at the hydrogen.
+
+Hydrogens are attached to their **nearest** heavy atom within 1.3 A, by distance
+rather than connectivity, because BinaryCIF carries no bond table for the
+polymer. 1.3 A spans the real bond lengths (O-H 0.98, N-H 1.01, C-H 1.09) and
+stops short of the nearest non-bonded contact. Nearest-only matters: a hydrogen
+between two polar atoms is bonded to one and merely close to the other, and
+assigning it to both would invent a donor.
+
+### What it buys
+
+Two rejections that distance alone accepts, both chemically impossible:
+
+- **A bent geometry.** At 60 degrees the heavy atoms are still inside the
+  distance cutoff, so distance alone calls it a bond. The hydrogen is pointing
+  somewhere else entirely.
+- **An acceptor-acceptor pair.** Two carbonyl oxygens 3 A apart are close and
+  neither can donate. Unreachable before, because without hydrogens the profiler
+  cannot tell a donor from an acceptor at all.
+
+Both are tested, and the bent case asserts the heavy atoms really are within the
+cutoff, so the test cannot pass by the pair being too far apart anyway.
+
+### The honest caveat, which is the reason this needed a decision
+
+Most deposited hydrogens are PLACED by refinement software at idealised geometry
+rather than observed. On such a structure this filters contacts using the
+refinement's assumptions and reports the result as measurement. The assumptions
+statement now names the cutoff and says so, and a test asserts the caveat is
+present rather than merely the cutoff: an accurate sentence that omits it would
+be worse than the old wrong one, because it would be defensible.
+
+Structures without hydrogens are unchanged and still use distance alone, which
+a test pins.
+
+BoffinStructure 117 tests.

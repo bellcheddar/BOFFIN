@@ -1014,3 +1014,44 @@ places; and that 1XQ8 loses nothing on load, because there is only one model to
 lose.
 
 BoffinStructure 103 tests.
+
+## Auditing the fixture manifest by measurement (2026-08-26)
+
+Two fixture claims had already proved false, both by the same route: a property
+inferred from what the entry IS rather than measured from what the file
+CONTAINS. So every remaining claim was measured.
+
+| Claim | Verdict |
+|---|---|
+| 1HCK carries ATP and Mg | **True.** Heteroatoms are ATP, MG, HOH |
+| 7K00 is 7.3 MB | **True.** 7,679,004 bytes, 149,338 atoms |
+| 2RH1 is a fusion construct | **True.** 442 observed residues |
+| 1E8A is selenomethionine-substituted | **False** |
+
+**1E8A is not what the manifest said it was, in any respect.** The
+authoritative entry is *The three-dimensional structure of human S100A12*: no
+MSE anywhere, no alternate locations, heteroatoms of only calcium and water. It
+was credited with non-standard residues and alternate locations and has
+neither. What it does have is calcium coordination and a declared dimer
+assembly, and it is now recorded for those.
+
+**The path it was supposed to test is real, careful, and had never run.**
+Selenomethionine is how a great many structures are phased, so MSE is one of the
+commonest non-standard residues in the PDB, and it is deposited as HETATM. A
+viewer treating HETATM as "not polymer" drops a methionine out of the middle of
+a chain: the cartoon breaks where it should be and a pocket selection returns a
+hole rather than an error. `SelectionEvaluator` handles this deliberately, with
+MSE in `polymerResidues` alongside SEC, PYL, HYP, SEP, TPO, PTR, CSO and CME,
+and explicit logic to accept MSE even when the record says HETATM.
+
+**1A8O added**: HIV capsid C-terminal domain, 644 atoms, 183 KB, **32 MSE atoms
+all recorded as HETATM**, four selenium. Found by querying RCSB for entries
+containing MSE under 1,500 atoms rather than by guessing, after five guesses in
+a row had none.
+
+Four tests: that the fixture really carries MSE as HETATM, since MSE as plain
+ATOM would test nothing; that it counts as polymer; that the exception has not
+widened into "all heteroatoms are polymer", which would pull every water into a
+binding site; and that 1E8A has no MSE, kept as the record of the claim.
+
+BoffinStructure 107 tests.

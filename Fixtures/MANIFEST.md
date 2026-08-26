@@ -21,8 +21,9 @@ app's own offline rule.
 | `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal. **Not** a multi-model ensemble: this row claimed one and the entry has a single deposited model, verified against the authoritative mmCIF (2,017 ATOM records, all at model 1). Solution NMR does not imply an ensemble, and that inference is how the claim got here. 1L2Y is the fixture that actually carries one |
 | `structures/7k00.bcif` | 7K00, *E. coli* 70S ribosome | Viewer performance guardrail (large assembly) |
 | `structures/1l2y.bcif` | 1L2Y, Trp-cage miniprotein (NMR) | **Multi-model ensemble.** 38 models, 11,552 atom rows, 304 atoms per model. Added 2026-08-26 because no fixture had more than one model, leaving the ensemble path untested. `AtomStore` deliberately takes a single model, so this exercises that choice being made rather than assumed |
+| `structures/1a8o.bcif` | 1A8O, HIV capsid C-terminal domain | **Selenomethionine.** 32 MSE atoms, **all recorded as HETATM**, which is the case `SelectionEvaluator` handles specially so modified residues still count as polymer. Added 2026-08-26: the path was written deliberately and had never been exercised, because the fixture credited with it is a different protein. 644 atoms, 183 KB |
 | `structures/1fha.bcif` | 1FHA, human ferritin heavy chain | **Biological assembly construction.** Declares a **24-mer** and deposits a **single chain**: the deposited coordinates look like a monomer and the molecule is a 24-subunit shell. Added 2026-08-26 because no other fixture had an assembly differing from its asymmetric unit, which left assembly construction untestable. 1,361 atoms, 246 KB |
-| `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues, and the **only fixture declaring a multimeric assembly** (a dimer, chains A and B). Note its assembly still equals its asymmetric unit, so it exercises assembly *discovery* and not *construction*. **Not** alternate locations: this row claimed them and the file has none, which was found on 2026-08-25 when the altloc handling was written against it and every test passed vacuously. PETase is the fixture that actually carries them |
+| `structures/1e8a.bcif` | 1E8A, human S100A12 | **Calcium coordination** and a declared dimer assembly. Every earlier claim in this row was wrong and is recorded rather than quietly replaced: it was described as selenomethionine-substituted and credited with non-standard residues and alternate locations. The authoritative entry is *The three-dimensional structure of human S100A12*, with **no MSE**, **no altlocs**, and heteroatoms of only Ca and water. 1A8O carries the selenomethionine, PETase the alternate locations |
 
 ## Sequences
 
@@ -108,4 +109,5 @@ d691a4b8a0c5d9a34709fac878560c987e99815271c5dfcf10efa650bed81d72  structures/1ub
 0a50e05d731ba19ac710433aae5c3e244a3a41fca1973b75540c42db3730442d  structures/7k00.bcif
 0920e18721ee85102ccce6f8de7cef2f7b0c6c1a87107a81b5c3521f96a0e0ab  structures/1fha.bcif
 3287cc3b2b0bfb0d5dcae685ac4ec8c40723927f70ec82049b55e32935fbc0c7  structures/1l2y.bcif
+ca59d7ab675557659005ef1ebd677d19d02dc8a84818262e573fbc504250da14  structures/1a8o.bcif
 ```

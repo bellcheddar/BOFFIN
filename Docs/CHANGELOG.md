@@ -2070,3 +2070,34 @@ That makes two fixture claims found false in two days, both by the same route:
 a property was inferred from what the entry IS (a crystal structure, an NMR
 structure) rather than measured from what the file CONTAINS. 1E8A was credited
 with alternate locations it does not have; 1XQ8 with models it does not have.
+
+---
+
+## The fixture audit, and a third false claim (2026-08-26)
+
+Two fixture claims had proved false by the same route, so every remaining one
+was measured rather than trusted. 1HCK's ATP and Mg, 7K00's 7.3 MB and 2RH1's
+fusion construct are all true. 1E8A's is not.
+
+**1E8A is not what the manifest said, in any respect.** The authoritative entry
+is "The three-dimensional structure of human S100A12": no MSE, no alternate
+locations, heteroatoms of only calcium and water. It was credited with
+non-standard residues and alternate locations and has neither. It does have
+calcium coordination and a declared dimer, and is recorded for those now.
+
+**The path it was meant to test is real and had never run.** Selenomethionine
+is how a great many structures are phased, MSE is deposited as HETATM, and a
+viewer treating HETATM as "not polymer" drops a methionine out of the middle of
+a chain: the cartoon breaks there and a pocket selection returns a hole rather
+than an error. `SelectionEvaluator` handles it deliberately, with MSE alongside
+SEC, PYL, HYP, SEP, TPO, PTR, CSO and CME, and explicit logic for the HETATM
+case.
+
+**1A8O added**: HIV capsid C-terminal domain, 644 atoms, 183 KB, 32 MSE atoms
+all recorded as HETATM. Found by querying RCSB for entries containing MSE under
+1,500 atoms, after five guesses in a row had none.
+
+Three false claims in three days, all the same shape: a property inferred from
+what the entry IS rather than measured from what the file CONTAINS. All three
+survived because nothing tested the property they were there to exercise, so
+the fixture and the test were missing together and neither absence was visible.

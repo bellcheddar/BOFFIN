@@ -20,7 +20,7 @@ app's own offline rule.
 | `structures/6eqe.bcif` | 6EQE, *Piscinibacter sakaiensis* PETase | Catalytic triad annotation, disulfide detection, **alternate conformations** (709 of 4,596 atoms carry an altloc; 25 residues have alternate CA positions) |
 | `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal, multi-model ensemble |
 | `structures/7k00.bcif` | 7K00, *E. coli* 70S ribosome | Viewer performance guardrail (large assembly) |
-| `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues. **Not** alternate locations: this row claimed them and the file has none, which was found on 2026-08-25 when the altloc handling was written against it and every test passed vacuously. PETase is the fixture that actually carries them |
+| `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues, and the **only fixture declaring a multimeric assembly** (a dimer, chains A and B). Note its assembly still equals its asymmetric unit, so it exercises assembly *discovery* and not *construction*. **Not** alternate locations: this row claimed them and the file has none, which was found on 2026-08-25 when the altloc handling was written against it and every test passed vacuously. PETase is the fixture that actually carries them |
 
 ## Sequences
 

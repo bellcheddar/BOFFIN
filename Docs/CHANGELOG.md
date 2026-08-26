@@ -2010,3 +2010,36 @@ asserting which sequences it fails on.
 The `AnalysisHeads` comments that still mention 100 families and Mahalanobis are
 deliberate: they explain why the current choice differs from the previous one,
 and deleting them would leave the reversal unexplained.
+
+---
+
+## Assembly discovery verified, and the reason construction could not be (2026-08-26)
+
+The deposited coordinates are the asymmetric unit, which is frequently not the
+molecule. That splits into two claims and only one of them is testable here.
+
+**Discovery** is reading what the entry declares. Now asserted against the real
+values in the fixtures: 1E8A declares a dimer, 7K00 declares all 56 of its
+chains, and the monomers declare one, which is an answer rather than a gap.
+
+**Construction** is rebuilding the structure from those declarations, and it
+cannot be tested with this fixture set at all, because every fixture's declared
+assembly already equals its asymmetric unit:
+
+| Fixture | Declared | Deposited |
+|---|---|---|
+| 1UBQ, 1HCK, 2RH1, 6EQE, 1XQ8 | 1 chain | 1 chain |
+| 1E8A | 2 chains | 2 chains (A and B) |
+| 7K00 | 56 chains | 56 chains |
+
+Building the assembly is a no-op on all seven. **That is the real reason the
+earlier UI test was deleted rather than tuned**: it was recorded as a
+version-pinning problem with what Mol* reports, and the deeper problem was that
+there was nothing meaningful for it to assert.
+
+A test now pins the limitation itself, so adding a fixture whose assembly
+differs from its coordinates makes it FAIL and forces the construction test to
+be written. A gap recorded only in prose is a gap that stays.
+
+The manifest records 1E8A's second purpose: it is the only fixture declaring a
+multimer, and it exercises discovery rather than construction.

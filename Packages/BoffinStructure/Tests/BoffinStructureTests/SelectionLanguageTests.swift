@@ -49,3 +49,61 @@ struct SelectionErrorMessageTests {
         }
     }
 }
+
+@Suite("Negative residue numbering")
+struct NegativeResidueNumberTests {
+
+    private func range(_ expression: String) throws -> [ClosedRange<Int>] {
+        guard case .residueNumbers(let ranges) = try SelectionParser.parse(expression) else {
+            Issue.record("\(expression) did not parse as residue numbers")
+            return []
+        }
+        return ranges
+    }
+
+    @Test("An expression tag numbered below one is selectable")
+    func negativeSingleAndRange() throws {
+        // The PDB numbers an expression tag backwards from the mature protein's
+        // first residue, so a cleaved His-tag is typically -20 to -1. The
+        // tokeniser treats `50-120` as one token specifically so the minus in
+        // that numbering is not read as a range separator.
+        #expect(try range("resi -5") == [(-5)...(-5)])
+        #expect(try range("resi 0") == [0...0])
+
+        // Both ends negative. This is the case the single-token treatment
+        // exists for and the one it used to fail: the body was split on every
+        // minus, giving three parts and "not a number", and there was no way at
+        // all to write a range that ends below zero.
+        #expect(try range("resi -20--1") == [(-20)...(-1)])
+    }
+
+    @Test("A range spanning zero works from either side")
+    func rangesAcrossZero() throws {
+        // A construct with a tag and a mature sequence is numbered through
+        // zero, so this is the ordinary way to ask for the whole thing.
+        #expect(try range("resi -5-10") == [(-5)...10])
+        #expect(try range("resi 50--10") == [(-10)...50], "a range ending negative")
+    }
+
+    @Test("Ordinary ranges are unaffected")
+    func positiveRangesUnchanged() throws {
+        // The behaviour every other selection depends on.
+        #expect(try range("resi 50-120") == [50...120])
+        #expect(try range("resi 7") == [7...7])
+        #expect(try range("resi 1+5+9") == [1...1, 5...5, 9...9])
+        #expect(try range("resi -3+7") == [(-3)...(-3), 7...7])
+    }
+
+    @Test("Nonsense is still refused")
+    func malformedIsRejected() {
+        // The fix must not have turned the parser permissive: an unparseable
+        // number has to name itself rather than selecting everything or
+        // nothing, because an over-broad selection makes a figure that is wrong
+        // in a way nobody can see.
+        for expression in ["resi 5-", "resi --", "resi 1-2-3", "resi abc"] {
+            #expect(throws: SelectionError.self) {
+                _ = try SelectionParser.parse(expression)
+            }
+        }
+    }
+}

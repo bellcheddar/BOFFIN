@@ -2166,3 +2166,28 @@ present, not merely the cutoff: an accurate sentence that omitted it would be
 worse than the old wrong one, because it would be defensible.
 
 Structures without hydrogens are unchanged and still use distance alone.
+
+---
+
+## The expression-tag range could not be written (2026-08-26)
+
+The last gap the fixture audit measured was that no fixture carries a residue
+numbered below one, leaving the selection language's expression-tag handling
+unexercised. It needed no fixture: the parser was wrong.
+
+The PDB numbers a cleaved tag backwards from the mature protein's first residue,
+so a His-tag is typically -20 to -1, and `50-120` is treated as a single token
+specifically so that minus is not read as a range separator.
+
+`resi -20--1` did not parse. The body was split on every minus, giving three
+parts and "not a number", and there was no way at all to write a range ending
+below zero because the high end never received a sign. The one case the design
+existed for was the one case it could not express.
+
+The split is now on the first minus after any leading one, with the remainder
+parsed as a signed number in its own right. `resi -20--1` gives -20 to -1 and
+`resi 50--10` gives -10 to 50; ordinary ranges are unchanged.
+
+Four tests, including that nonsense is still refused. A fix that made the parser
+permissive would let an unparseable number select everything, which makes a
+figure wrong in a way nobody can see.

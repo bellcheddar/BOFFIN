@@ -1194,3 +1194,39 @@ Structures without hydrogens are unchanged and still use distance alone, which
 a test pins.
 
 BoffinStructure 117 tests.
+
+## The expression-tag range the tokeniser existed to protect (2026-08-26)
+
+The last gap the fixture audit measured: no fixture has a residue numbered below
+one, so the selection language's handling of expression-tag numbering was
+unexercised. It turned out not to need a fixture, because the parser was wrong.
+
+The PDB numbers an expression tag backwards from the mature protein's first
+residue, so a cleaved His-tag is typically **-20 to -1**. `SelectionLanguage`
+treats `50-120` as a single token specifically so the minus in that numbering is
+not read as a range separator, and the comment says so.
+
+**`resi -20--1` did not parse.** The body was split on every minus, giving three
+parts and "not a number". There was also no way at all to write a range that
+ENDS below zero: the high end never received a sign.
+
+So the case the single-token treatment exists for was the one case it could not
+express.
+
+| Expression | Before | After |
+|---|---|---|
+| `resi -5` | -5 | -5 |
+| `resi -5-10` | -5 to 10 | -5 to 10 |
+| **`resi -20--1`** | **"not a number"** | **-20 to -1** |
+| **`resi 50--10`** | **"not a number"** | **-10 to 50** |
+| `resi 50-120` | 50 to 120 | 50 to 120 |
+
+The split is now on the FIRST minus after any leading one, and whatever follows
+is parsed as a number in its own right including its own sign.
+
+Four tests, one of which is the negative case, one the ordinary ranges that
+everything else depends on, and one asserting that nonsense is still refused:
+the fix must not have made the parser permissive, because an unparseable number
+that silently selects everything makes a figure wrong in a way nobody can see.
+
+BoffinStructure 121 tests.

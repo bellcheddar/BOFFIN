@@ -378,20 +378,36 @@ public enum SelectionParser {
             for piece in token.text.split(separator: "+") {
                 // A leading minus is a negative residue number, which the PDB
                 // uses for expression tags; a minus in the middle is a range.
-                let body = piece.dropFirst(piece.hasPrefix("-") ? 1 : 0)
-                let parts = body.split(separator: "-", omittingEmptySubsequences: false)
-                let sign = piece.hasPrefix("-") ? -1 : 1
-                if parts.count == 1 {
-                    guard let value = Int(parts[0]) else {
+                //
+                // Both ends may be negative, and that is the case this used to
+                // get wrong. `resi -20--1` is a tag numbered -20 to -1, which is
+                // precisely the numbering the single-token treatment exists to
+                // protect, and splitting the body on every minus gave three
+                // parts and an error. There was also no way at all to write a
+                // range that ENDS negative.
+                //
+                // So the split is on the FIRST minus after any leading one, and
+                // whatever follows is parsed as a number in its own right,
+                // including its own sign.
+                let leadingMinus = piece.hasPrefix("-")
+                let body = piece.dropFirst(leadingMinus ? 1 : 0)
+                let sign = leadingMinus ? -1 : 1
+
+                guard let separator = body.firstIndex(of: "-") else {
+                    guard let value = Int(body) else {
                         throw SelectionError.badNumber(String(piece))
                     }
                     result.append((sign * value)...(sign * value))
-                } else if parts.count == 2, let low = Int(parts[0]), let high = Int(parts[1]) {
-                    let start = sign * low
-                    result.append(min(start, high)...max(start, high))
-                } else {
+                    continue
+                }
+
+                let lowText = body[body.startIndex..<separator]
+                let highText = body[body.index(after: separator)...]
+                guard let lowMagnitude = Int(lowText), let high = Int(highText) else {
                     throw SelectionError.badNumber(String(piece))
                 }
+                let start = sign * lowMagnitude
+                result.append(min(start, high)...max(start, high))
             }
             return result
         }

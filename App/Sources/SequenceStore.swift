@@ -439,6 +439,12 @@ final class SequenceStore {
 
     /// Search the bundled index for proteins whose pooled embedding is close.
     ///
+    /// The file names come from `BoffinAsset`, which is the catalogue that
+    /// declares them along with their sizes and what each one enables. It had
+    /// no consumers: these four paths were spelled out here independently, so
+    /// the catalogue could be renamed without the loader noticing and the
+    /// loader could be renamed without the catalogue noticing.
+    ///
     /// The alignment of each hit runs off the main actor: it is a few million
     /// dynamic-programming cells and would be visible as a stutter otherwise.
     private func searchHomologs(pooled: [Float], sequence: ProteinSequence) async {
@@ -457,10 +463,10 @@ final class SequenceStore {
             () -> Result<[HomologAlignment], any Error> in
             do {
                 let index = try HomologIndex(
-                    vectors: assets.appending(path: "homolog_vectors.bin"),
-                    metadata: assets.appending(path: "homolog_meta.bin"))
+                    vectors: assets.appending(path: BoffinAsset.homologVectors.fileName),
+                    metadata: assets.appending(path: BoffinAsset.homologMetadata.fileName))
                 let hits = try index.search(pooled, limit: limit)
-                let sifts = try? SIFTSStore(url: assets.appending(path: "sifts_segments.bin"))
+                let sifts = try? SIFTSStore(url: assets.appending(path: BoffinAsset.siftsSegments.fileName))
                 let aligned = hits.map { hit in
                     HomologAlignment(
                         hit: hit,
@@ -480,7 +486,7 @@ final class SequenceStore {
             homologState = .ready(count: aligned.count)
             if let best = aligned.first,
                 let sifts = try? SIFTSStore(
-                    url: assets.appending(path: "sifts_segments.bin"))
+                    url: assets.appending(path: BoffinAsset.siftsSegments.fileName))
             {
                 precedent = Array(sifts.constructs(for: best.hit.accession).prefix(20))
             }

@@ -223,8 +223,15 @@ struct FamilyTabView: View {
                     Text("Searching").font(.caption).foregroundStyle(.secondary)
                 }
             case .notDownloaded:
+                // Named the file and nothing else. The catalogue carries what
+                // each asset enables and what it costs, in the user's terms
+                // and for exactly this message, and neither reached the screen:
+                // a user reading that an index is missing has no way to judge
+                // whether to care.
                 Label(
-                    "The homolog index has not been downloaded.",
+                    "\(BoffinAsset.homologVectors.enables) needs a "
+                        + "\(BoffinAsset.homologSearch.approximateSize) download "
+                        + "that has not been made.",
                     systemImage: "arrow.down.circle"
                 )
                 .font(.caption).foregroundStyle(.secondary)

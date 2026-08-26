@@ -13,6 +13,7 @@
 //  blocking network call.
 
 import BoffinCore
+import Foundation
 
 /// Where an asset lives and whether it is present.
 public enum AssetAvailability: Sendable, Hashable {
@@ -36,6 +37,13 @@ public enum AssetAvailability: Sendable, Hashable {
 public struct BoffinAsset: Sendable, Hashable, Identifiable {
     public let id: String
     public let fileName: String
+    /// Roughly what it costs to fetch, for the message that asks the user to.
+    ///
+    /// Measured from the built asset rather than estimated. These had drifted
+    /// while nothing read them: the metadata was declared at 28 MB against a
+    /// real 31.3 MB, so the first screen to quote the figure would have
+    /// understated the download by 10%. `AssetCatalogueTests` now checks the
+    /// declaration against the file whenever the file is present.
     public let approximateBytes: Int
     /// What the app cannot do until this is present, in the user's terms.
     public let enables: String
@@ -61,15 +69,24 @@ extension BoffinAsset {
     public static let homologMetadata = BoffinAsset(
         id: "homolog-metadata",
         fileName: "homolog_meta.bin",
-        approximateBytes: 28_000_000,
+        approximateBytes: 31_300_000,
         enables: "Naming homolog hits and aligning them to your sequence")
 
     /// SIFTS observed segments in SEQRES, UniProt and author numbering.
     public static let siftsSegments = BoffinAsset(
         id: "sifts-segments",
         fileName: "sifts_segments.bin",
-        approximateBytes: 42_000_000,
+        approximateBytes: 43_300_000,
         enables: "Reporting PDB author residue numbers and deposited constructs")
+
+    /// The pair the homolog search cannot run without, as a unit.
+    ///
+    /// Grouped rather than listed at each call site because they are only ever
+    /// useful together, and because the size the user is asked to accept is
+    /// the sum rather than either one.
+    public static let homologSearch: [BoffinAsset] = [
+        .homologVectors, .homologMetadata,
+    ]
 
     /// Everything Phase 5 can download, in the order it is useful.
     ///
@@ -77,7 +94,24 @@ extension BoffinAsset {
     /// vectors and another's metadata would return correct similarities attached
     /// to the wrong proteins, so `HomologIndex` refuses to load a mismatched
     /// pair and they are always fetched together.
-    public static let all: [BoffinAsset] = [
-        .homologVectors, .homologMetadata, .siftsSegments,
-    ]
+    public static let all: [BoffinAsset] = homologSearch + [.siftsSegments]
+
+    /// The download size, written the way the storage screen writes it.
+    public var approximateSize: String {
+        Self.size(of: approximateBytes)
+    }
+
+    static func size(of bytes: Int) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        formatter.allowedUnits = [.useMB, .useGB]
+        return formatter.string(fromByteCount: Int64(bytes))
+    }
+}
+
+extension Collection<BoffinAsset> {
+    /// The combined size of assets that have to be fetched together.
+    public var approximateSize: String {
+        BoffinAsset.size(of: reduce(0) { $0 + $1.approximateBytes })
+    }
 }

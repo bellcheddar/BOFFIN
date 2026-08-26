@@ -120,11 +120,42 @@ extension AtomStore {
     ///     An NMR ensemble holds twenty superimposed copies, and loading all of
     ///     them at once looks like a single very badly resolved structure.
     /// - Returns: the atoms of that model.
-    /// - Throws: ``AtomStoreError`` when the file has no atom site table.
+    /// - Throws: ``AtomStoreError`` when the file has no atom site table, or
+    ///   when that table is missing a column the result would be meaningless
+    ///   without.
     public static func from(
         _ file: BinaryCIFFile, model: Int? = nil
     ) throws -> AtomStore {
         guard let site = file["_atom_site"] else { throw AtomStoreError.noAtomSite }
+
+        // `missingColumn` was declared for exactly this and never thrown, so
+        // every column below reached for a fallback instead. Individually the
+        // fallbacks look defensive; together they turn an unreadable file into
+        // a successful load. A file whose coordinates failed to decode returns
+        // an empty store and no error. One with no `label_comp_id` returns
+        // atoms whose residues are all named "", so every selection matches
+        // nothing. One with neither sequence-number column numbers every
+        // residue 0, collapsing the whole chain into a single residue.
+        //
+        // These six are mandatory in mmCIF, so requiring them rejects broken
+        // files without rejecting unusual ones. Everything not listed here
+        // keeps its fallback deliberately: `occupancy` and `B_iso_or_equiv`
+        // are genuinely optional, and a predicted model legitimately has no
+        // `group_PDB`.
+        for required in ["Cartn_x", "Cartn_y", "Cartn_z", "type_symbol",
+                         "label_atom_id", "label_comp_id"] {
+            guard site[required] != nil else {
+                throw AtomStoreError.missingColumn(required)
+            }
+        }
+        // Either member of these pairs will do; losing both is fatal in the
+        // way described above, and the existing `??` chains hid it.
+        guard site["auth_seq_id"] != nil || site["label_seq_id"] != nil else {
+            throw AtomStoreError.missingColumn("auth_seq_id or label_seq_id")
+        }
+        guard site["auth_asym_id"] != nil || site["label_asym_id"] != nil else {
+            throw AtomStoreError.missingColumn("auth_asym_id or label_asym_id")
+        }
 
         let modelColumn = site["pdbx_PDB_model_num"]
         let wanted = model ?? modelColumn?.int(0) ?? 1

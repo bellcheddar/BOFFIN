@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key>
+  <string>BOFFIN</string>
+  <!-- Explicit because this target uses an INFOPLIST_FILE rather than a
+       generated one. Without CFBundleIdentifier the built extension does not
+       inherit PRODUCT_BUNDLE_IDENTIFIER, and the build fails with "Embedded
+       binary's bundle identifier is not prefixed with the parent app's" --
+       which points at the prefix rather than at the missing key. -->
+  <key>CFBundleIdentifier</key>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleName</key>
+  <string>$(PRODUCT_NAME)</string>
+  <key>CFBundleExecutable</key>
+  <string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundlePackageType</key>
+  <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.1.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>NSExtension</key>
+  <dict>
+    <key>NSExtensionPointIdentifier</key>
+    <string>com.apple.share-services</string>
+    <key>NSExtensionPrincipalClass</key>
+    <string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
+    <key>NSExtensionAttributes</key>
+    <dict>
+      <!-- A predicate rather than NSExtensionActivationRule's dictionary form,
+           because the dictionary form cannot express "text OR a file", and a
+           share sheet that appears for a FASTA in Files but not for a
+           selection in Mail is the kind of gap nobody reports. -->
+      <key>NSExtensionActivationRule</key>
+      <string>SUBQUERY (
+        extensionItems, $item,
+        SUBQUERY (
+          $item.attachments, $attachment,
+          ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.text"
+          || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.plain-text"
+          || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.file-url"
+        ).@count &gt;= 1
+      ).@count == 1</string>
+    </dict>
+  </dict>
+</dict>
+</plist>

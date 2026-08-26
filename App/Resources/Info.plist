@@ -27,6 +27,17 @@
 	<string>1</string>
 	<!-- BOFFIN works fully offline. No key here may imply otherwise, and no
 	     core path may require the network. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.mdeller.boffin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>boffin</string>
+			</array>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- Document types. A FASTA file shared from Mail, Files or a colleague has

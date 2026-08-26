@@ -56,6 +56,18 @@ struct RootView: View {
         // without CFBundleDocumentTypes the share sheet never offers BOFFIN and
         // this closure is never called, which reads as a bug in the handler.
         .onOpenURL { url in
+            // The share extension opens `boffin://shared` and leaves the text
+            // in the App Group container, because a URL cannot carry a
+            // multi-record FASTA and would truncate it silently. There is no
+            // file to read at this URL, so it is handled before the document
+            // path rather than falling into it and failing.
+            if url.scheme == "boffin", url.host == "shared" {
+                if let text = SharedInbox.take() {
+                    store.load(text: text, fileName: "Shared sequence")
+                    openError = nil
+                }
+                return
+            }
             do {
                 let text = try OpenedDocument.read(url)
                 store.load(text: text, fileName: url.lastPathComponent)
@@ -91,6 +103,18 @@ struct RootView: View {
         // early on every launch after the first, and warming the backbone is
         // most valuable exactly then.
         .task { await store.warmUpModel() }
+        // Also checked on foreground. `onOpenURL` fires when the extension
+        // opens the app, but a sequence shared while BOFFIN was already in the
+        // foreground would otherwise sit in the container unread until the
+        // next launch.
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: UIApplication.willEnterForegroundNotification)
+        ) { _ in
+            if let text = SharedInbox.take() {
+                store.load(text: text, fileName: "Shared sequence")
+            }
+        }
         // The engine is now held for the app's lifetime, so its embedding
         // cache is worth giving back when the system asks. The model stays
         // loaded: reloading it would repay the cost the warm-up just avoided.

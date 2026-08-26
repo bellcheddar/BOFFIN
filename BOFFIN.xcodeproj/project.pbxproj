@@ -12,37 +12,40 @@
 		093D59258C5D2CE1395D0464 /* BrandRulerStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */; };
 		0C2136391539F611D4635981 /* OrderTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6AF9CD98519D9AF99ED534B /* OrderTabView.swift */; };
 		0C7EB7B7CD9B9C5B19180327 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
+		0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */; };
+		0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */; };
+		123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */; };
 		309392C24349D867930D263C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		30D770903851CB5EF60E0780 /* FitnessTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A607093177A301AEAECFF0 /* FitnessTabView.swift */; };
+		343DBD360CF3B85BE7B4D0AE /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A37C9CB71C352F314951CF /* ShareViewController.swift */; };
+		3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */; };
+		40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */; };
 		415E88D6556DD32E9CAF5E68 /* FamilyTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA29CC48891E20037DF354 /* FamilyTabView.swift */; };
+		420D9554BDDF1D84569E4BA6 /* AnnotationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */; };
 		471354F21120830E72D5FA9C /* PropertiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A469349A97963F1293E91F91 /* PropertiesView.swift */; };
 		5316C03BC7B85C402CAE1366 /* OrderTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4A66A11CFF23594DC1D41D /* OrderTabUITests.swift */; };
+		60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */; };
 		7E5E08AE35F4236102CD6A72 /* LaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3211A8BC77205F57822AC0 /* LaunchUITests.swift */; };
+		807E5CBA693529F97233770D /* NoSequenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263D5703A26771A32159B0E2 /* NoSequenceView.swift */; };
 		822D6797A1FDD50249938A1C /* SequenceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */; };
 		86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14A4FCACD71928BC6B349BF /* FitnessTabUITests.swift */; };
 		892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */; };
+		A0D31EF67066D2CB14A93D26 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
+		AA6AF3571C126E7D1975FE1C /* ScreenshotCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */; };
 		B31D5E9CD2C7D310B2762DBD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		B4FAFC3F2B5E2685E3DF98FA /* AppSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */; };
-		F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F519F5A35151A9069277CE /* BoffinApp.swift */; };
-		F473D03A5B86076AE4353C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C4B37771FD3FEA80B21D072 /* Assets.xcassets */; };
-		E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */; };
-		123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */; };
-		E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F6704AD6431E78767C846 /* StructureTabView.swift */; };
-		40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */; };
-		0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */; };
-		F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */; };
-		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
 		B6A5CBEF672462525018F65D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */; };
-		F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */; };
-		EC0DD52C6D2BCDC9AC2A117B /* ExampleSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576B3A7177EA48A039B5C23E /* ExampleSequences.swift */; };
-		807E5CBA693529F97233770D /* NoSequenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263D5703A26771A32159B0E2 /* NoSequenceView.swift */; };
-		3DCA5B21697EE4C021E1C1C7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */; };
+		C4103237DB20CB961029F9BC /* BOFFINShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3BD8A9ABB55D0FAB17BBBEBA /* BOFFINShare.appex */; };
 		D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */; };
-		0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */; };
-		420D9554BDDF1D84569E4BA6 /* AnnotationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */; };
-		60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */; };
+		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
+		E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F6704AD6431E78767C846 /* StructureTabView.swift */; };
+		E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */; };
+		EC0DD52C6D2BCDC9AC2A117B /* ExampleSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576B3A7177EA48A039B5C23E /* ExampleSequences.swift */; };
+		F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F519F5A35151A9069277CE /* BoffinApp.swift */; };
 		F3D2B5E1D57DFAA89281B7B3 /* ExternalDisplayScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847B3051F7F2F48C57869643 /* ExternalDisplayScene.swift */; };
-		AA6AF3571C126E7D1975FE1C /* ScreenshotCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */; };
+		F473D03A5B86076AE4353C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C4B37771FD3FEA80B21D072 /* Assets.xcassets */; };
+		F62077CCC0EF43E64AACA5D0 /* AcknowledgementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */; };
+		F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,55 +63,78 @@
 			remoteGlobalIDString = AF1F7D39381FF88BD55FD38E;
 			remoteInfo = BOFFIN;
 		};
+		FB6E59580A165FA1745AD103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A0BE4A596DFF81FF2C699FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 62AAE3EA6B5FE8AC246C07F7;
+			remoteInfo = BOFFINShare;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		31165CE18DAF3E828977143D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C4103237DB20CB961029F9BC /* BOFFINShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		025405E6BD0A79F1E200A6D5 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScreenshotCaptureTests.swift; path = App/UITests/ScreenshotCaptureTests.swift; sourceTree = "<group>"; };
+		04A37C9CB71C352F314951CF /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		063F6704AD6431E78767C846 /* StructureTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabView.swift; path = App/Sources/StructureTabView.swift; sourceTree = "<group>"; };
+		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
 		1C4B37771FD3FEA80B21D072 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = App/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabUITests.swift; path = App/UITests/BoundaryTabUITests.swift; sourceTree = "<group>"; };
+		263D5703A26771A32159B0E2 /* NoSequenceView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoSequenceView.swift; path = App/Sources/NoSequenceView.swift; sourceTree = "<group>"; };
 		2C4A66A11CFF23594DC1D41D /* OrderTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrderTabUITests.swift; path = App/UITests/OrderTabUITests.swift; sourceTree = "<group>"; };
+		2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingUITests.swift; path = App/UITests/OnboardingUITests.swift; sourceTree = "<group>"; };
 		2C86B4F6F2133F1EC2D10115 /* BOFFIN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BOFFIN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppSmokeTests.swift; path = App/Tests/AppSmokeTests.swift; sourceTree = "<group>"; };
 		360DFC49528DA13E4D37399D /* CLAUDE.md */ = {isa = PBXFileReference; includeInIndex = 1; path = CLAUDE.md; sourceTree = "<group>"; };
 		3A1BCB9FEDFDE88FF4D1D2C9 /* perf-log.md */ = {isa = PBXFileReference; includeInIndex = 1; name = "perf-log.md"; path = "Docs/perf-log.md"; sourceTree = "<group>"; };
+		3BD8A9ABB55D0FAB17BBBEBA /* BOFFINShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BOFFINShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BOFFINUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabUITests.swift; path = App/UITests/StructureTabUITests.swift; sourceTree = "<group>"; };
+		576B3A7177EA48A039B5C23E /* ExampleSequences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExampleSequences.swift; path = App/Sources/ExampleSequences.swift; sourceTree = "<group>"; };
 		59C2A4FDA914BF77952ECCDF /* SequenceInputView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SequenceInputView.swift; path = App/Sources/SequenceInputView.swift; sourceTree = "<group>"; };
 		5A3211A8BC77205F57822AC0 /* LaunchUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LaunchUITests.swift; path = App/UITests/LaunchUITests.swift; sourceTree = "<group>"; };
+		80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = App/Resources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		847B3051F7F2F48C57869643 /* ExternalDisplayScene.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExternalDisplayScene.swift; path = App/Sources/ExternalDisplayScene.swift; sourceTree = "<group>"; };
 		85A607093177A301AEAECFF0 /* FitnessTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FitnessTabView.swift; path = App/Sources/FitnessTabView.swift; sourceTree = "<group>"; };
+		889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AcknowledgementsView.swift; path = App/Sources/AcknowledgementsView.swift; sourceTree = "<group>"; };
+		8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionBuilderView.swift; path = App/Sources/SelectionBuilderView.swift; sourceTree = "<group>"; };
 		95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FamilyTabUITests.swift; path = App/UITests/FamilyTabUITests.swift; sourceTree = "<group>"; };
 		A25E506DF3A473C4D4925FA1 /* MANIFEST.md */ = {isa = PBXFileReference; includeInIndex = 1; name = MANIFEST.md; path = Fixtures/MANIFEST.md; sourceTree = "<group>"; };
 		A469349A97963F1293E91F91 /* PropertiesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PropertiesView.swift; path = App/Sources/PropertiesView.swift; sourceTree = "<group>"; };
 		B2BB7456A68778FEF6291BD2 /* ATTRIBUTIONS.md */ = {isa = PBXFileReference; includeInIndex = 1; name = ATTRIBUTIONS.md; path = Docs/ATTRIBUTIONS.md; sourceTree = "<group>"; };
 		B748EDB595BF571562A511B3 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = App/Sources/RootView.swift; sourceTree = "<group>"; };
+		BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = App/Sources/OnboardingView.swift; sourceTree = "<group>"; };
 		BEA6F1540BB95EAD1919CF82 /* BOFFIN_BUILD_PLAN.md */ = {isa = PBXFileReference; includeInIndex = 1; name = BOFFIN_BUILD_PLAN.md; path = Docs/BOFFIN_BUILD_PLAN.md; sourceTree = "<group>"; };
 		C14A4FCACD71928BC6B349BF /* FitnessTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FitnessTabUITests.swift; path = App/UITests/FitnessTabUITests.swift; sourceTree = "<group>"; };
+		C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnnotationCanvas.swift; path = App/Sources/AnnotationCanvas.swift; sourceTree = "<group>"; };
+		C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDeck.swift; path = App/Sources/SceneDeck.swift; sourceTree = "<group>"; };
+		C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabView.swift; path = App/Sources/BoundaryTabView.swift; sourceTree = "<group>"; };
 		CF3222BCE24F65F84CA0580A /* ProbeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProbeTests.swift; path = App/UITests/ProbeTests.swift; sourceTree = "<group>"; };
 		CFD3EA957D205A3C45470A9F /* CHANGELOG.md */ = {isa = PBXFileReference; includeInIndex = 1; name = CHANGELOG.md; path = Docs/CHANGELOG.md; sourceTree = "<group>"; };
 		CFDA29CC48891E20037DF354 /* FamilyTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FamilyTabView.swift; path = App/Sources/FamilyTabView.swift; sourceTree = "<group>"; };
 		D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TouchTargetUITests.swift; path = App/UITests/TouchTargetUITests.swift; sourceTree = "<group>"; };
 		D65824DDFA9E4DC7375236C4 /* BOFFINTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BOFFINTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D66616C5FEBBE798A15B2564 /* BrandRulerStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BrandRulerStyle.swift; path = App/Sources/BrandRulerStyle.swift; sourceTree = "<group>"; };
+		DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenedDocument.swift; path = App/Sources/OpenedDocument.swift; sourceTree = "<group>"; };
 		E6AF9CD98519D9AF99ED534B /* OrderTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrderTabView.swift; path = App/Sources/OrderTabView.swift; sourceTree = "<group>"; };
 		F1F519F5A35151A9069277CE /* BoffinApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinApp.swift; path = App/Sources/BoffinApp.swift; sourceTree = "<group>"; };
 		F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SequenceStore.swift; path = App/Sources/SequenceStore.swift; sourceTree = "<group>"; };
 		F92CF2D37BBBC032A7551686 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = App/Resources/Info.plist; sourceTree = "<group>"; };
-		C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabView.swift; path = App/Sources/BoundaryTabView.swift; sourceTree = "<group>"; };
-		1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabUITests.swift; path = App/UITests/BoundaryTabUITests.swift; sourceTree = "<group>"; };
-		063F6704AD6431E78767C846 /* StructureTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabView.swift; path = App/Sources/StructureTabView.swift; sourceTree = "<group>"; };
-		467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabUITests.swift; path = App/UITests/StructureTabUITests.swift; sourceTree = "<group>"; };
-		C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDeck.swift; path = App/Sources/SceneDeck.swift; sourceTree = "<group>"; };
-		DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenedDocument.swift; path = App/Sources/OpenedDocument.swift; sourceTree = "<group>"; };
-		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
-		80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = App/Resources/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		889BF373E2EECCB4BE923AA4 /* AcknowledgementsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AcknowledgementsView.swift; path = App/Sources/AcknowledgementsView.swift; sourceTree = "<group>"; };
-		576B3A7177EA48A039B5C23E /* ExampleSequences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExampleSequences.swift; path = App/Sources/ExampleSequences.swift; sourceTree = "<group>"; };
-		263D5703A26771A32159B0E2 /* NoSequenceView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoSequenceView.swift; path = App/Sources/NoSequenceView.swift; sourceTree = "<group>"; };
-		BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = App/Sources/OnboardingView.swift; sourceTree = "<group>"; };
-		2C78A086CE7653170EBB09E5 /* OnboardingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingUITests.swift; path = App/UITests/OnboardingUITests.swift; sourceTree = "<group>"; };
-		8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionBuilderView.swift; path = App/Sources/SelectionBuilderView.swift; sourceTree = "<group>"; };
-		C249E024D36486233D2DA9C6 /* AnnotationCanvas.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnnotationCanvas.swift; path = App/Sources/AnnotationCanvas.swift; sourceTree = "<group>"; };
-		D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TouchTargetUITests.swift; path = App/UITests/TouchTargetUITests.swift; sourceTree = "<group>"; };
-		847B3051F7F2F48C57869643 /* ExternalDisplayScene.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExternalDisplayScene.swift; path = App/Sources/ExternalDisplayScene.swift; sourceTree = "<group>"; };
-		028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScreenshotCaptureTests.swift; path = App/UITests/ScreenshotCaptureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +162,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DEA618948A883242EA33CE24 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0D31EF67066D2CB14A93D26 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -153,6 +187,7 @@
 				2C86B4F6F2133F1EC2D10115 /* BOFFIN.app */,
 				D65824DDFA9E4DC7375236C4 /* BOFFINTests.xctest */,
 				3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */,
+				3BD8A9ABB55D0FAB17BBBEBA /* BOFFINShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,6 +198,15 @@
 				2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */,
 			);
 			name = Tests;
+			sourceTree = SOURCE_ROOT;
+		};
+		526113689FBF573252EE458E /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				04A37C9CB71C352F314951CF /* ShareViewController.swift */,
+			);
+			name = ShareExtension;
+			path = Extensions/ShareExtension;
 			sourceTree = SOURCE_ROOT;
 		};
 		5EC9DD697FA27758DA685DE9 /* Documentation */ = {
@@ -253,6 +297,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C420AA55AF08EA300342B1F3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				526113689FBF573252EE458E /* ShareExtension */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		D5A096BEFDCA50A8B28A02D7 = {
 			isa = PBXGroup;
 			children = (
@@ -260,6 +312,7 @@
 				C3982DBAD3700869171E81A5 /* Frameworks */,
 				A874C01D10DEBF3B78AE7D21 /* App */,
 				5EC9DD697FA27758DA685DE9 /* Documentation */,
+				C420AA55AF08EA300342B1F3 /* Extensions */,
 			);
 			sourceTree = "<group>";
 		};
@@ -284,6 +337,26 @@
 			productReference = 3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		62AAE3EA6B5FE8AC246C07F7 /* BOFFINShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 77E3F314DB1BEFDD3AF884E9 /* Build configuration list for PBXNativeTarget "BOFFINShare" */;
+			buildPhases = (
+				F8B1CE1E27A497B523151831 /* Sources */,
+				DEA618948A883242EA33CE24 /* Frameworks */,
+				E52B3F6CAB659D81E2C85860 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BOFFINShare;
+			packageProductDependencies = (
+				C0FFEE0000000000000SHARE /* BoffinCore */,
+			);
+			productName = BOFFINShare;
+			productReference = 3BD8A9ABB55D0FAB17BBBEBA /* BOFFINShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AF1F7D39381FF88BD55FD38E /* BOFFIN */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 06F6F1DF8CCFF90D88924A26 /* Build configuration list for PBXNativeTarget "BOFFIN" */;
@@ -292,10 +365,12 @@
 				D7158D0AE4168E774D943498 /* Frameworks */,
 				8BCC5793D466993997DE45AA /* Resources */,
 				A1C0DE0000000000000MODEL /* Copy Core ML models */,
+				31165CE18DAF3E828977143D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				430CF9CD18B8F9F41C54DEA6 /* PBXTargetDependency */,
 			);
 			name = BOFFIN;
 			packageProductDependencies = (
@@ -365,27 +440,10 @@
 				AF1F7D39381FF88BD55FD38E /* BOFFIN */,
 				CF09D9BDF8F919D0478F2B9D /* BOFFINTests */,
 				1E9501C31636001B98C8EFE4 /* BOFFINUITests */,
+				62AAE3EA6B5FE8AC246C07F7 /* BOFFINShare */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		A1C0DE0000000000000MODEL /* Copy Core ML models */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Core ML models";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "\"$SRCROOT/Tools/copy-models.sh\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		43AE07D8B3A23047EFB1B81C /* Resources */ = {
@@ -411,7 +469,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E52B3F6CAB659D81E2C85860 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1C0DE0000000000000MODEL /* Copy Core ML models */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Core ML models";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"$SRCROOT/Tools/copy-models.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0C64FEB0877F4F8FA48001CC /* Sources */ = {
@@ -466,9 +549,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F8B1CE1E27A497B523151831 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				343DBD360CF3B85BE7B4D0AE /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		430CF9CD18B8F9F41C54DEA6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BOFFINShare;
+			target = 62AAE3EA6B5FE8AC246C07F7 /* BOFFINShare */;
+			targetProxy = FB6E59580A165FA1745AD103 /* PBXContainerItemProxy */;
+		};
 		46969A1F53226D6FBFA5A966 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BOFFIN;
@@ -516,12 +613,14 @@
 		6C182F2BF34A1F8B1CC082D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -553,21 +652,22 @@
 		7E76835A37038E624E6890E0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = SYNV8TWB5Z;
-				PROVISIONING_PROFILE_SPECIFIER = "BOFFIN App Store";
+				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = App/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin;
+				PROVISIONING_PROFILE_SPECIFIER = "BOFFIN App Store";
 				SDKROOT = iphoneos;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.2;
@@ -634,6 +734,42 @@
 				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
 				SWIFT_VERSION = 6.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		84A0E805800C6A03D25C3643 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShareExtension/BOFFINShare.entitlements;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				INFOPLIST_FILE = Extensions/ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.share;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8D7AA2FEF4546026F2EC405F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Extensions/ShareExtension/BOFFINShare.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				INFOPLIST_FILE = Extensions/ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.share;
+				PROVISIONING_PROFILE_SPECIFIER = "BOFFIN Share App Store";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -741,6 +877,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		77E3F314DB1BEFDD3AF884E9 /* Build configuration list for PBXNativeTarget "BOFFINShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D7AA2FEF4546026F2EC405F /* Release */,
+				84A0E805800C6A03D25C3643 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BF37622D84B74E48FA49D451 /* Build configuration list for PBXProject "BOFFIN" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -793,6 +938,11 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C0FFEE0000000000000SHARE /* BoffinCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;
+			productName = BoffinCore;
+		};
 		52E64E40C0F2CF983CD10559 /* BoffinCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;

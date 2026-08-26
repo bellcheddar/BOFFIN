@@ -261,6 +261,35 @@ kinase research. Nucleic Acids Res 49:D562 (2021).
 
 ---
 
+## BOFFIN's own licence: MIT, 2026-08-26
+
+Marc's decision. The audit above is what made it available rather than merely
+plausible, so the reasoning is recorded here beside the evidence for it.
+
+The only copyleft item in the audit is **PLIP, GPL v2**. It is not linked,
+ported or consulted; the interaction profiler implements the published
+geometric criteria independently, and the section above records how that was
+kept true. GPL therefore imposes nothing here. **ESM-2 and Mol\* are both MIT**
+already, and Mol\*'s licence text is retained beside the vendored build at
+`Packages/BoffinViewer/Sources/BoffinViewer/Web/molstar-LICENSE.txt`, which is
+what MIT asks for.
+
+What MIT does NOT cover, and must not be read as covering:
+
+| Artefact | Terms it actually carries |
+|---|---|
+| `Models/esm2_t12_35M_UR50D.mlpackage` | Derived from ESM-2. MIT, inherited. Conversion is not authorship of the weights. |
+| `Models/heads/*.mlpackage` | Derived from the benchmark sets each was trained on, whose terms differ and are listed above. |
+| `Models/heads/*_cc0.pt` | Trained without any attribution- or share-alike-encumbered set, so a build using these depends on public-domain data only. |
+| `Packages/BoffinViewer/.../molstar.js`, `molstar.css` | Mol\*, MIT, third-party. |
+| Bundled reference data | Per-source, above. **SIFTS and KLIFS state no licence at all**, and the position on that is the 2026-08-25 decision recorded in this file, not an assumption of permissiveness. |
+
+The unstated-terms position is unchanged by this and remains the binding
+constraint on a commercial release: MIT on the code says nothing about whether
+a source that states no terms may be redistributed commercially.
+
+---
+
 ## Adding a dependency
 
 Rule 9 of `CLAUDE.md`: every new dependency needs a licence check recorded

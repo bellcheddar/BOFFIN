@@ -1324,3 +1324,36 @@ changes intensity and not hue, since a weak negative coming out bluish would
 make the sign unreadable exactly where a reader most needs it: near zero.
 
 BoffinCharts 39 tests, both idioms 22 of 22.
+
+## "The structure never loaded" says nothing about why (2026-08-26)
+
+CI failed twice more, on different tests each time, both on iPad, both with
+"the structure never loaded". The second was waiting the full 180 seconds, so
+this is not the timeout that caused the first one.
+
+**A timed-out wait cannot distinguish its own causes.** The tap may not have
+landed, the bridge may have errored, or the app may have released the structure
+under memory pressure, which it does deliberately: the viewer is a separate
+process and the system terminates it under pressure rather than asking, so
+BOFFIN releases the structure first and keeps the page alive. All three produce
+the same silence.
+
+Loading is now one helper used by all ten structure tests, and it does three
+things a bare tap-then-wait did not:
+
+- **Scrolls to the control and force-taps it.** The panel scrolls on iPad, and
+  a control that exists but is not hittable was already the cause of one
+  iPad-only failure this session.
+- **Taps once more before giving up.** A tap that does not register is the
+  cheapest of the three explanations to rule out, and retrying does not mask the
+  others: they still fail, and now with a report.
+- **Reports what is on screen when it fails.** The same technique found a test
+  that had silently drifted onto the Fitness tab, where "painting put the viewer
+  into an error state" was a true statement about a screen it should never have
+  been looking at.
+
+Nine copies of the same four lines became one call, so the next change to how a
+structure is loaded is one edit rather than nine.
+
+Both idioms pass 22 of 22 locally on freshly erased simulators. If CI fails
+again it will now say what it saw.

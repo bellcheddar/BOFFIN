@@ -104,6 +104,42 @@ extension XCUIApplication {
         }
     }
 
+    /// Load the bundled structure and wait for the viewer to report it.
+    ///
+    /// Centralised because it is the first step of nine tests and it has failed
+    /// on CI twice, on different tests each time, with "the structure never
+    /// loaded". A bare tap-then-wait cannot say WHY: the tap may not have
+    /// landed, the bridge may have errored, or the app may have released the
+    /// structure under memory pressure, and all three look identical from a
+    /// timed-out wait.
+    ///
+    /// So the failure carries what is actually on screen. The same technique
+    /// found a test that had silently drifted onto the Fitness tab.
+    func loadBundledStructure(
+        atomCount: Int = 660, file: StaticString = #filePath, line: UInt = #line
+    ) {
+        let load = buttons["boffin.load-structure"]
+        XCTAssertTrue(
+            load.waitForExistence(timeout: 30), "no load control", file: file, line: line)
+        scrollTo(load)
+        forceTap(load)
+
+        let loaded = staticTexts["\(atomCount.formatted()) atoms"]
+        if loaded.waitForExistence(timeout: StructureTabUITests.structureLoad) { return }
+
+        // Tap once more before giving up. A tap that does not register is the
+        // cheapest of the three explanations to rule out, and retrying it does
+        // not mask the other two: they will still fail, and now with a report.
+        forceTap(load)
+        if loaded.waitForExistence(timeout: 60) { return }
+
+        let visible = staticTexts.allElementsBoundByIndex
+            .prefix(20).map { $0.label }.filter { !$0.isEmpty }.joined(separator: " | ")
+        XCTFail(
+            "the structure never loaded after two taps. On screen: \(visible)",
+            file: file, line: line)
+    }
+
     /// Scroll back until an element reappears.
     ///
     /// A SwiftUI `ScrollView` drops off-screen content out of the accessibility

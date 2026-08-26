@@ -36,9 +36,7 @@ final class StructureTabUITests: XCTestCase {
         XCTAssertTrue(
             viewer.waitForExistence(timeout: 30), "the viewer never appeared")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 20), "no load control")
-        load.tap()
+        app.loadBundledStructure()
 
         let count = app.staticTexts["660 atoms"]
         let failure = app.staticTexts.containing(
@@ -79,12 +77,7 @@ final class StructureTabUITests: XCTestCase {
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 
         app.openTab("Structure")
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30))
-        load.tap()
-        XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
-            "the structure did not load")
+        app.loadBundledStructure()
 
         // Any continuous track will do; hydropathy is the one every sequence
         // has, because it needs no model.
@@ -126,12 +119,7 @@ final class StructureTabUITests: XCTestCase {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30))
-        load.tap()
-        XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
-            "the structure did not load")
+        app.loadBundledStructure()
 
         let profile = app.buttons["boffin.profile-interactions"]
         XCTAssertTrue(profile.waitForExistence(timeout: 20), "no profile control")
@@ -165,10 +153,7 @@ final class StructureTabUITests: XCTestCase {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30))
-        load.tap()
-        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad))
+        app.loadBundledStructure()
 
         // Capture two scenes so advancing has somewhere to go.
         //
@@ -243,10 +228,7 @@ final class StructureTabUITests: XCTestCase {
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 
         app.openTab("Structure")
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30))
-        load.tap()
-        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad))
+        app.loadBundledStructure()
 
         let agreement = app.staticTexts["boffin.structure-agreement"]
         // Absent when the model is not bundled, which is a legitimate state and
@@ -284,12 +266,7 @@ extension StructureTabUITests {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
-        load.tap()
-        XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
-            "the structure never loaded, so there is nothing to render")
+        app.loadBundledStructure()
 
         let export = app.buttons["boffin.export.1 column"]
         XCTAssertTrue(
@@ -345,12 +322,7 @@ extension StructureTabUITests {
 
         // The profiling control only exists once the viewer is up, so the
         // structure has to be loaded first.
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
-        load.tap()
-        XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
-            "the structure never loaded")
+        app.loadBundledStructure()
 
         let profile = app.buttons["boffin.profile-interactions"]
         XCTAssertTrue(profile.waitForExistence(timeout: 30), "no profiling control")
@@ -401,12 +373,7 @@ extension StructureTabUITests {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
-        load.tap()
-        XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
-            "ubiquitin did not load")
+        app.loadBundledStructure()
 
         // Profiling loads CDK2, which has 2,510 atoms.
         let profile = app.buttons["boffin.profile-interactions"]
@@ -448,9 +415,7 @@ extension StructureTabUITests {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
-        load.tap()
+        app.loadBundledStructure()
         XCTAssertTrue(
             app.staticTexts["\(660.formatted()) atoms"].waitForExistence(
                 timeout: Self.structureLoad),
@@ -527,9 +492,7 @@ extension StructureTabUITests {
         app.launchSkippingOnboarding()
         app.openTab("Structure")
 
-        let load = app.buttons["boffin.load-structure"]
-        XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
-        load.tap()
+        app.loadBundledStructure()
         XCTAssertTrue(
             app.staticTexts["\(660.formatted()) atoms"].waitForExistence(
                 timeout: Self.structureLoad),

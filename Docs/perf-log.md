@@ -1289,3 +1289,38 @@ sixty seconds repeated in nine places. The next slow runner is one edit rather
 than nine, and the constant carries the measurement that justifies it.
 
 Both idioms pass 22 of 22 locally, on freshly erased simulators.
+
+## The ruler and the structure disagreed about sign (2026-08-26)
+
+`ScientificPalette` fixes the delta-LLR convention, negative red and positive
+blue, and its comment says this is done "so the heatmap, the logo and the
+structure overlay cannot disagree about sign".
+
+**Only one place read it.** A grep for `llrNegative` found a single consumer:
+the ruler's brand style. The structure overlay had its own ramp.
+
+That ramp min-max normalised every continuous track and ran blue at fraction
+zero to red at fraction one. Hydropathy is a DIVERGING track, min -4.5, mid 0,
+max 4.5, so its most negative residue landed at fraction zero and was painted
+blue, while the ruler directly above it painted the same residue red.
+
+**The same track, coloured in opposite senses, in two views stacked one above
+the other.** Someone reading "red is hydrophobic" off the structure, with the
+ruler above it saying red is hydrophilic, draws the opposite conclusion about
+which face is buried. The overlay's own comment claimed it matched the app's
+diverging scale.
+
+The overlay now takes the track's own `colourScheme` and resolves it through
+`ScientificPalette`: diverging values keep their sign convention, sequential
+values use the viridis-like scale, and the min-max normalisation is gone because
+it was the thing throwing the sign away.
+
+One detail worth recording: the overlay fades towards WHITE rather than lowering
+opacity, because the viewer's background is dark and a translucent red on a dark
+ground reads as a darker red rather than a paler one.
+
+Three tests pin the convention on the ruler's default, including that magnitude
+changes intensity and not hue, since a weak negative coming out bluish would
+make the sign unreadable exactly where a reader most needs it: near zero.
+
+BoffinCharts 39 tests, both idioms 22 of 22.

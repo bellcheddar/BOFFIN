@@ -910,37 +910,88 @@ struct StructureTabView: View {
     /// loop needs the SIFTS mapping instead, and Phase 5 built it.
     private func paint(_ track: AnyResidueTrack, into model: StructureViewerModel) async {
         guard case .continuous(let values) = track.values else { return }
+        // The track's OWN scheme decides the colours, not a ramp invented here.
+        //
+        // This used to min-max normalise every continuous track onto one
+        // blue-to-red ramp, with a comment claiming it matched the app's
+        // diverging scale. It did the opposite. Hydropathy is diverging, and
+        // the ruler paints it negative-red, positive-blue through
+        // `ScientificPalette`; the overlay put the most negative residue at
+        // fraction zero and coloured it BLUE.
+        //
+        // So the same track was coloured in opposite senses in two views
+        // stacked one above the other, which is exactly the disagreement the
+        // shared palette exists to prevent. Someone reading "red is
+        // hydrophobic" off the structure, with the ruler above it saying red is
+        // hydrophilic, draws the opposite conclusion about which face is
+        // buried.
 
         let finite = values.compactMap { $0 }
+        // Still checked, because a track whose values are all identical has
+        // nothing to show and painting it one flat colour implies a gradient
+        // that is not there.
         guard let lowest = finite.min(), let highest = finite.max(), highest > lowest
         else { return }
 
         var residues: [PaintTrackCommand.Residue] = []
         for (index, value) in values.enumerated() {
             guard let value else { continue }
-            let fraction = (value - lowest) / (highest - lowest)
             residues.append(
-                .init(chain: "A", number: index + 1, colour: Self.colour(fraction)))
+                .init(
+                    chain: "A", number: index + 1,
+                    colour: Self.colour(value, scheme: track.colourScheme)))
         }
 
         try? await model.paint(title: track.title, residues: residues)
         paintedTrack = track.id
     }
 
-    /// A blue to white to red ramp, matching the app's diverging scale.
-    static func colour(_ fraction: Double) -> Int {
-        let clamped = min(max(fraction, 0), 1)
-        let low = (r: 0x46, g: 0x7F, b: 0xF7)
-        let mid = (r: 0xF5, g: 0xF5, b: 0xF5)
-        let high = (r: 0xD3, g: 0x2F, b: 0x2F)
-        func blend(_ a: Int, _ b: Int, _ t: Double) -> Int {
-            Int((Double(a) + (Double(b) - Double(a)) * t).rounded())
+    /// The colour a residue takes on the structure, from the track's own scheme.
+    ///
+    /// Shares `ScientificPalette` with the ruler so the two cannot disagree
+    /// about sign, which they did: a diverging track was drawn negative-red on
+    /// the ruler and negative-blue on the structure.
+    static func colour(_ value: Double, scheme: TrackColourScheme) -> Int {
+        switch scheme {
+        case .diverging(let low, let mid, let high):
+            // Signed, and the sign is the point. Negative is red because
+            // negative is destabilising, depleted or hydrophilic depending on
+            // the track, and it is the same red in every view.
+            let span = value < mid ? mid - low : high - mid
+            let magnitude = span > 0 ? min(abs(value - mid) / span, 1) : 0
+            let base =
+                value < mid
+                ? ScientificPalette.llrNegative : ScientificPalette.llrPositive
+            return packed(base, blendedWithWhiteBy: 1 - magnitude)
+
+        case .sequential(let low, let high):
+            let fraction = high > low ? ((value - low) / (high - low)) : 0
+            let palette = ScientificPalette.sequential
+            let position = min(max(fraction, 0), 1) * Double(palette.count - 1)
+            return packed(palette[Int(position.rounded())], blendedWithWhiteBy: 0)
+
+        case .categorical, .solid:
+            // Neither is reachable from a continuous track, and a grey is a
+            // better answer than a colour implying an order that is not there.
+            return 0x9E_9E_9E
         }
-        let (from, to, t) =
-            clamped < 0.5
-            ? (low, mid, clamped * 2) : (mid, high, (clamped - 0.5) * 2)
-        return blend(from.r, to.r, t) << 16 | blend(from.g, to.g, t) << 8
-            | blend(from.b, to.b, t)
+    }
+
+    /// A SwiftUI colour as 0xRRGGBB, optionally faded towards white.
+    ///
+    /// The viewer takes an integer, so the colour has to be resolved rather
+    /// than passed as a `Color`. Fading towards white rather than lowering
+    /// opacity: the structure behind is dark, and a translucent red on a dark
+    /// background reads as a darker red rather than a paler one.
+    private static func packed(_ colour: Color, blendedWithWhiteBy amount: Double) -> Int {
+        let resolved = colour.resolve(in: EnvironmentValues())
+        let fade = min(max(amount, 0), 1)
+        func channel(_ component: Float) -> Int {
+            let value = Double(component) + (1 - Double(component)) * fade
+            return Int((min(max(value, 0), 1) * 255).rounded())
+        }
+        return channel(resolved.red) << 16 | channel(resolved.green) << 8
+            | channel(resolved.blue)
     }
 
     static func fixture(named name: String) -> URL? {

@@ -1,0 +1,86 @@
+{
+  "disorder": {
+    "frozen": {
+      "cb513": {
+        "all": {
+          "disorder_mcc": 0.3623621934252725,
+          "positives": 3529
+        },
+        "masked": {
+          "disorder_mcc": 0.11856566060630609,
+          "positives": 564
+        }
+      },
+      "ts115": {
+        "all": {
+          "disorder_mcc": 0.5378056359559646,
+          "positives": 2203
+        },
+        "masked": {
+          "disorder_mcc": 0.5378056359559646,
+          "positives": 2203
+        }
+      },
+      "casp12": {
+        "all": {
+          "disorder_mcc": 0.49320136424871397,
+          "positives": 836
+        },
+        "masked": {
+          "disorder_mcc": 0.49320136424871397,
+          "positives": 836
+        }
+      }
+    },
+    "unfrozen": {
+      "cb513": {
+        "all": {
+          "disorder_mcc": 0.35279933063675256,
+          "positives": 3529
+        },
+        "masked": {
+          "disorder_mcc": 0.04562327327743266,
+          "positives": 564
+        }
+      },
+      "ts115": {
+        "all": {
+          "disorder_mcc": 0.5193253900636812,
+          "positives": 2203
+        },
+        "masked": {
+          "disorder_mcc": 0.5193253900636812,
+          "positives": 2203
+        }
+      },
+      "casp12": {
+        "all": {
+          "disorder_mcc": 0.5132934538699625,
+          "positives": 836
+        },
+        "masked": {
+          "disorder_mcc": 0.5132934538699625,
+          "positives": 836
+        }
+      }
+    }
+  },
+  "secondary_structure_on_finetuned_backbone": {
+    "cb513": {
+      "frozen_q3": 0.8081,
+      "finetuned_q3": 0.3442,
+      "delta": -0.4638
+    },
+    "ts115": {
+      "frozen_q3": 0.8232,
+      "finetuned_q3": 0.3958,
+      "delta": -0.4274
+    },
+    "casp12": {
+      "frozen_q3": 0.7428,
+      "finetuned_q3": 0.3117,
+      "delta": -0.4311
+    }
+  },
+  "note": "2 epochs, backbone lr 1e-5, 512-residue crop, seed 0. The frozen Q3 figures reproduce Models/heads/benchmarks.json, which is what makes the collapse credible."
+}

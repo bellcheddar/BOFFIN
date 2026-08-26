@@ -60,6 +60,15 @@ private let cdk2 = """
     FQDVTKPVPHLRL
     """
 
+/// How many families `family_labels.json` declares.
+private func declaredFamilyCount() throws -> Int {
+    struct Labels: Decodable { let families: [String] }
+    let url = headsDirectory.appending(path: "family_labels.json")
+    let labels = try JSONDecoder().decode(
+        Labels.self, from: try Data(contentsOf: url))
+    return labels.families.count
+}
+
 @Suite(
     "Family classification, against the real model",
     .enabled(
@@ -98,9 +107,20 @@ struct FamilyClassificationTests {
             "CDK2 was called \(top.accession), and no kinase family appears in \(ranked)")
 
         #expect(top.confidence > 0.5, "the call is \(top.confidence), which is a coin flip")
+        // Read from the labels file rather than written here. This said 500
+        // and failed the moment the classifier was expanded to 866, which is
+        // a test expiring rather than a defect being caught: the real
+        // invariant, that the model and its labels agree, is checked by
+        // `probabilityCountMatchesFamilies` against the model itself.
+        //
+        // The floor stays a literal on purpose. A labels file truncated to a
+        // handful of families would otherwise agree with a truncated model and
+        // both tests would pass.
+        let declared = try declaredFamilyCount()
         #expect(
-            call.familyCount == 500,
-            "the labels list \(call.familyCount) families, not the 500 trained")
+            call.familyCount == declared,
+            "the model reports \(call.familyCount) families, the labels list \(declared)")
+        #expect(declared > 100, "only \(declared) families: the labels look truncated")
     }
 
     @Test("A confident, in-set call is not flagged as out of distribution")

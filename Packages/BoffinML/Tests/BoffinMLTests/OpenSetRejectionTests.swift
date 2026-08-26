@@ -63,7 +63,7 @@ struct OpenSetRejectionTests {
         // 100-family model, and carrying that forward would have quoted a
         // measurement of a model the app no longer runs. This test exists
         // because that is a silent failure: the sentence still reads well.
-        #expect(abs(FamilyClassification.openSetDetectionRate - 0.763) < 0.001)
+        #expect(abs(FamilyClassification.openSetDetectionRate - 0.718) < 0.001)
 
         guard let labelsURL else { return }
         let object =
@@ -74,8 +74,8 @@ struct OpenSetRejectionTests {
         // retrained at a different one, openset_experiment.py has to run again,
         // and this is where that is caught rather than discovered later.
         #expect(
-            families.count == 500,
-            "the detection rate was measured on 500 families, not \(families.count)")
+            families.count == 866,
+            "the detection rate was measured on 866 families, not \(families.count)")
     }
 
     @Test("A low-confidence call is treated as outside the training set")
@@ -95,14 +95,20 @@ struct OpenSetRejectionTests {
         let call = FamilyClassification(
             ranked: [FamilyCall(accession: "PF00069", confidence: 0.99)],
             isConfident: true,
-            top1Accuracy: 0.9858,
+            top1Accuracy: 0.9836,
             similarityToNearestFamily: 0.98,
             isInDistribution: true,
-            familyCount: 500,
+            familyCount: 866,
             openSetConfidenceFloor: 0.97,
             openSetDetectionRate: FamilyClassification.openSetDetectionRate)
-        #expect(call.caveat.contains("76%"), "the caveat should state the measured rate")
-        #expect(call.caveat.contains("500"))
+        // Derived from the constant rather than written out, so the two cannot
+        // disagree: the point of the test is that the caveat STATES the rate,
+        // not that the rate is any particular number.
+        let percent = Int((FamilyClassification.openSetDetectionRate * 100).rounded())
+        #expect(
+            call.caveat.contains("\(percent)%"),
+            "the caveat should state the measured rate: \(call.caveat)")
+        #expect(call.caveat.contains("866"))
     }
 }
 

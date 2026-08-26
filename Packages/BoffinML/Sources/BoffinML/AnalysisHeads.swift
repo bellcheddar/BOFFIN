@@ -704,17 +704,27 @@ public struct FamilyClassification: Sendable {
     /// What the open-set flag is measured to catch, at the shipped threshold.
     ///
     /// From `Tools/heads/openset_experiment.py`, holding out whole families at
-    /// the shipped family count: 0.763 +/- 0.009.
+    /// the shipped family count: 0.718 +/- 0.101 for max softmax.
     ///
-    /// Re-measured when the classifier grew from 100 families to 500. It was
-    /// 0.805 for a different score on the smaller model, and carrying that
-    /// number forward would have quoted a measurement of a model the app no
-    /// longer runs.
+    /// Re-measured at every family count, because it moves at every one and
+    /// not always the way expansion is expected to move it:
     ///
-    /// Stated rather than rounded to "most", because roughly one unseen protein
-    /// in four is still missed and a reader is entitled to know that before
-    /// treating the absence of a warning as an all-clear.
-    static let openSetDetectionRate = 0.763
+    ///     families   max softmax        mahalanobis
+    ///          100   0.805 (different score entirely)
+    ///          500   0.763 +/- 0.009    0.736 +/- 0.038
+    ///          866   0.718 +/- 0.101    0.611 +/- 0.071
+    ///
+    /// Expansion buys coverage and costs detection. Going from 500 families to
+    /// 866 raised top-1 coverage over far more of what a user might paste and
+    /// **lowered** the fraction of genuinely unseen families this catches, by
+    /// 0.045, while making the figure eleven times less stable across splits.
+    /// The ordering between the two scores holds, so max softmax remains the
+    /// choice and still needs no shipped asset.
+    ///
+    /// Stated rather than rounded to "most", because getting on for one unseen
+    /// protein in three is now missed and a reader is entitled to know that
+    /// before treating the absence of a warning as an all-clear.
+    static let openSetDetectionRate = 0.718
 
     /// Below this, the call is presented as uncertain rather than as an answer.
     ///

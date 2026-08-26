@@ -27,6 +27,10 @@
 	<string>1</string>
 	<!-- BOFFIN works fully offline. No key here may imply otherwise, and no
 	     core path may require the network. -->
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.mdeller.boffin.analyse</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

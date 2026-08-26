@@ -103,6 +103,32 @@ struct RootView: View {
         // early on every launch after the first, and warming the backbone is
         // most valuable exactly then.
         .task { await store.warmUpModel() }
+        // Handoff. Advertised whenever a sequence is loaded, so the same
+        // protein can be picked up on another device signed into the same
+        // iCloud account. It carries the sequence, not the results: the tracks
+        // are hundreds of kilobytes against Handoff's few, and the receiving
+        // device recomputes them in seconds rather than displaying numbers it
+        // did not produce.
+        .userActivity(
+            HandoffActivity.type,
+            isActive: store.sequence != nil
+        ) { activity in
+            guard let sequence = store.sequence,
+                let payload = HandoffActivity.payload(
+                    name: sequence.name, letters: sequence.letters)
+            else { return }
+            activity.title = sequence.name
+            activity.userInfo = payload
+            activity.isEligibleForHandoff = true
+            // Not indexed for search or made public: the sequence a user is
+            // looking at is theirs, and this app collects nothing.
+            activity.isEligibleForSearch = false
+            activity.isEligibleForPublicIndexing = false
+        }
+        .onContinueUserActivity(HandoffActivity.type) { activity in
+            guard let continued = HandoffActivity.read(activity.userInfo) else { return }
+            store.load(text: continued.letters, fileName: continued.name)
+        }
         // Also checked on foreground. `onOpenURL` fires when the extension
         // opens the app, but a sequence shared while BOFFIN was already in the
         // foreground would otherwise sit in the container unread until the

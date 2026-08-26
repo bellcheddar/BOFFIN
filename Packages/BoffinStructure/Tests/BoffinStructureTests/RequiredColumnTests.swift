@@ -30,13 +30,16 @@ private func load(_ name: String) throws -> BinaryCIFFile {
 }
 
 /// The same file with one column of `_atom_site` removed.
-private func stripping(_ column: String, from file: BinaryCIFFile) throws
+private func stripping(
+    _ column: String, from file: BinaryCIFFile
+) throws
     -> BinaryCIFFile
 {
     let site = try #require(file["_atom_site"])
     var columns = site.columns
-    #expect(columns.removeValue(forKey: column) != nil,
-            "the fixture has no \(column) to strip, so this proves nothing")
+    #expect(
+        columns.removeValue(forKey: column) != nil,
+        "the fixture has no \(column) to strip, so this proves nothing")
     var categories = file.categories
     categories["_atom_site"] = CIFCategory(
         name: site.name, rowCount: site.rowCount, columns: columns)
@@ -77,9 +80,11 @@ struct RequiredColumnTests {
     }
 
     /// The half that keeps the guard honest.
-    @Test("Every fixture still loads", arguments: [
-        "1ubq.bcif", "1fha.bcif", "1l2y.bcif", "1a8o.bcif",
-    ])
+    @Test(
+        "Every fixture still loads",
+        arguments: [
+            "1ubq.bcif", "1fha.bcif", "1l2y.bcif", "1a8o.bcif",
+        ])
     func realFilesUnaffected(name: String) throws {
         let store = try AtomStore.from(try load(name))
         #expect(store.count > 0)

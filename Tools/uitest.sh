@@ -19,6 +19,14 @@ cd "$(dirname "$0")/.."
 DEVICE="${1:-iPhone 17 Pro}"
 shift || true
 
+# CI lints before it tests, so a formatting slip fails the run after the tests
+# have already passed and looks like a test failure in the summary. Catching it
+# here costs three seconds.
+if ! swift format lint --recursive --parallel --strict App Packages 2>/dev/null; then
+    echo "NOTE: swift format lint is unhappy; run"
+    echo "  swift format --recursive --parallel --in-place App Packages"
+fi
+
 xcrun simctl shutdown all >/dev/null 2>&1
 xcrun simctl erase "$DEVICE" >/dev/null 2>&1
 

@@ -67,14 +67,16 @@ struct AssetCatalogueTests {
         let url = directory.appending(path: asset.fileName)
         // The loader opens exactly this path, so a name that has drifted is a
         // feature that silently reports itself as not downloaded.
-        #expect(FileManager.default.fileExists(atPath: url.path),
-                "no file at the declared name \(asset.fileName)")
+        #expect(
+            FileManager.default.fileExists(atPath: url.path),
+            "no file at the declared name \(asset.fileName)")
 
         let actual = try Data(contentsOf: url, options: .mappedIfSafe).count
         let drift = abs(Double(actual - asset.approximateBytes)) / Double(actual)
         // Five per cent absorbs regenerating an asset; it does not absorb the
         // 10% the metadata had drifted by while nothing read the figure.
-        let detail = "\(asset.fileName): declared \(asset.approximateBytes),"
+        let detail =
+            "\(asset.fileName): declared \(asset.approximateBytes),"
             + " actual \(actual), off by \(Int(drift * 100))%"
         #expect(drift < 0.05, "\(detail)")
     }

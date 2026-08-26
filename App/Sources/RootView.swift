@@ -87,6 +87,10 @@ struct RootView: View {
             hasSeenOnboarding = true
             isShowingOnboarding = true
         }
+        // Separate from the onboarding task deliberately: that one returns
+        // early on every launch after the first, and warming the backbone is
+        // most valuable exactly then.
+        .task { await store.warmUpModel() }
     }
 
     private var openAlert: Binding<Bool> {

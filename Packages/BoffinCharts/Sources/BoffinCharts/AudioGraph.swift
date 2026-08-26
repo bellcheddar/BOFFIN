@@ -65,6 +65,11 @@ public struct TrackChartDescriptor: AXChartDescriptorRepresentable {
         let series = AXDataSeriesDescriptor(
             name: title, isContinuous: true, dataPoints: points)
 
+        // Always a fresh descriptor. There was a public `updateChartDescriptor`
+        // beside this whose body was empty apart from a comment saying the
+        // descriptor should be rebuilt rather than mutated. It was correct
+        // about that and did nothing about anything, so a caller reading the
+        // name would have believed a stale audio graph had been refreshed.
         return AXChartDescriptor(
             title: title,
             summary: summary(pairs, lowest: lowest, highest: highest),
@@ -72,11 +77,6 @@ public struct TrackChartDescriptor: AXChartDescriptorRepresentable {
             yAxis: yAxis,
             additionalAxes: [],
             series: [series])
-    }
-
-    public func updateChartDescriptor(_ descriptor: AXChartDescriptor) {
-        // Rebuilt rather than mutated: the descriptor is cheap and a partial
-        // update is how an axis comes to describe data it no longer holds.
     }
 
     /// The spoken summary, which is what a user hears before the tones.

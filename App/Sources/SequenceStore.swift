@@ -221,9 +221,7 @@ final class SequenceStore {
 
         modelState = .running
         do {
-            let engine = try EmbeddingEngine(
-                modelURL: bundle.appending(path: Self.backboneName),
-                tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
+            let engine = try embeddingEngine(in: bundle)
             let embedding = try await engine.embed(sequence)
 
             let heads = try AnalysisHeads(directory: bundle.appending(path: "heads"))
@@ -466,7 +464,8 @@ final class SequenceStore {
                     vectors: assets.appending(path: BoffinAsset.homologVectors.fileName),
                     metadata: assets.appending(path: BoffinAsset.homologMetadata.fileName))
                 let hits = try index.search(pooled, limit: limit)
-                let sifts = try? SIFTSStore(url: assets.appending(path: BoffinAsset.siftsSegments.fileName))
+                let sifts = try? SIFTSStore(
+                    url: assets.appending(path: BoffinAsset.siftsSegments.fileName))
                 let aligned = hits.map { hit in
                     HomologAlignment(
                         hit: hit,
@@ -564,6 +563,49 @@ final class SequenceStore {
         return nil
     }
 
+    /// One embedding engine for the app's lifetime.
+    ///
+    /// It used to be constructed fresh at both call sites, so the model was
+    /// loaded again for every sequence analysed and again for every mutation
+    /// scan. That is also why `EmbeddingEngine.warmUp()` had no callers: it
+    /// exists to pay the Neural Engine's first-prediction cost at launch
+    /// instead of attaching it to the user's first sequence, and there was no
+    /// engine alive at launch to warm.
+    ///
+    /// The engine caches its compiled model for its own lifetime, so a new
+    /// engine per analysis threw that cache away each time. Measured on this
+    /// Mac over three runs, a fresh engine's first embedding took 50.9, 50.6
+    /// and 49.9 seconds against 0.023, 0.023 and 0.018 for a warmed one.
+    ///
+    /// Those figures are the DEVELOPMENT configuration and must not be quoted
+    /// as a user-facing saving: here `Models/` holds the raw `.mlpackage` from
+    /// the conversion pipeline, which Core ML compiles on load, and a shipping
+    /// build bundles a `.mlmodelc` compiled at build time instead. What a
+    /// shipped app was paying per analysis is the model load and the Neural
+    /// Engine's first-prediction cost, which is the cost `warmUp` names and
+    /// has not been measured on a device.
+    private var engine: EmbeddingEngine?
+
+    private func embeddingEngine(in bundle: URL) throws -> EmbeddingEngine {
+        if let engine { return engine }
+        let created = try EmbeddingEngine(
+            modelURL: bundle.appending(path: Self.backboneName),
+            tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
+        engine = created
+        return created
+    }
+
+    /// Load and warm the backbone before the user asks anything of it.
+    ///
+    /// Failures are deliberately silent. This is an optimisation, and a build
+    /// with no models bundled must still start and say so through the normal
+    /// `modelState` path rather than through a launch error.
+    func warmUpModel() async {
+        guard let bundle = Self.modelDirectory else { return }
+        guard let engine = try? embeddingEngine(in: bundle) else { return }
+        await engine.warmUp()
+    }
+
     /// The converted backbone's package name, in one place because three call
     /// sites need to agree about it.
     private static let backboneName = "esm2_t12_35M_UR50D.mlpackage"
@@ -601,9 +643,7 @@ final class SequenceStore {
         // whenever the sequence changes, so holding it for the scan is safe.
         scanTask = Task { @MainActor in
             do {
-                let engine = try EmbeddingEngine(
-                    modelURL: bundle.appending(path: Self.backboneName),
-                    tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
+                let engine = try self.embeddingEngine(in: bundle)
 
                 let matrix = try await engine.maskedMarginals(
                     sequence, positions: scanPositions, mode: mode

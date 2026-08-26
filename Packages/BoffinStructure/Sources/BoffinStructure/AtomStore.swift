@@ -142,8 +142,10 @@ extension AtomStore {
         // keeps its fallback deliberately: `occupancy` and `B_iso_or_equiv`
         // are genuinely optional, and a predicted model legitimately has no
         // `group_PDB`.
-        for required in ["Cartn_x", "Cartn_y", "Cartn_z", "type_symbol",
-                         "label_atom_id", "label_comp_id"] {
+        for required in [
+            "Cartn_x", "Cartn_y", "Cartn_z", "type_symbol",
+            "label_atom_id", "label_comp_id",
+        ] {
             guard site[required] != nil else {
                 throw AtomStoreError.missingColumn(required)
             }

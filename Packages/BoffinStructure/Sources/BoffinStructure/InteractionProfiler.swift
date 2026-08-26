@@ -45,6 +45,18 @@ public struct InteractionCriteria: Sendable, Hashable {
     public var metalDistance: Double = 3.0
     public var halogenDistance: Double = 4.0
 
+    /// Smallest acceptable C-X...A angle for a halogen bond, in degrees.
+    ///
+    /// A halogen bond is strongly directional because the sigma-hole lies on
+    /// the extension of the C-X bond, so the acceptor must be roughly along
+    /// that axis. The published criterion is 165 degrees with a 30 degree
+    /// tolerance, which is the 135 used here.
+    ///
+    /// Distance alone is not a halogen bond. Without this, a 4 A sphere around
+    /// one chlorine caught three separate acceptors at once on 1XKK, which is
+    /// geometrically impossible: one sigma-hole points one way.
+    public var halogenAngle: Double = 135
+
     public init() {}
 }
 
@@ -148,7 +160,31 @@ public enum InteractionProfiler {
     static let apolarElements: Set<String> = ["C", "S"]
     /// Nitrogen, oxygen and sulfur: donors and acceptors, before protonation.
     static let polarElements: Set<String> = ["N", "O", "S"]
-    static let halogens: Set<String> = ["CL", "BR", "I", "F"]
+    /// Halogens that can donate a halogen bond.
+    ///
+    /// **Fluorine is deliberately absent.** A halogen bond needs a positive
+    /// sigma-hole on the halogen, opposite the C-X bond, and C-F has none:
+    /// fluorine is too electronegative and too little polarisable to develop
+    /// one, which is why organofluorine is not a halogen-bond donor while
+    /// C-Cl, C-Br and C-I are, in that increasing order of strength.
+    ///
+    /// It was in this set, and the consequence was measurable rather than
+    /// theoretical. Nothing in the fixture suite had ever exercised a
+    /// halogenated ligand, so the rule had never run. On 1XKK, whose ligand
+    /// lapatinib carries exactly one chlorine and one fluorine, the profiler
+    /// reported eight halogen bonds and **five of them came from the single
+    /// fluorine** -- more than the chlorine produced, because a smaller atom
+    /// sits closer to more of its neighbours. Fluorine appears in roughly a
+    /// fifth of marketed drugs, so on drug-like ligands the false positives
+    /// would have outnumbered the real interactions.
+    static let halogens: Set<String> = ["CL", "BR", "I"]
+
+    /// Longest C-X covalent bond among the donors above, plus a margin.
+    ///
+    /// C-Cl is 1.74 A, C-Br 1.94 and C-I 2.14. 2.4 spans all three and stops
+    /// short of the nearest non-bonded contact, the same trade the hydrogen
+    /// attachment above makes at 1.3.
+    static let carbonHalogenBondLength: Double = 2.4
 
     /// Residues carrying a formal positive charge at pH 7.4, with the atoms
     /// that carry it.
@@ -244,6 +280,48 @@ public enum InteractionProfiler {
                 // the other, and assigning it to both would invent a donor.
                 if let closest { hydrogensByHeavyAtom[closest, default: []].append(hydrogen) }
             }
+        }
+
+        // The carbon each halogen hangs off, by the same nearest-neighbour
+        // reasoning as the hydrogens above. It is what makes the sigma-hole
+        // direction computable: the hole lies on the far side of the halogen
+        // from this carbon.
+        var carbonForHalogen: [Int: Int] = [:]
+        for atom in conformation
+        where halogens.contains(store.element[atom].uppercased()) {
+            var closest: Int?
+            var closestDistance = Double.greatestFiniteMagnitude
+            for carbon in conformation
+            where store.element[carbon].uppercased() == "C" {
+                guard let separation = store.distance(atom, carbon) else { continue }
+                if separation < closestDistance,
+                    separation <= carbonHalogenBondLength
+                {
+                    closestDistance = separation
+                    closest = carbon
+                }
+            }
+            if let closest { carbonForHalogen[atom] = closest }
+        }
+
+        /// The angle at `vertex` between `a` and `b`, in degrees.
+        func angle(at vertex: Int, from a: Int, to b: Int) -> Double? {
+            let vx = Double(store.x[vertex])
+            let vy = Double(store.y[vertex])
+            let vz = Double(store.z[vertex])
+            let ax = Double(store.x[a]) - vx
+            let ay = Double(store.y[a]) - vy
+            let az = Double(store.z[a]) - vz
+            let bx = Double(store.x[b]) - vx
+            let by = Double(store.y[b]) - vy
+            let bz = Double(store.z[b]) - vz
+            let lengths =
+                (ax * ax + ay * ay + az * az).squareRoot()
+                * (bx * bx + by * by + bz * bz).squareRoot()
+            guard lengths > 0 else { return nil }
+            let cosine = (ax * bx + ay * by + az * bz) / lengths
+            // Clamped for the same reason as the hydrogen-bond angle above.
+            return Foundation.acos(min(max(cosine, -1), 1)) * 180 / Double.pi
         }
 
         /// Whether a donor-hydrogen-acceptor angle clears the criterion.
@@ -349,13 +427,25 @@ public enum InteractionProfiler {
                     }
                 }
 
-                // Halogen bond, by distance. The two angle criteria need the
-                // carbon the halogen is bonded to, which needs connectivity the
-                // file does not always carry, so this is reported as a candidate
-                // and the assumptions say the angles were not checked.
+                // Halogen bond: distance AND the donor angle. The comment
+                // here used to say the angle criteria needed connectivity the
+                // file does not carry, so only distance was tested. Half of
+                // that was true. The acceptor-side angle does need the
+                // acceptor's own covalent neighbour and is still not tested,
+                // but the donor side only needs the carbon the halogen hangs
+                // off, and that is recoverable by distance exactly as the
+                // hydrogens above are. It is now tested, and it is what
+                // separates a halogen bond from a close contact.
                 if separation <= criteria.halogenDistance,
                     halogens.contains(ligandElement),
-                    ["N", "O", "S"].contains(proteinElement)
+                    ["N", "O", "S"].contains(proteinElement),
+                    // Directional, not merely close. A halogen with no carbon
+                    // found is not reported at all: without the C-X axis there
+                    // is no sigma-hole direction to test, and reporting it
+                    // anyway is the distance-only rule wearing an angle's name.
+                    let carbon = carbonForHalogen[ligandAtom],
+                    let sigmaHole = angle(at: ligandAtom, from: carbon, to: partnerAtom),
+                    sigmaHole >= criteria.halogenAngle
                 {
                     found.append(
                         Interaction(

@@ -243,7 +243,7 @@ public struct FamilyStore: Sendable {
                     label: "\(gpcrdbLabel) (BW \(residue.ballesterosWeinstein))",
                     segment: residue.segment)
             }
-            best = (name, identity, numbers)
+            best = (name, identity, Self.numbersInIntactSegments(numbers))
         }
 
         guard let best, best.identity >= NumberingResult.minimumIdentity else {
@@ -251,6 +251,57 @@ public struct FamilyStore: Sendable {
         }
         return NumberingResult(
             reference: best.name, identity: best.identity, numbers: best.numbers)
+    }
+
+    /// Drop the numbers of any segment the alignment did not keep intact.
+    ///
+    /// Generic numbers are transferred through an alignment, one reference
+    /// position at a time, and nothing checked that the result was locally
+    /// consistent. A transmembrane helix is structurally rigid and has no
+    /// insertions, so consecutive positions within one segment must land on
+    /// consecutive residues. Where they do not, the aligner has threaded the
+    /// helix through something that is not the receptor.
+    ///
+    /// 2RH1 is why this exists. It is the entry the beta-2 adrenergic receptor
+    /// is usually quoted from and it is a chimera: T4 lysozyme replaces most
+    /// of ICL3. Numbering it assigned **5x70 to 5x76 and 6x24 to lysozyme
+    /// residues**, with 5x70 at 238, 5x71 at 244 and 5x74 at 279 -- positions
+    /// in one helix cannot be six and thirty-three residues apart. A generic
+    /// number is what a reader copies out of the app and into a paper, so a
+    /// wrong one is worse than none.
+    ///
+    /// The whole segment goes rather than the offending positions. A helix
+    /// numbering that is right for its first half and silently truncated is
+    /// not a safer answer, it is the same wrong answer with fewer places to
+    /// notice it. A construct that genuinely disrupts TM5 should report no
+    /// TM5, and an intact receptor is unaffected because its segments align
+    /// contiguously.
+    ///
+    /// Not applied to KLIFS: that pocket is discontinuous in sequence by
+    /// definition, so contiguity is not a property its numbering has. Whether
+    /// a kinase fusion construct needs an equivalent guard is untested,
+    /// because no fixture here is one.
+    static func numbersInIntactSegments(_ numbers: [CanonicalNumber]) -> [CanonicalNumber] {
+        var bySegment: [String: [CanonicalNumber]] = [:]
+        var unsegmented: [CanonicalNumber] = []
+        for number in numbers {
+            if let segment = number.segment {
+                bySegment[segment, default: []].append(number)
+            } else {
+                unsegmented.append(number)
+            }
+        }
+
+        var kept = unsegmented
+        for (_, members) in bySegment {
+            let indices = members.map(\.residue).sorted()
+            // Contiguous, not merely increasing. A residue the query lacks
+            // leaves its reference position unmapped and the rest still
+            // consecutive, so a deletion is tolerated; an insertion is not.
+            let intact = zip(indices, indices.dropFirst()).allSatisfy { $1 == $0 + 1 }
+            if intact { kept.append(contentsOf: members) }
+        }
+        return kept.sorted { $0.residue < $1.residue }
     }
 
     // MARK: - KLIFS

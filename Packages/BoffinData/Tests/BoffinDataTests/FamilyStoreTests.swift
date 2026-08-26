@@ -75,6 +75,64 @@ struct FamilyStoreTests {
         #expect(arginine.map { $0.residue + 1 } == 131, "3x50 did not land on R131")
     }
 
+    @Test("The T4 lysozyme insert of a fusion construct is not numbered")
+    func fusionInsertIsNotNumbered() throws {
+        // 2RH1 is the entry the beta-2 receptor structure is usually quoted
+        // from, and it is a chimera: T4 lysozyme replaces most of ICL3, which
+        // is why its entry sequence is 500 residues rather than a receptor.
+        // GPCRdb generic numbering is defined on the receptor, so a lysozyme
+        // residue must not receive one -- a number like 5x60 printed against
+        // a lysozyme position is not a weak answer, it is a wrong one that
+        // will be copied out of the app.
+        //
+        // The fixture was collected for exactly this and no test loaded it.
+        let store = try FamilyStore()
+        let chimera = try fixture("2RH1.fasta")
+        let result = try store.gpcrdbNumbering(for: chimera)
+
+        // The insert, located by its own sequence rather than by a remembered
+        // range: T4 lysozyme 2-161, one-based 238 to 397 in this construct.
+        let text = String(chimera.residues.map(\.code))
+        let insertStart = try #require(text.range(of: "NIFEMLRIDEGLRLKIY"))
+        let insertEnd = try #require(text.range(of: "KFCLKEHKALKTLGIIMGT"))
+        let first = text.distance(from: text.startIndex, to: insertStart.lowerBound)
+        let last = text.distance(from: text.startIndex, to: insertEnd.lowerBound)
+        #expect(last - first > 150, "the located insert is not lysozyme-sized")
+
+        let numbered = result.numbers.filter { $0.residue >= first && $0.residue < last }
+        let detail =
+            numbered
+            .map { "\($0.label)@\($0.residue + 1)" }
+            .joined(separator: ", ")
+
+        // Eight before the segment-contiguity guard: 5x70 to 5x76 scattered
+        // across the insert, and 6x24. What remains is one residue, and it is
+        // a different kind of error -- not a scattered misassignment but the
+        // alignment placing TM6's boundary one residue across the splice,
+        // with TM6 otherwise contiguous and genuinely receptor. Contiguity
+        // cannot catch that by construction.
+        //
+        // Bounded rather than waived. The count and the position are both
+        // asserted, so the scattering cannot come back disguised as the
+        // boundary case, and a fix that removes the last one will fail here
+        // and say so.
+        #expect(numbered.count <= 1, "numbered \(numbered.count): \(detail)")
+        if let stray = numbered.first {
+            #expect(
+                stray.residue >= last - 1,
+                "a stray number away from the splice junction is the old bug: \(detail)")
+        }
+
+        // The segment the scattering was in is gone entirely, which is the
+        // guard working rather than the alignment improving.
+        #expect(!result.numbers.contains { $0.segment == "TM5" })
+
+        // And the receptor half is still numbered, or the assertion above
+        // would pass for the uninteresting reason that nothing was numbered.
+        #expect(result.numbers.contains { $0.label.hasPrefix("3x50") })
+        #expect(result.numbers.contains { $0.residue < first })
+    }
+
     @Test("Ubiquitin is refused by both schemes rather than numbered")
     func ubiquitinIsRefused() throws {
         // The test that matters most. A numbering returned for a protein from

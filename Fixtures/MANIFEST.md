@@ -16,6 +16,7 @@ app's own offline rule.
 |---|---|---|
 | `structures/1ubq.bcif` | 1UBQ, ubiquitin | Baseline and fast path: small, well behaved, mixed alpha/beta |
 | `structures/1hck.bcif` | 1HCK, human CDK2 with ATP and Mg | KLIFS numbering, motif detection, interaction profiling |
+| `structures/1xkk.bcif` | 1XKK, EGFR kinase with lapatinib | Halogen bonds: the ligand carries one chlorine and one fluorine |
 | `structures/2rh1.bcif` | 2RH1, beta-2 adrenergic receptor with carazolol | GPCRdb generic numbering, TM span prediction |
 | `structures/6eqe.bcif` | 6EQE, *Piscinibacter sakaiensis* PETase | Catalytic triad annotation, disulfide detection, **alternate conformations** (709 of 4,596 atoms carry an altloc; 25 residues have alternate CA positions) |
 | `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal. **Not** a multi-model ensemble: this row claimed one and the entry has a single deposited model, verified against the authoritative mmCIF (2,017 ATOM records, all at model 1). Solution NMR does not imply an ensemble, and that inference is how the claim got here. 1L2Y is the fixture that actually carries one |
@@ -57,28 +58,44 @@ pass while measuring the wrong thing.
 | `malformed/bare-sequence.txt` | No header at all |
 | `malformed/crlf.fasta` | CRLF line endings, as arriving from a share sheet |
 
-## Caveats to confirm before these are trusted as gold
+## Caveats, resolved 2026-08-26
 
-Three choices here are judgement calls, not facts, and the build plan says to
-surface rather than guess:
+All three were judgement calls the build plan said to surface rather than
+guess. Answering them found two real defects, both in code no fixture had ever
+reached.
 
-1. **2RH1 is a fusion construct.** It is beta-2 adrenergic receptor with T4
-   lysozyme replacing most of ICL3, which is why the entry sequence is 500
-   residues rather than a clean receptor. That makes it a genuinely useful
-   stress test for GPCRdb numbering across a disrupted loop, but it must not be
-   treated as wild-type ADRB2. `P07550_ADRB2_HUMAN.fasta` is the unmodified
-   sequence. Confirm which of the two the GPCRdb tests should assert against,
-   or whether a non-fusion structure (for example a thermostabilised or
-   cryo-EM entry) is the better fixture.
-2. **1HCK is CDK2 with ATP, not with an inhibitor.** The build plan says "CDK2
-   with an ATP-site ligand", which ATP satisfies. If the intent was a
-   drug-like inhibitor for the interaction profiler, a different entry is
-   wanted, since ATP and a typical hinge-binding inhibitor exercise different
-   interaction types.
-3. **7K00 is 2.0 MDa and 7.3 MB as BinaryCIF.** Large enough to trip the viewer
-   guardrail, which is the point. If the repository should stay lighter, this
-   is the one file to move to on-demand fetch, at the cost of the fixture suite
-   no longer running fully offline.
+1. **2RH1 is a fusion construct, and it is kept as one.** T4 lysozyme replaces
+   most of ICL3, which is why the entry sequence is 500 residues. The GPCRdb
+   tests were already asserting against `P07550_ADRB2_HUMAN.fasta`, the
+   unmodified receptor, which is right: generic numbering is defined on the
+   receptor and asserting against the chimera would bake lysozyme into the
+   expectations. What was missing is the stress test 2RH1 was collected for,
+   because no test loaded the file at all. It does now, and it failed:
+   numbering assigned **5x70 to 5x76 and 6x24 to lysozyme residues**, with
+   5x70 at 238, 5x71 at 244 and 5x74 at 279. Positions within one helix cannot
+   be six and thirty-three residues apart. `FamilyStore` now drops any segment
+   whose numbers do not land on consecutive residues, which removes seven of
+   the eight; the last is the alignment placing TM6's boundary one residue
+   across the splice, and the test bounds it at one rather than waiving it.
+
+2. **1HCK stays, and 1XKK joins it.** The question was whether the profiler
+   wanted a drug-like inhibitor instead of ATP. It wants both, and the reason
+   is not preference: ATP with Mg exercises hydrogen bonds, hydrophobic
+   contacts, salt bridges and metal coordination, and **nothing exercised
+   halogen bonds at all**. `1xkk.bcif` is EGFR with lapatinib, whose ligand
+   carries exactly one chlorine and exactly one fluorine -- which is what makes
+   it the right choice rather than merely a halogenated one, since it separates
+   two errors at once. The dead rule counted fluorine as a halogen-bond donor,
+   which it is not, and tested distance without direction: it reported eight
+   halogen bonds on this entry, **five of them from the single fluorine**, and
+   three from one chlorine, which one sigma-hole cannot do. Now one, from the
+   chlorine, to Leu788's backbone oxygen at 3.10 A.
+
+3. **7K00 stays in the repository.** The trade was 7.3 MB against the fixture
+   suite running fully offline. Offline wins easily at this size: the whole
+   `.git` directory is 16 MB, so the ribosome is a rounding error next to the
+   guarantee that the suite needs no network. Revisit only if the repository
+   grows enough for it to matter.
 
 ## Checksums (SHA-256)
 
@@ -102,6 +119,7 @@ e1d2c99f6cfa33ceb1faa519ea9dda372e391511f7a295c9474c1af8be61c207  sequences/A0A0
 44fb78fc03c1b336f175c08b0945206f5ed574564b8d637f9f7f3d4ea1ceae92  sequences/P37840_SYUA_HUMAN.fasta
 f93b5f370b0b63d0d33fc20da568595e74213d370f00f08900c55adda859cb22  structures/1e8a.bcif
 9b13dc6074a20e0ad88d84a7d91dd128f193db9a115577b13c91b625866d2763  structures/1hck.bcif
+c0bfdef0a5ddb24dddd2c22111e78cf2c3c4e3ddf232fa6c18f59593e4adcb08  structures/1xkk.bcif
 d691a4b8a0c5d9a34709fac878560c987e99815271c5dfcf10efa650bed81d72  structures/1ubq.bcif
 75ba05bff833481f2b8240e4a4ed19bb94b01775923d4675d6d153135edfe11d  structures/1xq8.bcif
 7cf4b591b17e0ab2bab783290d46df1e99da3bba3c2a6501862eb4ebe286277f  structures/2rh1.bcif

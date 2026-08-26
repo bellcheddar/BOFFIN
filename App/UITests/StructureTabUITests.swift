@@ -6,6 +6,19 @@ import XCTest
 final class StructureTabUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
+    /// How long to wait for a structure to appear in the viewer.
+    ///
+    /// Generous on purpose. Loading goes through a WKWebView and Mol*, and CI's
+    /// runners are roughly three times slower than the development machine: the
+    /// iPad job takes sixteen minutes there against five here, and a load that
+    /// finishes in twelve seconds locally was measured at 35.7 on CI.
+    ///
+    /// This was 60 seconds in nine places and CI failed on the one test that
+    /// happened to run when the machine was busiest, reporting "the structure
+    /// never loaded" for what was only a slow load. A timeout tuned on the fast
+    /// machine turns a slow environment into a phantom bug.
+    static let structureLoad: TimeInterval = 180
+
     /// Phase 7's first acceptance: 1UBQ loads from the bundle, offline, and the
     /// viewer reports the atom count the file actually holds.
     ///
@@ -70,7 +83,7 @@ final class StructureTabUITests: XCTestCase {
         XCTAssertTrue(load.waitForExistence(timeout: 30))
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
             "the structure did not load")
 
         // Any continuous track will do; hydropathy is the one every sequence
@@ -117,7 +130,7 @@ final class StructureTabUITests: XCTestCase {
         XCTAssertTrue(load.waitForExistence(timeout: 30))
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
             "the structure did not load")
 
         let profile = app.buttons["boffin.profile-interactions"]
@@ -155,7 +168,7 @@ final class StructureTabUITests: XCTestCase {
         let load = app.buttons["boffin.load-structure"]
         XCTAssertTrue(load.waitForExistence(timeout: 30))
         load.tap()
-        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: 60))
+        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad))
 
         // Capture two scenes so advancing has somewhere to go.
         //
@@ -233,7 +246,7 @@ final class StructureTabUITests: XCTestCase {
         let load = app.buttons["boffin.load-structure"]
         XCTAssertTrue(load.waitForExistence(timeout: 30))
         load.tap()
-        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: 60))
+        XCTAssertTrue(app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad))
 
         let agreement = app.staticTexts["boffin.structure-agreement"]
         // Absent when the model is not bundled, which is a legitimate state and
@@ -275,7 +288,7 @@ extension StructureTabUITests {
         XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
             "the structure never loaded, so there is nothing to render")
 
         let export = app.buttons["boffin.export.1 column"]
@@ -336,7 +349,7 @@ extension StructureTabUITests {
         XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
             "the structure never loaded")
 
         let profile = app.buttons["boffin.profile-interactions"]
@@ -392,7 +405,7 @@ extension StructureTabUITests {
         XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["660 atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["660 atoms"].waitForExistence(timeout: Self.structureLoad),
             "ubiquitin did not load")
 
         // Profiling loads CDK2, which has 2,510 atoms.
@@ -407,7 +420,7 @@ extension StructureTabUITests {
         // test never noticed.
         let kinase = "\(2510.formatted()) atoms"
         XCTAssertTrue(
-            app.staticTexts[kinase].waitForExistence(timeout: 60),
+            app.staticTexts[kinase].waitForExistence(timeout: Self.structureLoad),
             "the viewer still reports ubiquitin's atom count after loading a kinase, "
                 + "so the structures are accumulating instead of replacing")
         XCTAssertFalse(
@@ -439,7 +452,8 @@ extension StructureTabUITests {
         XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(
+                timeout: Self.structureLoad),
             "the structure never loaded")
 
         let build = app.buttons["boffin.selection.build"]
@@ -517,7 +531,8 @@ extension StructureTabUITests {
         XCTAssertTrue(load.waitForExistence(timeout: 30), "no load control")
         load.tap()
         XCTAssertTrue(
-            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(timeout: 60),
+            app.staticTexts["\(660.formatted()) atoms"].waitForExistence(
+                timeout: Self.structureLoad),
             "the structure never loaded")
 
         let expand = app.buttons["boffin.symmetry.10"]
@@ -526,7 +541,8 @@ extension StructureTabUITests {
 
         let result = app.staticTexts["boffin.symmetry.result"]
         XCTAssertTrue(
-            result.waitForExistence(timeout: 60), "symmetry produced no result at all")
+            result.waitForExistence(timeout: Self.structureLoad),
+            "symmetry produced no result at all")
 
         // Ubiquitin is a crystal structure, so this must be the "applied"
         // branch rather than the "no unit cell" one.

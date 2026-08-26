@@ -1266,3 +1266,26 @@ during this session. The recorded recovery works and is the only one that does:
 reboot to undo.
 
 Both idioms now pass 22 of 22.
+
+## A timeout tuned on the fast machine (2026-08-26)
+
+The first CI fix was correct and CI failed again, on a different test:
+`testFigureExportProducesAPNGAtTheRequestedSize`, reporting "the structure never
+loaded, so there is nothing to render".
+
+Nothing was broken. **CI's runners are about three times slower than this
+machine**: the iPad job takes sixteen minutes there against five here, and a
+load that finishes in twelve seconds locally was measured at 35.7 seconds on CI
+in the same run. The wait was 60 seconds, which is comfortable here and marginal
+there, so whichever structure test ran while the runner was busiest failed.
+
+That is worse than an ordinary flake because of what it says: "the structure
+never loaded" is a claim about the app, and the app was fine. A timeout tuned on
+the fast machine turns a slow environment into a phantom bug, and the next person
+to see that message would go looking at the viewer.
+
+The wait is now one named constant, `structureLoad`, at 180 seconds, in place of
+sixty seconds repeated in nine places. The next slow runner is one edit rather
+than nine, and the constant carries the measurement that justifies it.
+
+Both idioms pass 22 of 22 locally, on freshly erased simulators.

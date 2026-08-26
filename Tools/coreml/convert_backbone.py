@@ -108,15 +108,23 @@ DEFAULT_BUCKET = 384
 # structural question the project's fatal risk depended on, and it does not
 # answer "how fast will they".
 #
-# The available win, if it is wanted, is one extra model traced at 384: 31.01
-# to 21.40 ms per variant, taking a 300-residue masked-marginal scan from 9.30
-# to 6.42 s on this Mac, for +67.4 MB against a 200 MB bundle target. Proteins
-# longer than 382 residues would fall back to batch 1 unchanged. That is a
-# bundle-size decision rather than an engineering one, so it is costed here and
-# not taken. Reproduce with:
+# The win was taken, 2026-08-26, at the +67.4 MB it costs. It ships as a
+# SECOND model rather than a replacement, because the backbone still serves
+# embedding and every other length faster at batch 1:
 #
-#     convert_backbone.py --scoring-batch 8 --flexible range \
-#         --default-bucket 384 --suffix .batch8
+#     convert_backbone.py --scoring-batch 8 --flexible fixed \
+#         --default-bucket 384 --suffix .scoring
+#
+# `fixed` rather than `range`, deliberately. Both measure the same at 384, but
+# a fixed shape makes Core ML reject any other input outright, where a RangeDim
+# would accept it and quietly run two to three times slower. The constraint is
+# better enforced by the framework than remembered by the caller.
+#
+# Measured end to end on CDK2's 298 positions, which is the case this file's
+# 9.37 s figure came from: 9.50 s at batch 1 against 6.90 s batched, 31.9 to
+# 23.1 ms per variant. Slightly short of the 1.45x microbenchmark because the
+# last batch of a scan is partial. The batched path is verified to produce a
+# bit-identical delta-LLR matrix, row by row, by ScoringModelTests.
 #
 # The configuration that ships is batch 1 with enumerated sequence shapes, which
 # is what Phase 2 proved at 98.8% ANE residency. The cost is a 9.37 s
@@ -253,10 +261,13 @@ def main() -> int:
         help="rows per prediction. Above 1 forces --flexible range, because "
              "Core ML will not combine a batch with EnumeratedShapes.")
     parser.add_argument(
-        "--flexible", default="enumerated", choices=["enumerated", "range"],
-        help="how sequence length varies. `enumerated` is the shipping "
+        "--flexible", default="enumerated", choices=["enumerated", "range", "fixed"],
+        help="how sequence length varies. `enumerated` is the backbone's "
              "configuration and is fixed at batch 1; `range` is a RangeDim, "
-             "which is the only mechanism that accepts a batch dimension.")
+             "which accepts a batch but is fast only at the traced shape; "
+             "`fixed` is one shape and nothing else, which is what the "
+             "scoring model uses so Core ML enforces the constraint rather "
+             "than the calling code remembering it.")
     parser.add_argument(
         "--default-bucket", type=int, default=DEFAULT_BUCKET,
         help="the shape the model is specialised at. With --flexible range "
@@ -268,9 +279,9 @@ def main() -> int:
              "benchmarked without overwriting the shipping model.")
     args = parser.parse_args()
 
-    if args.scoring_batch > 1 and args.flexible != "range":
+    if args.scoring_batch > 1 and args.flexible == "enumerated":
         raise SystemExit(
-            "a batch above 1 needs --flexible range: EnumeratedShapes with a "
+            "a batch above 1 needs --flexible range or fixed: EnumeratedShapes with a "
             "batch dimension converts, then kills the process with SIGTRAP on "
             "the first predict (re-verified on coremltools 9.0, 2026-08-26)")
 
@@ -320,7 +331,9 @@ def main() -> int:
     # was unavailable; RangeDim is a different mechanism and it converts and
     # predicts at batch 8. Whether it stays on the Neural Engine is the
     # question that decides it, and that is what benchmark_ane.py answers.
-    if args.flexible == "range":
+    if args.flexible == "fixed":
+        shape = ct.Shape(shape=(batch, args.default_bucket))
+    elif args.flexible == "range":
         shape = ct.Shape(
             shape=(batch, ct.RangeDim(min(BUCKETS), max(BUCKETS),
                                       default=args.default_bucket)))

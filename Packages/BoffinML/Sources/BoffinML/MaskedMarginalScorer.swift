@@ -85,18 +85,27 @@ public enum ScoringError: Error, Sendable {
 
 extension EmbeddingEngine {
 
-    /// Variants scored per prediction.
+    /// Variants scored per prediction by the SCORING model.
     ///
-    /// **This MUST equal `SCORING_BATCH` in Tools/coreml/convert_backbone.py.**
-    /// It is 1, because Core ML would not accept a batch dimension alongside
-    /// enumerated sequence shapes (see that file for the three configurations
-    /// tried). A mismatch fails at runtime with "MultiArray Shape (8 x 128) was
-    /// not in enumerated set of allowed shapes", and only when a scan is
-    /// actually run: it builds, converts and passes every other test.
+    /// **This MUST equal the `--scoring-batch` the scoring model was converted
+    /// with**, and the length below must equal its `--default-bucket`. A
+    /// mismatch fails at runtime, and only when a scan is actually run: it
+    /// builds, converts and passes every other test. With the shape fixed
+    /// rather than enumerated, Core ML rejects the wrong shape outright rather
+    /// than quietly taking a slower path.
     ///
-    /// Batching would be worth 31% if it were available: measured at 31.2 ms
-    /// per variant at batch 1, 21.6 at batch 8, 22.6 at batch 16.
-    public static let scoringBatchSize = 1
+    /// 8 because the win saturates there: 31.2 ms per variant at batch 1, 21.6
+    /// at 8, 22.6 at 16. This is a compute-bound workload, so a larger batch
+    /// buys nothing.
+    ///
+    /// The backbone still scores at batch 1 and does so for every length but
+    /// one. That is not a fallback but the faster path there: measured per
+    /// variant, batch 8 loses to batch 1 by nearly three times at 128 and 256.
+    public static let scoringBatchSize = 8
+
+    /// The one length the scoring model is traced at, and so the only length
+    /// it is used at.
+    public static let scoringBucket = ShapeBucket.tokens384
 
     /// Score every canonical substitution at the given positions.
     ///
@@ -141,7 +150,7 @@ extension EmbeddingEngine {
                 limit: ShapeBucket.tokens1024.rawValue - tokeniserSpecialTokenCount)
         }
 
-        let model = try await loadedModelForScoring()
+        let plan = try await scoringPlan(for: bucket)
         let canonical = AminoAcid.canonical
         let canonicalTokens = canonical.map { tokeniserIndex(for: .canonical($0)) }
 
@@ -154,8 +163,12 @@ extension EmbeddingEngine {
         // position's distribution is read from the same forward pass, so the
         // whole matrix costs what a single embedding costs.
         if mode == .wildTypeMarginal {
+            // The wild-type pass reads every token from ONE unmasked row, so
+            // it takes the backbone regardless of the plan: eight identical
+            // rows would cost eight times as much for the same answer.
             let logits = try predictMasked(
-                model: model, sequence: sequence, positions: [], bucket: bucket)
+                model: try await loadedModelForScoring(), sequence: sequence,
+                positions: [], bucket: bucket)
             for position in scorable {
                 guard case .canonical(let wildType) = sequence.residues[position].identity
                 else { continue }
@@ -172,11 +185,12 @@ extension EmbeddingEngine {
         }
 
         var completed = 0
-        for chunk in scorable.chunked(into: Self.scoringBatchSize) {
+        for chunk in scorable.chunked(into: plan.rows) {
             try Task.checkCancellation()
 
             let logits = try predictMasked(
-                model: model, sequence: sequence, positions: chunk, bucket: bucket)
+                model: plan.model, sequence: sequence, positions: chunk,
+                bucket: bucket, batchRows: plan.rows)
 
             for (offset, position) in chunk.enumerated() {
                 guard case .canonical(let wildType) = sequence.residues[position].identity

@@ -89,6 +89,14 @@ public actor EmbeddingEngine {
     private let tokeniser: Tokeniser
     private var model: MLModel?
     private var compiledURL: URL?
+    private let scoringModelURL: URL?
+    private var scoringModel: MLModel?
+    private var scoringCompiledURL: URL?
+    /// Set once the scoring model has been tried and found unusable, so a
+    /// missing or broken second model costs one failed load rather than one
+    /// per batch of a 300-position scan.
+    private var scoringModelUnavailable = false
+
     private var cache: [String: EmbeddingResult] = [:]
     private let cacheLimit: Int
     private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "EmbeddingEngine")
@@ -96,12 +104,19 @@ public actor EmbeddingEngine {
     /// - Parameters:
     ///   - modelURL: a compiled `.mlmodelc` or an `.mlpackage`.
     ///   - tokeniserURL: the JSON exported alongside the model.
+    ///   - scoringModelURL: an optional second model, traced at a fixed batch
+    ///     and a fixed length, used only by the masked-marginal scan. Absent,
+    ///     everything still works and the scan runs a row at a time.
     ///   - cacheLimit: how many results to retain, keyed by sequence.
     /// - Throws: ``EmbeddingError/tokeniserUnavailable(_:)`` when the alphabet
     ///   cannot be read. The model itself is loaded lazily on first use, so a
     ///   missing model surfaces at ``embed(_:)`` rather than here.
-    public init(modelURL: URL, tokeniserURL: URL, cacheLimit: Int = 16) throws {
+    public init(
+        modelURL: URL, tokeniserURL: URL, scoringModelURL: URL? = nil,
+        cacheLimit: Int = 16
+    ) throws {
         self.modelURL = modelURL
+        self.scoringModelURL = scoringModelURL
         self.cacheLimit = cacheLimit
         do {
             self.tokeniser = try Tokeniser(contentsOf: tokeniserURL)
@@ -342,6 +357,62 @@ public actor EmbeddingEngine {
         residue + (tokeniser.prependBOS ? 1 : 0)
     }
 
+    /// The model and batch size to score with, for a given bucket.
+    ///
+    /// The scoring model is traced at ONE batch and ONE length, so it is used
+    /// only at that length and the backbone serves everything else. This is
+    /// not a tuning choice: measured per variant, batch 8 beats batch 1 by
+    /// 1.45x at 384 and loses to it by nearly three times at 128 and 256. A
+    /// model traced at a fixed shape is fast at that shape and nowhere else.
+    ///
+    /// Because the shape is fixed rather than a range, Core ML refuses any
+    /// other input outright instead of silently running the slow path, which
+    /// is the reason for preferring `--flexible fixed` when converting it.
+    func scoringPlan(for bucket: ShapeBucket) async throws -> (model: MLModel, rows: Int) {
+        if bucket == Self.scoringBucket, !scoringModelUnavailable,
+            let model = await loadedScoringModel()
+        {
+            return (model, Self.scoringBatchSize)
+        }
+        return (try await loadedModel(), 1)
+    }
+
+    private func loadedScoringModel() async -> MLModel? {
+        if let scoringModel { return scoringModel }
+        guard let scoringModelURL else {
+            scoringModelUnavailable = true
+            return nil
+        }
+        do {
+            let loadURL: URL
+            if scoringModelURL.pathExtension == "mlpackage" {
+                if let compiled = scoringCompiledURL {
+                    loadURL = compiled
+                } else {
+                    let compiled = try await MLModel.compileModel(at: scoringModelURL)
+                    scoringCompiledURL = compiled
+                    loadURL = compiled
+                }
+            } else {
+                loadURL = scoringModelURL
+            }
+            let configuration = MLModelConfiguration()
+            configuration.computeUnits = .cpuAndNeuralEngine
+            let loaded = try MLModel(contentsOf: loadURL, configuration: configuration)
+            scoringModel = loaded
+            logger.info("scoring model loaded")
+            return loaded
+        } catch {
+            // Degrade rather than fail. The scan is correct at batch 1 and only
+            // slower, so an absent or unreadable second model must not be the
+            // difference between a fitness scan and an error.
+            let detail = String(describing: error)
+            logger.error("scoring model unavailable, scanning a row at a time: \(detail)")
+            scoringModelUnavailable = true
+            return nil
+        }
+    }
+
     func loadedModelForScoring() async throws -> MLModel {
         try await loadedModel()
     }
@@ -357,12 +428,17 @@ public actor EmbeddingEngine {
         model: MLModel,
         sequence: ProteinSequence,
         positions: [Int],
-        bucket: ShapeBucket
+        bucket: ShapeBucket,
+        batchRows: Int? = nil
     ) throws -> [[Float]] {
         let width = bucket.rawValue
         let (baseTokens, _) = tokeniser.encode(sequence.residues, paddedTo: width)
 
-        let rowCount = max(positions.count, 1)
+        // The scoring model's batch is FIXED, so the last chunk of a scan has
+        // to be padded up to it rather than sent short. The padding rows carry
+        // the unmasked sequence and their outputs are never read: `positions`
+        // is what the rows are indexed by below.
+        let rowCount = max(batchRows ?? positions.count, max(positions.count, 1))
         let input = try MLMultiArray(
             shape: [NSNumber(value: rowCount), NSNumber(value: width)], dataType: .int32)
 

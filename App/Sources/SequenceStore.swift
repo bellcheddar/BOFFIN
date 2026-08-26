@@ -590,7 +590,8 @@ final class SequenceStore {
         if let engine { return engine }
         let created = try EmbeddingEngine(
             modelURL: bundle.appending(path: Self.backboneName),
-            tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"))
+            tokeniserURL: bundle.appending(path: "esm2_t12_35M_UR50D.tokeniser.json"),
+            scoringModelURL: Self.scoringModelURL(in: bundle))
         engine = created
         return created
     }
@@ -609,6 +610,21 @@ final class SequenceStore {
     /// Give back the engine's cached embeddings, keeping the model loaded.
     func releaseEmbeddingCache() async {
         await engine?.releaseUnderMemoryPressure()
+    }
+
+    /// The second, batched model the mutation scan uses where it helps.
+    ///
+    /// Optional by design. Absent, every scan still runs and is correct, just
+    /// a row at a time: measured on CDK2's 298 positions, 9.50 s against
+    /// 6.90 s. It is a separate 67 MB package rather than part of the
+    /// backbone because Core ML will not give one model both a batch
+    /// dimension and a flexible sequence length, and because it is fast at
+    /// exactly the one shape it was traced at.
+    private static let scoringName = "esm2_t12_35M_UR50D.scoring.mlpackage"
+
+    private static func scoringModelURL(in bundle: URL) -> URL? {
+        let url = bundle.appending(path: scoringName)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
     }
 
     /// The converted backbone's package name, in one place because three call

@@ -1230,3 +1230,39 @@ the fix must not have made the parser permissive, because an unparseable number
 that silently selects everything makes a figure wrong in a way nobody can see.
 
 BoffinStructure 121 tests.
+
+## CI had been red for five commits and I had not looked (2026-08-26)
+
+The autonomous check found `main` failing on five consecutive completed runs.
+Two more showed `cancelled`, which is a push landing while the previous run was
+still going, so CI had not actually verified anything for some time.
+
+**One cause, one test.** `testSelectionBuilderComposesAWorkingExpression` fails
+on iPad with "no byres control". The builder's Form is taller than the sheet on
+that idiom, so the Refine section starts below the fold and a bare `.exists`
+returns false.
+
+**The lesson is about the local run, not the test.** CI covers iPhone AND iPad;
+I had been running only iPhone and treating a local pass as sufficient. Every
+push since the selection builder inherited the same failure, and the fix took
+minutes once looked at.
+
+Two further problems surfaced while fixing it, both worth recording:
+
+**A stale element handle.** Tapping the control rebuilds the label's view, so
+the earlier `XCUIElement` no longer resolves and reading `.label` fails with "no
+matches found" rather than with a wrong value. Re-query after any tap that
+changes the view.
+
+**Scrolling drops content out of the accessibility tree.** Reaching the byres
+control scrolls the Form, and the count label above it then reads as missing
+rather than as off-screen. Same behaviour already met on the Structure tab, now
+met again inside a sheet.
+
+**And the simulators wedge.** "Application failed preflight checks" three times
+during this session. The recorded recovery works and is the only one that does:
+`simctl shutdown all`, `erase` the device, `bootstatus -b`. Never
+`killall CoreSimulatorService`, which unmounts the runtime cryptex and needs a
+reboot to undo.
+
+Both idioms now pass 22 of 22.

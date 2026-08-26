@@ -461,16 +461,40 @@ extension StructureTabUITests {
             "`polymer` matched nothing in ubiquitin, which is all polymer")
 
         // Now wrap it, which is the part that is genuinely painful to type.
+        //
+        // Waited for and scrolled to, not asserted with a bare `exists`. On
+        // iPad the builder's Form is taller than the sheet and the Refine
+        // section starts below the fold, so `exists` was false and this failed
+        // with "no byres control" on every CI run since the test was written,
+        // while passing locally on iPhone. The lesson is about the local run,
+        // not the test: CI covers both idioms and only one was being checked.
         let byres = app.buttons["boffin.selection.byres"]
-        XCTAssertTrue(byres.exists, "no byres control")
-        byres.tap()
-
-        XCTAssertFalse(
-            count.label.lowercased().contains("not a selection keyword"),
-            "wrapping produced invalid syntax: \(count.label)")
+        if !byres.exists || !byres.isHittable {
+            app.scrollTo(byres)
+        }
         XCTAssertTrue(
-            count.label.contains("atoms"),
-            "the wrapped expression stopped matching: \(count.label)")
+            byres.waitForExistence(timeout: 10),
+            "no byres control, even after scrolling the builder")
+        app.forceTap(byres)
+
+        // Re-queried, not reused. Tapping the control rebuilds the label's
+        // view, so the earlier handle no longer resolves and reading `.label`
+        // off it fails with "no matches found" rather than with a wrong value.
+        // Re-queried AND scrolled back to. Reaching the byres control scrolled
+        // the builder down, and a SwiftUI Form drops off-screen content out of
+        // the accessibility tree, so the count reads as missing when it is
+        // merely above the fold.
+        let wrapped = app.staticTexts["boffin.selection.count"]
+        app.scrollBackTo(wrapped)
+        XCTAssertTrue(
+            wrapped.waitForExistence(timeout: 10),
+            "the count disappeared after wrapping the expression")
+        XCTAssertFalse(
+            wrapped.label.lowercased().contains("not a selection keyword"),
+            "wrapping produced invalid syntax: \(wrapped.label)")
+        XCTAssertTrue(
+            wrapped.label.contains("atoms"),
+            "the wrapped expression stopped matching: \(wrapped.label)")
     }
 }
 

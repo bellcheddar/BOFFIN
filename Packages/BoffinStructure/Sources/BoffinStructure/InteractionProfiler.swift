@@ -28,6 +28,18 @@ import simd
 public struct InteractionCriteria: Sendable, Hashable {
     public var hydrophobicDistance: Double = 4.0
     public var hydrogenBondDistance: Double = 4.1
+    /// Minimum donor-hydrogen-acceptor angle, in degrees.
+    ///
+    /// **Declared and not used.** Nothing reads this, and no hydrogen bond in
+    /// this profiler is angle-filtered: the criterion is heavy-atom distance
+    /// alone whether or not the structure carries hydrogens.
+    ///
+    /// Kept rather than deleted because the number is the right one and the
+    /// gap is worth seeing. Applying it needs a decision that is not a
+    /// programming one: hydrogens in most deposited structures are CALCULATED
+    /// by refinement software rather than observed, so filtering on their
+    /// geometry would be filtering on a model's assumptions and reporting the
+    /// result as measurement.
     public var hydrogenBondAngle: Double = 100
     public var saltBridgeDistance: Double = 5.5
     public var metalDistance: Double = 3.0
@@ -49,9 +61,19 @@ public struct InteractionAssumptions: Sendable, Hashable {
                 + String(format: "%.1f", pH) + "."
         ]
         if hasExplicitHydrogens {
+            // Corrected 2026-08-26. This said the hydrogens "were used for
+            // donor geometry where present". They are not used at all: the
+            // hydrogen bond criterion is heavy-atom distance alone, and
+            // `hydrogenBondAngle` is declared and read nowhere.
+            //
+            // Worse than an ordinary stale comment, because this string IS the
+            // honesty mechanism. It exists so a reader can tell which criteria
+            // were applied, and it was overclaiming rigour in exactly the place
+            // built to prevent that.
             lines.append(
-                "The structure contains explicit hydrogens, which were used for "
-                    + "donor geometry where present.")
+                "The structure contains explicit hydrogens, but they were NOT used: "
+                    + "bonds are called on heavy-atom distance alone, the same as for a "
+                    + "structure without them.")
         } else {
             lines.append(
                 "The structure has NO hydrogens, so donor and acceptor roles are "

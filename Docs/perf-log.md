@@ -1112,3 +1112,39 @@ tag's negative numbering is not read as a range separator, and nothing exercises
 a structure that actually has one.
 
 BoffinStructure 110 tests.
+
+## The honesty mechanism was overclaiming (2026-08-26)
+
+The interaction profiler's assumptions statement exists so a reader can tell
+which criteria were applied and which were not. For a structure carrying
+explicit hydrogens it said:
+
+> The structure contains explicit hydrogens, which were used for donor geometry
+> where present.
+
+**They are not used.** The hydrogen bond criterion is heavy-atom distance alone,
+unconditionally, and `criteria.hydrogenBondAngle = 100` is declared once and read
+nowhere, not even in a test.
+
+This is the fourth claim in three days that the code did not support, and the
+worst placed: the string is the mechanism built to prevent exactly this, so it
+was overclaiming rigour in the one sentence a careful reader would trust.
+
+**Why it survived.** The only profiling test uses CDK2, which has no hydrogens,
+so the branch shown for a structure WITH them had never been rendered. PETase
+carries 2,102 hydrogens and was in the fixture set the whole time.
+
+The statement now says the hydrogens are not used and that bonds are called on
+heavy-atom distance, the same as for a structure without them. Three tests cover
+it, including that PETase really does carry hydrogens, so the suite cannot go
+vacuous if the fixture changes.
+
+### The decision this raises, which is not a programming one
+
+`hydrogenBondAngle` is the right number and applying it would be better science
+on a structure whose hydrogens are real. But hydrogens in most deposited
+structures are CALCULATED by refinement software rather than observed, so
+filtering donor geometry on them would be filtering on a model's assumptions
+while reporting the result as a measurement. Whether BOFFIN should do that is a
+judgement about what the app is claiming, not a question about code, and it is
+recorded here rather than answered.

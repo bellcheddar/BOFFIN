@@ -168,3 +168,58 @@ struct ModifiedHeteroatomTests {
                 with: ["ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE"]))
     }
 }
+
+@Suite("Interaction assumptions say what was done")
+struct AssumptionsHonestyTests {
+
+    /// A structure carrying explicit hydrogens.
+    ///
+    /// PETase has 2,102 of them. The profiler's hydrogen-bearing branch had
+    /// never run: the only profiling test uses CDK2, which has none, so the
+    /// statement shown for a structure WITH hydrogens went unread for months.
+    private func petase() throws -> AtomStore {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Fixtures/structures/6eqe.bcif")
+        return try AtomStore.from(try BinaryCIF.decode(Data(contentsOf: url)))
+    }
+
+    @Test("PETase really carries hydrogens, or this proves nothing")
+    func petaseHasHydrogens() throws {
+        let atoms = try petase()
+        let hydrogens = (0..<atoms.count).filter { atoms.element[$0].uppercased() == "H" }
+        #expect(hydrogens.count > 2000, "found \(hydrogens.count) hydrogens")
+    }
+
+    @Test("The statement does not claim hydrogens were used, because they are not")
+    func statementDoesNotOverclaim() {
+        // This is the honesty mechanism, so it is the one string in the app
+        // that must never overclaim. It said explicit hydrogens "were used for
+        // donor geometry where present" and nothing uses them: the criterion is
+        // heavy-atom distance alone, and `hydrogenBondAngle` is read nowhere.
+        let withHydrogens = InteractionAssumptions(hasExplicitHydrogens: true, pH: 7.4)
+        let statement = withHydrogens.statement
+
+        #expect(statement.contains("NOT used"), "the statement must say they are unused")
+        #expect(
+            !statement.contains("were used for donor geometry"),
+            "the overclaiming sentence is back")
+        #expect(statement.contains("heavy-atom distance"))
+    }
+
+    @Test("Both statements name the pH and neither is silent")
+    func bothBranchesSayEnough() {
+        // The branch without hydrogens was the tested one and stays as it was.
+        for hydrogens in [true, false] {
+            let statement = InteractionAssumptions(
+                hasExplicitHydrogens: hydrogens, pH: 7.4
+            ).statement
+            #expect(statement.contains("7.4"), "the assumed pH is part of the assumption")
+            #expect(statement.count > 80, "a one-line disclaimer is not an assumption statement")
+        }
+    }
+}

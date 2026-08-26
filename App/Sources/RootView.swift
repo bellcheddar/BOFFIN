@@ -91,6 +91,15 @@ struct RootView: View {
         // early on every launch after the first, and warming the backbone is
         // most valuable exactly then.
         .task { await store.warmUpModel() }
+        // The engine is now held for the app's lifetime, so its embedding
+        // cache is worth giving back when the system asks. The model stays
+        // loaded: reloading it would repay the cost the warm-up just avoided.
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: UIApplication.didReceiveMemoryWarningNotification)
+        ) { _ in
+            Task { await store.releaseEmbeddingCache() }
+        }
     }
 
     private var openAlert: Binding<Bool> {

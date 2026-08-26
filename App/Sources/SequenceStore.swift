@@ -606,6 +606,11 @@ final class SequenceStore {
         await engine.warmUp()
     }
 
+    /// Give back the engine's cached embeddings, keeping the model loaded.
+    func releaseEmbeddingCache() async {
+        await engine?.releaseUnderMemoryPressure()
+    }
+
     /// The converted backbone's package name, in one place because three call
     /// sites need to agree about it.
     private static let backboneName = "esm2_t12_35M_UR50D.mlpackage"

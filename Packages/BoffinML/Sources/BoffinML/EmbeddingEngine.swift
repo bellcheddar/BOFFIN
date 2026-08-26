@@ -154,6 +154,29 @@ public actor EmbeddingEngine {
         }
     }
 
+    /// Drop cached embeddings, keeping the loaded model.
+    ///
+    /// The cache holds up to `cacheLimit` results and each one is a hidden
+    /// state per residue, so a full cache of long sequences is tens of
+    /// megabytes. It cost nothing before, because the app built a new engine
+    /// for every analysis and the cache never outlived one; now that the
+    /// engine is held for the app's lifetime the cache is real and worth
+    /// giving back under pressure.
+    ///
+    /// The model itself is kept. Releasing it would mean paying the load and
+    /// the first-prediction cost again, which is the cost `warmUp` exists to
+    /// avoid, and the cached results are the larger and more replaceable half.
+    /// How many results are cached. For tests: the cache is otherwise
+    /// invisible, and a release that frees nothing looks identical to one that
+    /// frees everything.
+    var cachedCount: Int { cache.count }
+
+    public func releaseUnderMemoryPressure() {
+        let released = cache.count
+        cache.removeAll(keepingCapacity: false)
+        logger.info("released \(released) cached embeddings")
+    }
+
     /// Pay the Neural Engine compilation cost with a dummy input.
     ///
     /// The first prediction after load is markedly slower than every subsequent

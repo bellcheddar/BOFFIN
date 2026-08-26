@@ -140,6 +140,31 @@ jobs:
           echo "Using: $name"
           echo "name=$name" >> "$GITHUB_OUTPUT"
 
+      - name: Start the simulator from a known state
+        run: |
+          set -uo pipefail
+          # The retries below were not enough. On 2026-08-26 the iPad job
+          # failed BOTH attempts with "Failed to get launch progress" and
+          # "Failed to get background assertion for target app", which is the
+          # simulator unable to start the app rather than a test failing.
+          #
+          # Erasing first is what fixed the identical wedge on the development
+          # machine, where it appeared as "Application failed preflight
+          # checks" and recurred on roughly every other run. It costs about
+          # fifteen seconds and removes a failure mode that reads, in the job
+          # summary, exactly like a broken test.
+          #
+          # NEVER `killall CoreSimulatorService` to clear this: it unmounts the
+          # runtime cryptex and only a reboot brings the runtimes back.
+          name='${{ steps.sim.outputs.name }}'
+          xcrun simctl shutdown all >/dev/null 2>&1 || true
+          xcrun simctl erase "$name" >/dev/null 2>&1 || true
+          xcrun simctl boot "$name" >/dev/null 2>&1 || true
+          # Boot completion, not a fixed sleep: a simulator still starting its
+          # services is the state that produces the failure above.
+          xcrun simctl bootstatus "$name" -b || true
+          xcrun simctl list devices | grep -A 1 "$name" | head -2 || true
+
       - name: Build and test
         run: |
           set -o pipefail

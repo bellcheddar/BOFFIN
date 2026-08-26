@@ -154,13 +154,37 @@ public final class StructureViewerModel {
             }
             let declared = try await bridge.send(
                 ListAssembliesCommand(), expecting: Declared.self)
-            assemblies = declared.assemblies
             modelCount = declared.models
             assembly = nil
-            // An empty list because the structure has no assemblies is a fact;
-            // an empty list because the viewer could not look is a defect, and
-            // the two must not read the same. The note carries which it was.
-            assemblyNote = declared.assemblies.isEmpty ? declared.note : nil
+
+            // Assemblies come from BOFFIN's own parse, not from the viewer.
+            //
+            // This Mol* build cannot enumerate them. `Symmetry` exposes
+            // `findAssembly` and `StructureSymmetry` exposes builders, but
+            // neither offers a LIST, and there is no `Symmetry.Provider` at
+            // all, so the bridge's every path fell through to "no symmetry
+            // provider in this Mol* build". Measured on 1FHA, which declares a
+            // 24-mer: the viewer happily BUILT it and could not name it.
+            //
+            // The entry can. `_pdbx_struct_assembly` is an ordinary category in
+            // the file this method was just handed, and BOFFIN already parses
+            // it for the numbering. Same lesson as the crystal cell: read the
+            // entry rather than interrogating a minified viewer.
+            let parsed = (try? BinaryCIF.decode(data)).map(EntryNumbering.from)
+            if let parsed, !parsed.assemblies.isEmpty {
+                assemblies = parsed.assemblies.map {
+                    Assembly(id: $0.id, details: $0.details)
+                }
+                assemblyNote = nil
+            } else {
+                // Falls back to whatever the viewer managed, so a format the
+                // parser cannot read is not silently assembly-less.
+                assemblies = declared.assemblies
+                // An empty list because the structure declares none is a fact;
+                // an empty list because nothing could look is a defect, and the
+                // two must not read the same.
+                assemblyNote = declared.assemblies.isEmpty ? declared.note : nil
+            }
         } catch {
             state = .failed(String(describing: error))
         }

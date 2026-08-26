@@ -892,3 +892,58 @@ it pass again. A guard that has never been seen to fail is not a guard.
 Comparing dates rather than loading the model is deliberate: Core ML is not
 available on the macOS test host for an iOS package, and the signal that matters
 is "these two were not produced together", which a timestamp carries.
+
+## The fixture that unblocked assembly construction, and what it found (2026-08-26)
+
+### Why a new fixture
+
+Assembly *construction* was untestable: every golden fixture's declared assembly
+already equalled its asymmetric unit, so building it was a no-op on all seven.
+The criterion for a fixture that fixes that is objective, not a matter of taste,
+so candidates were fetched and measured rather than guessed:
+
+| Candidate | Declared | Deposited |
+|---|---|---|
+| 1HVR, 1TIM | 2 | 2 |
+| 2SOD, 4INS | 2 | 4 |
+| 1GFL | 1 | 2 |
+| 2GLS | 12 | 12 |
+| 1HTO | 12 | 24 |
+| **1FHA, 1AEW** | **24** | **1** |
+
+**1FHA**, human ferritin heavy chain: 24-mer declared, one chain deposited,
+1,361 atoms, 246 KB. The textbook case, and small.
+
+### Three findings, none of them expected
+
+**Mol\* builds the assembly on LOAD.** Ferritin arrives as 32,664 atoms, which
+is 1,361 x 24. The default preset is assembly-aware, so BOFFIN has been showing
+biological assemblies all along, and asking for the "model" is what yields the
+deposited coordinates. The project's notes had this backwards: they described
+the risk of seeing a monomer where the molecule is a dimer, and the real risk is
+the reverse, that a user believes they are looking at deposited coordinates.
+
+**`listAssemblies` computed a diagnostic and threw it away.** The handler
+carefully worked out which path it took, or why none worked, assigned it to
+`note`, and the return statement omitted the field. So every empty list arrived
+identical, which is exactly the confusion the note was written to prevent. It
+went unnoticed because no fixture declared an assembly the viewer could fail to
+find.
+
+**This Mol\* build cannot enumerate assemblies.** With the note finally
+returned, it read "no symmetry provider in this Mol* build". Probing the
+namespace: `Symmetry` exposes `findAssembly` and `getUnitcellLabel`,
+`StructureSymmetry` exposes `buildAssembly` and friends. Builders and a lookup,
+no list, and no `Symmetry.Provider` at all.
+
+### The fix
+
+Assemblies now come from BOFFIN's own parse of `_pdbx_struct_assembly`, which
+had the answer throughout. The viewer is still asked, and its reply is the
+fallback for a format the parser cannot read.
+
+Same lesson as the crystal cell, and the second time it has applied: read the
+entry rather than interrogating a minified viewer's internals. BOFFIN parses the
+file anyway.
+
+BoffinViewer 25 tests, BoffinStructure 99, 22 UI tests.

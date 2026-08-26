@@ -300,7 +300,15 @@
         details: a.details || '',
       }));
       const trajectory = viewer.plugin.managers.structure.hierarchy.current.models;
-      return { assemblies: assemblies, models: trajectory.length || 1 };
+      // `note` is RETURNED, which it was not until 2026-08-26.
+      //
+      // Everything above computes it: which path was taken, or why none was.
+      // The return statement then dropped it, so every empty list arrived
+      // looking identical and the whole mechanism for telling "this entry
+      // declares none" apart from "the viewer could not look" was dead. The
+      // Swift side reads `note` and shows it, so the symptom was an empty
+      // picker with no explanation, which is what the note existed to prevent.
+      return { assemblies: assemblies, models: trajectory.length || 1, note: note };
     },
 
     // Build crystallographic symmetry mates within a radius.

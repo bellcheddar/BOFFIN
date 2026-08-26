@@ -23,11 +23,15 @@
 //      2RH1  declares 1 chain, ASU has 1        7K00  56 and 56
 //      1E8A  declares 2 chains, ASU has 2 (A and B)
 //
-//  So building the assembly is a no-op on all seven, and an earlier UI test
-//  asserting construction was deleted rather than tuned because there was
-//  nothing meaningful for it to assert. Closing that gap needs a fixture whose
-//  assembly genuinely differs from its deposited coordinates, which is recorded
-//  in the roadmap rather than papered over here.
+//  Building the assembly was therefore a no-op on all seven, which is the real
+//  reason an earlier UI test asserting construction was deleted rather than
+//  tuned: there was nothing meaningful for it to assert.
+//
+//  **1FHA closes that gap**, added 2026-08-26. Human ferritin heavy chain
+//  declares a 24-mer and deposits a single chain, so building its assembly
+//  multiplies the structure twenty-four-fold. A viewer that ignores the
+//  assembly shows one twenty-fourth of the protein and looks entirely
+//  reasonable doing it.
 
 import Foundation
 import Testing
@@ -86,11 +90,32 @@ struct AssemblyDiscoveryTests {
         }
     }
 
-    @Test("Every fixture's assembly equals its asymmetric unit, which is the gap")
-    func noFixtureExercisesConstruction() throws {
-        // This test asserts a LIMITATION of the fixture set, so that adding a
-        // genuine multimer fixture makes it fail and forces the construction
-        // test to be written. A gap recorded only in prose is a gap that stays.
+    @Test("1FHA declares a 24-mer and deposits one chain")
+    func ferritinExpands() throws {
+        // The fixture added on 2026-08-26 to make assembly CONSTRUCTION
+        // testable at all. Human ferritin heavy chain: the deposited
+        // coordinates are one subunit and the molecule is a 24-subunit shell,
+        // so a viewer that ignores the assembly shows 1/24th of the protein
+        // and looks perfectly reasonable doing it.
+        let entry = try numbering("1fha.bcif")
+        let assembly = try #require(entry.assemblies.first)
+        #expect(assembly.chainCount == 24, "ferritin is a 24-mer")
+
+        let atoms = try AtomStore.from(
+            try BinaryCIF.decode(Data(contentsOf: fixtures.appending(path: "1fha.bcif"))))
+        let deposited = Set(
+            (0..<atoms.count).filter { !atoms.isHeteroatom[$0] }.map { atoms.chainID[$0] })
+        #expect(deposited.count == 1, "the asymmetric unit holds a single chain")
+        #expect(
+            assembly.chainCount ?? 0 > deposited.count,
+            "this is the whole point of the fixture: the assembly must exceed the deposit")
+    }
+
+    @Test("The other fixtures' assemblies still equal their asymmetric units")
+    func otherFixturesDoNotExerciseConstruction() throws {
+        // Kept as a record of WHY 1FHA had to be added, and still live: if one
+        // of these ever gains an assembly differing from its deposit, that is
+        // worth knowing rather than discovering during a debugging session.
         for name in ["1ubq.bcif", "1hck.bcif", "2rh1.bcif", "6eqe.bcif", "1e8a.bcif", "7k00.bcif"] {
             let file = try BinaryCIF.decode(Data(contentsOf: fixtures.appending(path: name)))
             let entry = EntryNumbering.from(file)

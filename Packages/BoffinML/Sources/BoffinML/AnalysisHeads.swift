@@ -298,7 +298,7 @@ public actor AnalysisHeads {
     private let openSetConfidenceFloor: Double?
     private var compiled: [URL: URL] = [:]
 
-    private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "AnalysisHeads")
+    private let logger = Logger(subsystem: "com.mdeller.boffin", category: "AnalysisHeads")
 
     /// - Parameter directory: the folder holding `secondary_structure.mlpackage`,
     ///   `disorder.mlpackage` and `config.json`.

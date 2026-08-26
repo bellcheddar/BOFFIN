@@ -99,7 +99,7 @@ public actor EmbeddingEngine {
 
     private var cache: [String: EmbeddingResult] = [:]
     private let cacheLimit: Int
-    private let logger = Logger(subsystem: "com.marcdeller.boffin", category: "EmbeddingEngine")
+    private let logger = Logger(subsystem: "com.mdeller.boffin", category: "EmbeddingEngine")
 
     /// - Parameters:
     ///   - modelURL: a compiled `.mlmodelc` or an `.mlpackage`.

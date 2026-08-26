@@ -761,11 +761,21 @@ struct StructureTabView: View {
                 .font(.caption)
                 .accessibilityIdentifier("boffin.assembly-picker")
 
+                // Reworded 2026-08-26 after measuring what the viewer does.
+                //
+                // This said "a dimer with one chain in the asymmetric unit
+                // looks like a monomer until the assembly is built", which is
+                // the right worry about the wrong viewer. Mol*'s default
+                // preset BUILDS the assembly on load: ferritin arrives as its
+                // 24-mer, not as the single chain deposited. So the risk here
+                // is the reverse, that a reader assumes the screen shows the
+                // deposited coordinates when it usually does not.
                 Text(
-                    "The deposited coordinates are the asymmetric unit, which is a "
-                        + "crystallographic convenience and often not the molecule. A "
-                        + "dimer with one chain in the asymmetric unit looks like a "
-                        + "monomer until the assembly is built."
+                    "This viewer shows the biological assembly by default, which is "
+                        + "usually the molecule rather than what the file deposits. The "
+                        + "deposited coordinates are the asymmetric unit, a "
+                        + "crystallographic convenience: choose them to see exactly what "
+                        + "was solved."
                 )
                 .font(.caption2).foregroundStyle(.tertiary)
                 .fixedSize(horizontal: false, vertical: true)

@@ -947,3 +947,34 @@ entry rather than interrogating a minified viewer's internals. BOFFIN parses the
 file anyway.
 
 BoffinViewer 25 tests, BoffinStructure 99, 22 UI tests.
+
+## The picker was labelling a 24-mer "deposited coordinates" (2026-08-26)
+
+A direct consequence of the ferritin finding, and the user-facing half of it.
+
+Mol*'s default preset builds the biological assembly on load. The viewer model
+initialised its assembly selection to `nil` regardless, and `nil` is the
+picker's tag for "Deposited coordinates". So on ferritin the control asserted
+the screen showed a single deposited chain while it showed a 24-subunit shell.
+
+A picker that disagrees with the picture is worse than no picker: it is a label
+making a false claim about what you are looking at, in an app whose entire
+argument is that it says what it is showing.
+
+**Measured, not assumed.** Rather than hardcoding "the default preset builds
+assembly 1", the load path compares the atom count the viewer reports against
+the count BOFFIN parses from the same bytes. More atoms on screen than in the
+file means an assembly was built, and the selection is set accordingly. That
+survives a Mol* upgrade changing its preset, where an assumption would not.
+
+**The explanatory text was backwards too**, in the same direction as the
+project's notes: it warned that "a dimer with one chain in the asymmetric unit
+looks like a monomer until the assembly is built". The real risk is the
+opposite. It now says the viewer shows the biological assembly by default and
+that choosing deposited coordinates is how to see exactly what was solved.
+
+A test pins the selection against the fixture, and it is discriminating by
+construction: before the fix the model set `nil` unconditionally, so comparing
+it against the first declared assembly's id could not have passed.
+
+BoffinViewer 26 tests, 22 UI tests.

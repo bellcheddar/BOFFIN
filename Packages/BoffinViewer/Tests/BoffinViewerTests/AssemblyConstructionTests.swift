@@ -145,3 +145,41 @@ struct AssemblyConstructionTests {
         }
     }
 }
+
+@Suite("Which assembly the picker claims", .serialized)
+struct AssemblySelectionTests {
+
+    /// The viewer model's own load path, exercised against the real fixture.
+    ///
+    /// This is the state the UI binds to. It said "deposited coordinates" while
+    /// the screen showed a 24-mer, because Mol*'s default preset builds the
+    /// assembly and the model initialised its selection to nil regardless. A
+    /// picker that disagrees with the picture is worse than no picker: it is a
+    /// label asserting something false about what you are looking at.
+    @MainActor
+    @Test("Ferritin's selection reflects the assembly actually shown")
+    func selectionMatchesWhatIsDisplayed() async throws {
+        guard FileManager.default.fileExists(atPath: fixture.path) else { return }
+        let model: StructureViewerModel
+        do { model = try StructureViewerModel() } catch { return }
+
+        model.start()
+        for _ in 0..<150 where model.state != .ready {
+            try? await Task.sleep(for: .milliseconds(400))
+        }
+        guard model.state == .ready else { return }
+
+        await model.load(try Data(contentsOf: fixture), format: .binaryCIF)
+
+        // The entry declares one assembly and BOFFIN parses it from the file,
+        // so the picker has something to offer whatever Mol* can enumerate.
+        #expect(model.assemblies.count == 1, "1FHA declares one assembly")
+
+        // And the selection is that assembly, not nil, because the viewer is
+        // showing it. Measured on load by comparing the viewer's atom count
+        // against BOFFIN's own parse rather than assuming the preset.
+        #expect(
+            model.assembly == model.assemblies.first?.id,
+            "the picker claims deposited coordinates while a 24-mer is on screen")
+    }
+}

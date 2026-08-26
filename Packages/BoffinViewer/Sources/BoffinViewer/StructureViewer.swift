@@ -170,12 +170,31 @@ public final class StructureViewerModel {
             // the file this method was just handed, and BOFFIN already parses
             // it for the numbering. Same lesson as the crystal cell: read the
             // entry rather than interrogating a minified viewer.
-            let parsed = (try? BinaryCIF.decode(data)).map(EntryNumbering.from)
+            let decoded = try? BinaryCIF.decode(data)
+            let parsed = decoded.map(EntryNumbering.from)
             if let parsed, !parsed.assemblies.isEmpty {
                 assemblies = parsed.assemblies.map {
                     Assembly(id: $0.id, details: $0.details)
                 }
                 assemblyNote = nil
+
+                // Which one is ACTUALLY showing, measured rather than assumed.
+                //
+                // Mol*'s default preset is assembly-aware: it builds the
+                // assembly on load, so the picker defaulting to "deposited
+                // coordinates" said one thing while the viewer showed another.
+                // On ferritin that is a 24-mer labelled as a single deposited
+                // chain, which is the kind of confident mislabelling this app
+                // exists to avoid.
+                //
+                // Rather than assume the default preset's behaviour, compare
+                // the atom count the viewer reports against the count BOFFIN
+                // parses from the same bytes. More atoms on screen than in the
+                // file means an assembly was built.
+                let depositedAtoms = decoded.flatMap { try? AtomStore.from($0) }?.count
+                if let depositedAtoms, reply.atomCount > depositedAtoms {
+                    assembly = assemblies.first?.id
+                }
             } else {
                 // Falls back to whatever the viewer managed, so a format the
                 // parser cannot read is not silently assembly-less.

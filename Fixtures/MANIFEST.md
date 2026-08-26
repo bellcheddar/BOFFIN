@@ -18,8 +18,9 @@ app's own offline rule.
 | `structures/1hck.bcif` | 1HCK, human CDK2 with ATP and Mg | KLIFS numbering, motif detection, interaction profiling |
 | `structures/2rh1.bcif` | 2RH1, beta-2 adrenergic receptor with carazolol | GPCRdb generic numbering, TM span prediction |
 | `structures/6eqe.bcif` | 6EQE, *Piscinibacter sakaiensis* PETase | Catalytic triad annotation, disulfide detection, **alternate conformations** (709 of 4,596 atoms carry an altloc; 25 residues have alternate CA positions) |
-| `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal, multi-model ensemble |
+| `structures/1xq8.bcif` | 1XQ8, micelle-bound alpha-synuclein (NMR) | Disorder track, boundary solver refusal. **Not** a multi-model ensemble: this row claimed one and the entry has a single deposited model, verified against the authoritative mmCIF (2,017 ATOM records, all at model 1). Solution NMR does not imply an ensemble, and that inference is how the claim got here. 1L2Y is the fixture that actually carries one |
 | `structures/7k00.bcif` | 7K00, *E. coli* 70S ribosome | Viewer performance guardrail (large assembly) |
+| `structures/1l2y.bcif` | 1L2Y, Trp-cage miniprotein (NMR) | **Multi-model ensemble.** 38 models, 11,552 atom rows, 304 atoms per model. Added 2026-08-26 because no fixture had more than one model, leaving the ensemble path untested. `AtomStore` deliberately takes a single model, so this exercises that choice being made rather than assumed |
 | `structures/1fha.bcif` | 1FHA, human ferritin heavy chain | **Biological assembly construction.** Declares a **24-mer** and deposits a **single chain**: the deposited coordinates look like a monomer and the molecule is a 24-subunit shell. Added 2026-08-26 because no other fixture had an assembly differing from its asymmetric unit, which left assembly construction untestable. 1,361 atoms, 246 KB |
 | `structures/1e8a.bcif` | 1E8A, selenomethionine-substituted | Non-standard residues, and the **only fixture declaring a multimeric assembly** (a dimer, chains A and B). Note its assembly still equals its asymmetric unit, so it exercises assembly *discovery* and not *construction*. **Not** alternate locations: this row claimed them and the file has none, which was found on 2026-08-25 when the altloc handling was written against it and every test passed vacuously. PETase is the fixture that actually carries them |
 
@@ -106,4 +107,5 @@ d691a4b8a0c5d9a34709fac878560c987e99815271c5dfcf10efa650bed81d72  structures/1ub
 730f10a7598769463e81d2107b18953c967a826e0a7b53e7dfa11d31528076bd  structures/6eqe.bcif
 0a50e05d731ba19ac710433aae5c3e244a3a41fca1973b75540c42db3730442d  structures/7k00.bcif
 0920e18721ee85102ccce6f8de7cef2f7b0c6c1a87107a81b5c3521f96a0e0ab  structures/1fha.bcif
+3287cc3b2b0bfb0d5dcae685ac4ec8c40723927f70ec82049b55e32935fbc0c7  structures/1l2y.bcif
 ```

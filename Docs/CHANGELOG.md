@@ -2043,3 +2043,30 @@ be written. A gap recorded only in prose is a gap that stays.
 
 The manifest records 1E8A's second purpose: it is the only fixture declaring a
 multimer, and it exercises discovery rather than construction.
+
+---
+
+## The ensemble fixture was not an ensemble (2026-08-26)
+
+The Structure tab's multi-model notice could never fire: no fixture had more
+than one model, and 1XQ8 was recorded in the manifest as the multi-model one.
+
+1XQ8 has a single deposited model. Verified against the authoritative mmCIF:
+2,017 ATOM records, all at model 1, method SOLUTION NMR. Being solution NMR does
+not imply an ensemble, and that inference is how the claim reached the manifest.
+
+1L2Y added: Trp-cage, 38 models, 11,552 atom rows, 304 atoms per model. Four
+tests now cover what could not be covered before, including that the fixture
+really holds 38 models, asserted against the raw table rather than the parsed
+store so it cannot quietly become vacuous.
+
+One thing that looked like a defect is not. `AtomStore.from` returning 304 atoms
+from an 11,552-row file reads exactly like silent data loss, and it is the
+documented, deliberate choice to analyse one model: twenty superimposed copies
+render as a single badly resolved structure, and every geometric measurement
+would span copies that are not in contact. The code was right.
+
+That makes two fixture claims found false in two days, both by the same route:
+a property was inferred from what the entry IS (a crystal structure, an NMR
+structure) rather than measured from what the file CONTAINS. 1E8A was credited
+with alternate locations it does not have; 1XQ8 with models it does not have.

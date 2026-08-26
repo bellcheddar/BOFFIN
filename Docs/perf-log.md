@@ -978,3 +978,39 @@ construction: before the fix the model set `nil` unconditionally, so comparing
 it against the first declared assembly's id could not have passed.
 
 BoffinViewer 26 tests, 22 UI tests.
+
+## The ensemble fixture was not an ensemble (2026-08-26)
+
+Auditing viewer claims against measured behaviour, after the assembly text
+turned out to be backwards.
+
+The Structure tab says, when a file holds several models: "N models in this
+file: an NMR ensemble. One is shown; superimposing all of them renders as a
+single very badly resolved structure." **No fixture could ever trigger it**, and
+1XQ8 was recorded in the manifest as the multi-model fixture.
+
+**1XQ8 has one model.** Verified against the authoritative mmCIF from RCSB:
+2,017 ATOM records, every one at `pdbx_PDB_model_num` 1, method SOLUTION NMR.
+Being solution NMR does not imply an ensemble, and that inference is how the
+claim reached the manifest.
+
+**One thing that looked like a bug and is not.** `AtomStore.from` returned 304
+atoms for a 1L2Y file holding 11,552 rows, which reads exactly like silent data
+loss. It is deliberate and documented: the method takes a single model,
+defaulting to the first, because loading twenty superimposed copies renders as
+one badly resolved structure and every geometric measurement would span copies
+that are not in contact. The code was right.
+
+**1L2Y added**: Trp-cage, 38 models, 11,552 atom rows, 304 atoms per model,
+591 KB. The first fixture with more than one model.
+
+Four tests now cover what could not be covered before: that the fixture really
+holds 38 models, asserted against the raw table rather than the parsed store so
+it cannot become vacuous; that exactly one model's worth is loaded and the ratio
+is exact, so a parser that started concatenating models fails rather than
+quietly producing a structure whose distances span two copies; that the model
+parameter is not decorative, since model 7 must hold the same atoms in different
+places; and that 1XQ8 loses nothing on load, because there is only one model to
+lose.
+
+BoffinStructure 103 tests.

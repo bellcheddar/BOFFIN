@@ -108,3 +108,25 @@ struct DeckPresentationTests {
         #expect(deck.currentScene?.name == "Two")
     }
 }
+
+@Suite("Presenter caption")
+struct PresenterCaptionTests {
+
+    @MainActor
+    @Test("The structure's name reaches the bridge for the projector to show")
+    func titleIsCarried() {
+        // `title` was written by `load` and read by nothing, so the room saw a
+        // scene caption like "Active site" with no way to tell which protein
+        // it was the active site of. The projector shows it now, and this is
+        // what stops it being dropped again.
+        let bridge = PresentationBridge()
+        bridge.load(Data([0x01]), format: .binaryCIF, title: "1HCK")
+        #expect(bridge.title == "1HCK")
+
+        // Replacing the structure replaces the caption with it: a title left
+        // over from the previous structure is worse than none, because it
+        // names the wrong protein confidently.
+        bridge.load(Data([0x02]), format: .binaryCIF, title: "1UBQ")
+        #expect(bridge.title == "1UBQ")
+    }
+}

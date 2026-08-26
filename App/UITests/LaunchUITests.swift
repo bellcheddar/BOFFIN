@@ -168,6 +168,37 @@ extension XCUIApplication {
     }
 
     /// Switch to a tab and wait for its screen.
+    /// Tap a button once it is actually there.
+    ///
+    /// `app.tapButton("X")` fails the instant X is absent, and a sheet
+    /// that is still animating in is absent. Twenty-three call sites tapped
+    /// blind, and the one that failed most is the pair
+    /// "Paste a sequence" then "Use the CDK2 example": the second tap lands
+    /// while the sheet the first opened is still on its way. Under load that
+    /// reads as "No matches found for Elements matching predicate", which
+    /// looks like a missing button rather than an early tap.
+    ///
+    /// CI passes `-retry-tests-on-failure`, so these were being masked rather
+    /// than fixed. A test that needs a retry is a test that will eventually
+    /// fail both attempts.
+    func tapButton(
+        _ label: String, timeout: TimeInterval = 15,
+        file: StaticString = #filePath, line: UInt = #line
+    ) {
+        let button = buttons[label]
+        guard button.waitForExistence(timeout: timeout) else {
+            let visible = buttons.allElementsBoundByIndex
+                .filter(\.exists)
+                .prefix(12)
+                .map { $0.label.isEmpty ? $0.identifier : $0.label }
+            XCTFail(
+                "no button \"\(label)\" after \(Int(timeout))s; visible: \(visible)",
+                file: file, line: line)
+            return
+        }
+        button.tap()
+    }
+
     func openTab(_ name: String, file: StaticString = #filePath, line: UInt = #line) {
         let tab = buttons[name].firstMatch
         XCTAssertTrue(

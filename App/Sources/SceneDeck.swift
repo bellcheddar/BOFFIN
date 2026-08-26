@@ -16,6 +16,7 @@ import SwiftUI
 
 struct SceneDeckView: View {
     @Bindable var model: SceneDeckModel
+    @Bindable private var bridge = PresentationBridge.shared
     let viewer: StructureViewerModel
     @State private var name: String = ""
     @State private var notes: String = ""
@@ -32,11 +33,19 @@ struct SceneDeckView: View {
                             .font(.caption2)
                     }
                     .accessibilityIdentifier("boffin.export-pml")
-                    Button("Present") { model.present() }
-                        .buttonStyle(.borderedProminent)
-                        .font(.caption2)
-                        .minimumTouchTarget()
-                        .accessibilityIdentifier("boffin.present-deck")
+                    // `isAttached` said in its own doc comment that the
+                    // device side would offer presenter controls only when
+                    // there was somewhere to present, and nothing on the
+                    // device side read it. Now the button says where the
+                    // deck is going, which is the difference between
+                    // presenting to a room and presenting to your own hand.
+                    Button(bridge.isAttached ? "Present on display" : "Present") {
+                        model.present()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .font(.caption2)
+                    .minimumTouchTarget()
+                    .accessibilityIdentifier("boffin.present-deck")
                 }
             }
 

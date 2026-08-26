@@ -94,6 +94,15 @@ struct PresenterView: View {
 
             if let scene = bridge.scene {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
+                    // The structure's own name, above the scene's. The
+                    // bridge carried it and nothing showed it, so the room
+                    // saw a caption like "Active site" with no way to tell
+                    // which protein it was the active site of.
+                    if !bridge.title.isEmpty {
+                        Text(bridge.title)
+                            .font(.system(size: 26, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
                     Text(scene.name)
                         .font(.system(size: 44, weight: .semibold))
                     if !scene.notes.isEmpty {

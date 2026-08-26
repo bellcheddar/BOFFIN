@@ -9,9 +9,9 @@ final class FamilyTabUITests: XCTestCase {
     func testUbiquitinShowsNoFamilyRatherThanAWrongOne() throws {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
-        app.buttons["Paste a sequence"].tap()
-        app.buttons["Use the ubiquitin example"].tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Paste a sequence")
+        app.tapButton("Use the ubiquitin example")
+        app.tapButton("Analyse")
         XCTAssertTrue(
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 
@@ -36,11 +36,11 @@ final class FamilyTabUITests: XCTestCase {
     func testCDK2AnnotatesItsPocketLandmarksByName() throws {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
-        app.buttons["Paste a sequence"].tap()
+        app.tapButton("Paste a sequence")
         let cdk2Button = app.buttons["Use the CDK2 example"]
         XCTAssertTrue(cdk2Button.waitForExistence(timeout: 10), "no CDK2 example button")
         cdk2Button.tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Analyse")
         // Not "pasted": the example carries a `>sp|P24941|CDK2_HUMAN` header,
         // so the parser recognises it as a UniProt record and says so. That is
         // the parser working, and this assertion pins it.

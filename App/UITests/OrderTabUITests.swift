@@ -27,7 +27,7 @@ final class OrderTabUITests: XCTestCase {
         XCTAssertTrue(example.waitForExistence(timeout: 5))
         example.tap()
 
-        app.buttons["Analyse"].tap()
+        app.tapButton("Analyse")
 
         // The header reports what was parsed.
         let header = app.staticTexts["76 residues \u{00B7} pasted"]
@@ -60,7 +60,7 @@ final class OrderTabUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
 
-        app.buttons["Paste a sequence"].tap()
+        app.tapButton("Paste a sequence")
         // Analyse must be disabled with nothing typed, rather than producing an
         // empty sequence or an error the user has to dismiss.
         XCTAssertFalse(app.buttons["Analyse"].isEnabled)

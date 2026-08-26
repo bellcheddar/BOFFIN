@@ -10,9 +10,9 @@ final class FitnessTabUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
     private func loadUbiquitin(_ app: XCUIApplication) {
-        app.buttons["Paste a sequence"].tap()
-        app.buttons["Use the ubiquitin example"].tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Paste a sequence")
+        app.tapButton("Use the ubiquitin example")
+        app.tapButton("Analyse")
         XCTAssertTrue(
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
     }

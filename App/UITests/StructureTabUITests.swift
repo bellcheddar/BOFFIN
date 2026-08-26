@@ -70,9 +70,9 @@ final class StructureTabUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
 
-        app.buttons["Paste a sequence"].tap()
-        app.buttons["Use the ubiquitin example"].tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Paste a sequence")
+        app.tapButton("Use the ubiquitin example")
+        app.tapButton("Analyse")
         XCTAssertTrue(
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 
@@ -175,7 +175,7 @@ final class StructureTabUITests: XCTestCase {
             app.buttons["boffin.export-pml"].waitForExistence(timeout: 10),
             "a deck with scenes cannot be exported")
 
-        app.buttons["boffin.present-deck"].tap()
+        app.tapButton("boffin.present-deck")
 
         // The position counter is the assertion, not the notes container. A
         // VStack carrying an accessibility identifier does not reliably surface
@@ -200,12 +200,12 @@ final class StructureTabUITests: XCTestCase {
         XCTAssertTrue(
             app.staticTexts["2 of 2"].waitForExistence(timeout: 10),
             "advancing did nothing")
-        app.buttons["boffin.next-scene"].tap()
+        app.tapButton("boffin.next-scene")
         XCTAssertTrue(app.staticTexts["2 of 2"].exists, "the deck wrapped past the end")
-        app.buttons["boffin.previous-scene"].tap()
+        app.tapButton("boffin.previous-scene")
         XCTAssertTrue(app.staticTexts["1 of 2"].waitForExistence(timeout: 10))
 
-        app.buttons["boffin.end-presentation"].tap()
+        app.tapButton("boffin.end-presentation")
         XCTAssertTrue(
             app.buttons["boffin.load-structure"].waitForExistence(timeout: 10),
             "dismissing the presentation did not return to the tab")
@@ -221,9 +221,9 @@ final class StructureTabUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
 
-        app.buttons["Paste a sequence"].tap()
-        app.buttons["Use the ubiquitin example"].tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Paste a sequence")
+        app.tapButton("Use the ubiquitin example")
+        app.tapButton("Analyse")
         XCTAssertTrue(
             app.staticTexts["76 residues \u{00B7} pasted"].waitForExistence(timeout: 15))
 

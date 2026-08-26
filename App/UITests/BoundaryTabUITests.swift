@@ -17,9 +17,9 @@ final class BoundaryTabUITests: XCTestCase {
     func testBoundaryTabEnforcesKinaseMotifs() throws {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
-        app.buttons["Paste a sequence"].tap()
-        app.buttons["Use the CDK2 example"].tap()
-        app.buttons["Analyse"].tap()
+        app.tapButton("Paste a sequence")
+        app.tapButton("Use the CDK2 example")
+        app.tapButton("Analyse")
         XCTAssertTrue(
             app.staticTexts["298 residues \u{00B7} UniProt P24941"]
                 .waitForExistence(timeout: 15))

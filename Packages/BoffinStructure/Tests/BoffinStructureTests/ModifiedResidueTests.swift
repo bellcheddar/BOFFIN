@@ -102,3 +102,69 @@ struct ModifiedResidueTests {
         #expect(!calcium.isEmpty, "1E8A is a calcium-binding protein")
     }
 }
+
+@Suite("Modified residues as heteroatoms")
+struct ModifiedHeteroatomTests {
+
+    /// A chain of three residues where the middle one is modified and, as the
+    /// PDB records it, a HETATM.
+    private func chain(middle: String, heteroatom: Bool) -> AtomStore {
+        var atoms = AtomStore()
+        let residues = [("SER", false), (middle, heteroatom), ("GLY", false)]
+        for (index, entry) in residues.enumerated() {
+            atoms.append(
+                x: Float(index) * 3.8, y: 0, z: 0, element: "C", atomName: "CA",
+                residueName: entry.0, authorNumber: index + 1, chainID: "A",
+                bFactor: 20, occupancy: 1, altLoc: "", isHeteroatom: entry.1, model: 1)
+        }
+        return atoms
+    }
+
+    @Test("Phosphoserine stays in the chain, and the others with it")
+    func modifiedResiduesSurviveTheHeteroatomFlag() throws {
+        // The bug this covers: the exception was `== "MSE"`, so
+        // selenomethionine was rescued and nothing else was. SEP, TPO and PTR
+        // are deposited as HETATM and are the entire point of a
+        // kinase-substrate structure, so a phosphopeptide lost its
+        // phosphoresidues from every polymer selection: the cartoon breaks at
+        // the modified residue and a pocket returns a hole exactly where the
+        // chemistry is.
+        for name in ["SEP", "TPO", "PTR", "CSO", "CME", "SEC", "PYL", "HYP", "MSE"] {
+            let atoms = chain(middle: name, heteroatom: true)
+            let polymer = SelectionEvaluator.evaluate(.category(.polymer), in: atoms).indices
+            #expect(
+                polymer.count == 3,
+                "\(name) was dropped from the chain, leaving \(polymer.count) of 3 residues")
+        }
+    }
+
+    @Test("A free amino acid ligand is still not part of the chain")
+    func standardResiduesAsHeteroatomsStayOut() throws {
+        // The other side, and why the exception is a named set rather than
+        // "any name in polymerResidues". A free alanine or glycine bound in a
+        // site is deposited as HETATM and is a LIGAND. Accepting every polymer
+        // name as HETATM would quietly pull it into the protein, which is the
+        // opposite error and just as invisible.
+        for name in ["ALA", "GLY", "SER", "HIS"] {
+            let atoms = chain(middle: name, heteroatom: true)
+            let polymer = SelectionEvaluator.evaluate(.category(.polymer), in: atoms).indices
+            #expect(
+                polymer.count == 2,
+                "a free \(name) ligand was counted as part of the chain")
+        }
+    }
+
+    @Test("The two sets say what they mean")
+    func setsAreConsistent() {
+        // Every modified residue that takes the HETATM exception must also be
+        // a polymer residue, or the exception admits something the ordinary
+        // rule would reject.
+        #expect(
+            SelectionEvaluator.modifiedPolymerResidues
+                .isSubset(of: SelectionEvaluator.polymerResidues))
+        // And none of the standard twenty may be in it.
+        #expect(
+            SelectionEvaluator.modifiedPolymerResidues.isDisjoint(
+                with: ["ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE"]))
+    }
+}

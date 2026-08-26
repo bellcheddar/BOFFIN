@@ -2101,3 +2101,34 @@ Three false claims in three days, all the same shape: a property inferred from
 what the entry IS rather than measured from what the file CONTAINS. All three
 survived because nothing tested the property they were there to exercise, so
 the fixture and the test were missing together and neither absence was visible.
+
+---
+
+## Phosphoresidues were being dropped from the protein (2026-08-26)
+
+Found by asking which code paths have no fixture, after three false fixture
+claims made "which fixtures are wrong" the less useful question.
+
+`SelectionEvaluator`'s polymer rule gave the HETATM exception to MSE alone,
+while `polymerResidues` also carries SEC, PYL, HYP, SEP, TPO, PTR, CSO and CME.
+Modified residues are deposited as HETATM by definition, which is why the
+exception exists at all, so those eight were in the set and could never benefit
+from it.
+
+SEP, TPO and PTR are the ones that matter. Phosphoserine, phosphothreonine and
+phosphotyrosine are the entire point of a kinase-substrate structure, and a
+phosphopeptide lost them from every polymer selection: the cartoon breaks at the
+modified residue and `byres (polymer within 5 of organic)` returns a pocket with
+a hole in it exactly where the chemistry is. No error, and a figure that looks
+deliberate.
+
+Fixed with a named `modifiedPolymerResidues` set rather than the tempting
+simplification of accepting any polymer name whatever the record type. A free
+alanine or glycine bound in a site is also HETATM and is a ligand; blanket
+acceptance would pull it into the protein, which is the opposite error and just
+as invisible. Tested both directions, because testing only the first would have
+licensed the fix that breaks the second.
+
+Still open: no fixture has a residue numbered below 1, so the tokeniser's
+deliberate handling of negative residue numbers in expression tags remains
+unexercised against a real structure.

@@ -45,6 +45,31 @@ public enum SelectionEvaluator {
     /// and O. Not CB, which is where a side chain begins.
     public static let backboneAtoms: Set<String> = ["N", "CA", "C", "O", "OXT"]
 
+    /// Modified residues that belong to a chain even when deposited as HETATM.
+    ///
+    /// The distinction this set exists to draw. A residue name in
+    /// ``polymerResidues`` can appear as a HETATM for two opposite reasons:
+    ///
+    /// - it is a MODIFIED residue in the middle of a chain, which the PDB
+    ///   records as HETATM because it is not one of the twenty. It is polymer.
+    /// - it is a FREE amino acid bound as a ligand, an alanine or a glycine
+    ///   sitting in a site. It is not polymer, and counting it as one would put
+    ///   a ligand into the protein.
+    ///
+    /// Only these names take the exception. The standard twenty appearing as
+    /// HETATM are ligands and stay out.
+    ///
+    /// This was `== "MSE"` alone until 2026-08-26, so selenomethionine was
+    /// rescued and every other modified residue was not. Phosphoserine is the
+    /// one that matters most in practice: SEP, TPO and PTR are deposited as
+    /// HETATM and are the whole point of a kinase-substrate structure, so a
+    /// phosphopeptide lost its phosphoresidues from every polymer selection.
+    /// The cartoon breaks at the modified residue and a pocket selection
+    /// returns a hole exactly where the chemistry is.
+    public static let modifiedPolymerResidues: Set<String> = [
+        "MSE", "SEC", "PYL", "HYP", "SEP", "TPO", "PTR", "CSO", "CME",
+    ]
+
     /// The twenty standard residues plus the common modified ones a chain can
     /// contain without ceasing to be a polymer.
     public static let polymerResidues: Set<String> = [
@@ -128,8 +153,8 @@ public enum SelectionEvaluator {
                 polymerResidues.contains(store.residueName[$0].uppercased())
                     && !store.isHeteroatom[$0]
                     || (store.isHeteroatom[$0]
-                        && polymerResidues.contains(store.residueName[$0].uppercased())
-                        && store.residueName[$0].uppercased() == "MSE")
+                        && modifiedPolymerResidues.contains(
+                            store.residueName[$0].uppercased()))
             }
         case .solvent:
             return filter(store) { solventResidues.contains(store.residueName[$0].uppercased()) }

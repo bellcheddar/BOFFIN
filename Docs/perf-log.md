@@ -1055,3 +1055,60 @@ widened into "all heteroatoms are polymer", which would pull every water into a
 binding site; and that 1E8A has no MSE, kept as the record of the claim.
 
 BoffinStructure 107 tests.
+
+## A bug found by asking which code paths have no fixture (2026-08-26)
+
+After three false fixture claims, the productive question stopped being "which
+fixtures are wrong" and became "which deliberate code paths has nothing ever
+run". Measuring the fixtures for the features the code special-cases:
+
+| Feature | Fixtures carrying it |
+|---|---|
+| Explicit hydrogens | 6EQE (2,102), 1XQ8 (1,004), 1L2Y (150) |
+| Metals | 1HCK, 1E8A, 7K00, 1FHA, 6EQE |
+| Selenomethionine | 1A8O, added yesterday |
+| Residue numbers below 1 | **none** |
+| Modified residues other than MSE | **none** |
+
+That last row is where the bug was.
+
+### The bug
+
+`SelectionEvaluator`'s polymer rule read:
+
+    (inPolymerSet && !isHeteroatom) || (isHeteroatom && inPolymerSet && name == "MSE")
+
+`polymerResidues` carries SEC, PYL, HYP, SEP, TPO, PTR, CSO and CME alongside
+MSE, and **only MSE took the HETATM exception**. Every other modified residue
+was in the set and could never benefit from it, because modified residues are
+deposited as HETATM by definition: that is why they need the exception at all.
+
+**SEP, TPO and PTR are the ones that matter.** Phosphoserine, phosphothreonine
+and phosphotyrosine are deposited as HETATM and are the entire point of a
+kinase-substrate structure. A phosphopeptide lost its phosphoresidues from
+every `polymer` selection: the cartoon breaks at the modified residue, and
+`byres (polymer within 5 of organic)` returns a pocket with a hole in it exactly
+where the chemistry is. No error, and a figure that looks deliberate.
+
+### The fix, and why it is a named set rather than a simpler rule
+
+The obvious simplification is to accept any name in `polymerResidues` whatever
+the record type, which is wrong in the opposite direction. A free alanine or
+glycine bound in a site is deposited as HETATM and is a LIGAND. Blanket
+acceptance would pull it into the protein, which is just as invisible and just
+as wrong.
+
+So `modifiedPolymerResidues` names the nine residues that take the exception,
+and the standard twenty appearing as HETATM stay out as the ligands they are.
+
+Tested both directions, because only testing the first would have licensed the
+simplification that breaks the second.
+
+### Still open
+
+No fixture has a residue numbered below 1. The selection tokeniser treats
+`50-120` as a single token specifically so that the minus sign in an expression
+tag's negative numbering is not read as a range separator, and nothing exercises
+a structure that actually has one.
+
+BoffinStructure 110 tests.

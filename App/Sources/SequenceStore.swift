@@ -14,6 +14,7 @@ import BoffinML
 import BoffinStructure
 import Observation
 import SwiftUI
+import WidgetKit
 
 @MainActor
 @Observable
@@ -242,6 +243,7 @@ final class SequenceStore {
             // Constructs need the disorder and topology tracks AND the homolog
             // precedent, so this runs last.
             recomputeConstructs()
+            recordSnapshot(for: sequence, predictions: result)
         } catch {
             modelTracks = []
             predictions = nil
@@ -613,6 +615,46 @@ final class SequenceStore {
         guard let bundle = Self.modelDirectory else { return }
         guard let engine = try? embeddingEngine(in: bundle) else { return }
         await engine.warmUp()
+    }
+
+    /// Leave the headline numbers where the widget can read them.
+    ///
+    /// Derived from predictions the app has just made rather than recomputed:
+    /// a widget gets a few tens of megabytes and cannot run a 67 MB backbone,
+    /// so anything it shows has to be computed here or not at all.
+    ///
+    /// Failure is ignored deliberately. A widget that cannot be updated shows
+    /// stale numbers; an analysis that failed because a widget could not be
+    /// updated would be absurd.
+    private func recordSnapshot(
+        for sequence: ProteinSequence, predictions: HeadPredictions
+    ) {
+        let residues = max(predictions.disorderProbability.count, 1)
+        let disordered = predictions.disorderProbability
+            .filter { $0 > predictions.disorderThreshold }.count
+        let helix = predictions.secondaryStructure.filter {
+            $0 == .alphaHelix || $0 == .threeTenHelix || $0 == .piHelix
+        }.count
+        let strand = predictions.secondaryStructure.filter {
+            $0 == .betaStrand || $0 == .betaBridge
+        }.count
+
+        SharedInbox.writeSnapshot(
+            AnalysisSnapshot(
+                name: sequence.name,
+                residueCount: sequence.count,
+                disorderedFraction: Double(disordered) / Double(residues),
+                helixFraction: Double(helix) / Double(residues),
+                strandFraction: Double(strand) / Double(residues),
+                // The Pfam accession, which is what the classifier actually
+                // knows. A human-readable name would need the family table,
+                // and a widget cannot load it.
+                familyName: familyCall?.top?.accession,
+                familyConfidence: familyCall?.top?.confidence,
+                analysedAt: Date()))
+        // Without this the widget shows the previous analysis until iOS next
+        // decides to refresh it, which can be hours.
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     /// Give back the engine's cached embeddings, keeping the model loaded.

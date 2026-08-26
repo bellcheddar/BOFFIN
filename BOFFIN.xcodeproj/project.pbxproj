@@ -15,6 +15,7 @@
 		0F9777EEEAF5CCD485EBF518 /* SelectionBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1CA8E2C14FA2AD30A300C8 /* SelectionBuilderView.swift */; };
 		0FBA9C5977B9BC9839951C64 /* SceneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87EB5FCF3A2ECC6E1119AAF /* SceneDeck.swift */; };
 		123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */; };
+		1B469B23A30CCBB8572B3A92 /* BoffinWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E6FD6DDF9D9A4DA99CF6CC /* BoffinWidget.swift */; };
 		309392C24349D867930D263C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		30D770903851CB5EF60E0780 /* FitnessTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A607093177A301AEAECFF0 /* FitnessTabView.swift */; };
 		343DBD360CF3B85BE7B4D0AE /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A37C9CB71C352F314951CF /* ShareViewController.swift */; };
@@ -30,8 +31,11 @@
 		822D6797A1FDD50249938A1C /* SequenceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */; };
 		86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14A4FCACD71928BC6B349BF /* FitnessTabUITests.swift */; };
 		892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */; };
+		9C46C50FE94AAE4BBB14BE9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		A0D31EF67066D2CB14A93D26 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		AA6AF3571C126E7D1975FE1C /* ScreenshotCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */; };
+		AD39D489F35D85DFDB4AA1E7 /* BOFFINQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FCFB5B1992AFA395C1573818 /* BOFFINQuickLook.appex */; };
+		AEB9271A7021333B07C6BEC3 /* BOFFINWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FDB080B0BD4D12058F9B8247 /* BOFFINWidget.appex */; };
 		B31D5E9CD2C7D310B2762DBD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		B4FAFC3F2B5E2685E3DF98FA /* AppSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEF2858CC20FB2A94033BAF /* AppSmokeTests.swift */; };
 		B6A5CBEF672462525018F65D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 80ACAF88CACF334FF8B043CE /* PrivacyInfo.xcprivacy */; };
@@ -40,7 +44,9 @@
 		E0F1D12FC78D7B293D42B305 /* BoffinIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AB5915B686A16BF428E028 /* BoffinIntents.swift */; };
 		E2DEEB525CCC0976F02BEF09 /* StructureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F6704AD6431E78767C846 /* StructureTabView.swift */; };
 		E5F4E3C9D53AF8E6D05554C4 /* BoundaryTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88BD62C7A7A7833A8769C4B /* BoundaryTabView.swift */; };
+		EA55C6096C9F1EC0EFD6BEFC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CA2675EEE882E56E8DC4C1 /* Foundation.framework */; };
 		EC0DD52C6D2BCDC9AC2A117B /* ExampleSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576B3A7177EA48A039B5C23E /* ExampleSequences.swift */; };
+		EE9FEC85502DF73DC78DE522 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A944F3582809B35E3F8B0795 /* PreviewViewController.swift */; };
 		F095E92EB33F7A668A9F5F9B /* BoffinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F519F5A35151A9069277CE /* BoffinApp.swift */; };
 		F3D2B5E1D57DFAA89281B7B3 /* ExternalDisplayScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847B3051F7F2F48C57869643 /* ExternalDisplayScene.swift */; };
 		F473D03A5B86076AE4353C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C4B37771FD3FEA80B21D072 /* Assets.xcassets */; };
@@ -49,6 +55,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2748E6B7A21F68DD7C8F798F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A0BE4A596DFF81FF2C699FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6A13817E407A1F347AFA5C3;
+			remoteInfo = BOFFINQuickLook;
+		};
 		852503CDBB09F35C0A185CAA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1A0BE4A596DFF81FF2C699FB /* Project object */;
@@ -62,6 +75,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = AF1F7D39381FF88BD55FD38E;
 			remoteInfo = BOFFIN;
+		};
+		CC71B313407A32EE160D7E63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A0BE4A596DFF81FF2C699FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 239B4D174A89FF89785C6ECC;
+			remoteInfo = BOFFINWidget;
 		};
 		FB6E59580A165FA1745AD103 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -80,6 +100,8 @@
 			dstSubfolderSpec = 13;
 			files = (
 				C4103237DB20CB961029F9BC /* BOFFINShare.appex in Embed Foundation Extensions */,
+				AD39D489F35D85DFDB4AA1E7 /* BOFFINQuickLook.appex in Embed Foundation Extensions */,
+				AEB9271A7021333B07C6BEC3 /* BOFFINWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,6 +114,7 @@
 		04A37C9CB71C352F314951CF /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		063F6704AD6431E78767C846 /* StructureTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StructureTabView.swift; path = App/Sources/StructureTabView.swift; sourceTree = "<group>"; };
 		07AB5915B686A16BF428E028 /* BoffinIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinIntents.swift; path = App/Sources/BoffinIntents.swift; sourceTree = "<group>"; };
+		07E6FD6DDF9D9A4DA99CF6CC /* BoffinWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoffinWidget.swift; sourceTree = "<group>"; };
 		1C4B37771FD3FEA80B21D072 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = App/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundaryTabUITests.swift; path = App/UITests/BoundaryTabUITests.swift; sourceTree = "<group>"; };
 		263D5703A26771A32159B0E2 /* NoSequenceView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoSequenceView.swift; path = App/Sources/NoSequenceView.swift; sourceTree = "<group>"; };
@@ -115,6 +138,7 @@
 		95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FamilyTabUITests.swift; path = App/UITests/FamilyTabUITests.swift; sourceTree = "<group>"; };
 		A25E506DF3A473C4D4925FA1 /* MANIFEST.md */ = {isa = PBXFileReference; includeInIndex = 1; name = MANIFEST.md; path = Fixtures/MANIFEST.md; sourceTree = "<group>"; };
 		A469349A97963F1293E91F91 /* PropertiesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PropertiesView.swift; path = App/Sources/PropertiesView.swift; sourceTree = "<group>"; };
+		A944F3582809B35E3F8B0795 /* PreviewViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
 		B2BB7456A68778FEF6291BD2 /* ATTRIBUTIONS.md */ = {isa = PBXFileReference; includeInIndex = 1; name = ATTRIBUTIONS.md; path = Docs/ATTRIBUTIONS.md; sourceTree = "<group>"; };
 		B748EDB595BF571562A511B3 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = App/Sources/RootView.swift; sourceTree = "<group>"; };
 		BE1F80B95B82AFE6A1578684 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = App/Sources/OnboardingView.swift; sourceTree = "<group>"; };
@@ -135,6 +159,8 @@
 		F1F519F5A35151A9069277CE /* BoffinApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoffinApp.swift; path = App/Sources/BoffinApp.swift; sourceTree = "<group>"; };
 		F3D52D3A375A745F5C688AD1 /* SequenceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SequenceStore.swift; path = App/Sources/SequenceStore.swift; sourceTree = "<group>"; };
 		F92CF2D37BBBC032A7551686 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = App/Resources/Info.plist; sourceTree = "<group>"; };
+		FCFB5B1992AFA395C1573818 /* BOFFINQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BOFFINQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FDB080B0BD4D12058F9B8247 /* BOFFINWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BOFFINWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,11 +172,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BEA85AE6909421AC1758F6C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C46C50FE94AAE4BBB14BE9D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5F15C646C4AB748A6DF8AEFA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B31D5E9CD2C7D310B2762DBD /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB148A318C6EE75F6EE3644D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA55C6096C9F1EC0EFD6BEFC /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +215,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10AA787D499E808A3FD8DF5D /* QuickLookExtension */ = {
+			isa = PBXGroup;
+			children = (
+				A944F3582809B35E3F8B0795 /* PreviewViewController.swift */,
+			);
+			name = QuickLookExtension;
+			path = Extensions/QuickLookExtension;
+			sourceTree = SOURCE_ROOT;
+		};
 		25B2F8FBDC33FAF97385AEF6 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -188,6 +239,8 @@
 				D65824DDFA9E4DC7375236C4 /* BOFFINTests.xctest */,
 				3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */,
 				3BD8A9ABB55D0FAB17BBBEBA /* BOFFINShare.appex */,
+				FCFB5B1992AFA395C1573818 /* BOFFINQuickLook.appex */,
+				FDB080B0BD4D12058F9B8247 /* BOFFINWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -238,6 +291,15 @@
 				467A32F0746DFDCFC98DD31F /* StructureTabUITests.swift */,
 			);
 			name = UITests;
+			sourceTree = SOURCE_ROOT;
+		};
+		8DD00BDF1B2B8ADA94C57A06 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				07E6FD6DDF9D9A4DA99CF6CC /* BoffinWidget.swift */,
+			);
+			name = Widget;
+			path = Extensions/Widget;
 			sourceTree = SOURCE_ROOT;
 		};
 		8F5F5C4DCBDA395D2F12AAEB /* Resources */ = {
@@ -301,6 +363,8 @@
 			isa = PBXGroup;
 			children = (
 				526113689FBF573252EE458E /* ShareExtension */,
+				10AA787D499E808A3FD8DF5D /* QuickLookExtension */,
+				8DD00BDF1B2B8ADA94C57A06 /* Widget */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -337,6 +401,26 @@
 			productReference = 3F1088F7B7179024551B03E2 /* BOFFINUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		239B4D174A89FF89785C6ECC /* BOFFINWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1EC40547E84CFD702B601C51 /* Build configuration list for PBXNativeTarget "BOFFINWidget" */;
+			buildPhases = (
+				412E0BAF83FA6E224B29CF5D /* Sources */,
+				AB148A318C6EE75F6EE3644D /* Frameworks */,
+				F6BC53BCF8F0B5D4C0AD295B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BOFFINWidget;
+			packageProductDependencies = (
+				E41C1A1886C206A1558C633F /* BoffinCore */,
+			);
+			productName = BOFFINWidget;
+			productReference = FDB080B0BD4D12058F9B8247 /* BOFFINWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		62AAE3EA6B5FE8AC246C07F7 /* BOFFINShare */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 77E3F314DB1BEFDD3AF884E9 /* Build configuration list for PBXNativeTarget "BOFFINShare" */;
@@ -371,6 +455,8 @@
 			);
 			dependencies = (
 				430CF9CD18B8F9F41C54DEA6 /* PBXTargetDependency */,
+				A5A3303A782AD231C3F311AD /* PBXTargetDependency */,
+				C076ECB8A22BF3ABA3CA39F9 /* PBXTargetDependency */,
 			);
 			name = BOFFIN;
 			packageProductDependencies = (
@@ -385,6 +471,26 @@
 			productName = BOFFIN;
 			productReference = 2C86B4F6F2133F1EC2D10115 /* BOFFIN.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B6A13817E407A1F347AFA5C3 /* BOFFINQuickLook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3ADB5F387FA4BE36030AD6D6 /* Build configuration list for PBXNativeTarget "BOFFINQuickLook" */;
+			buildPhases = (
+				0B8C9FF45FDFFB689AE19362 /* Sources */,
+				4BEA85AE6909421AC1758F6C /* Frameworks */,
+				876129DF37C54B6290630FB9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BOFFINQuickLook;
+			packageProductDependencies = (
+				6A1743F2E8A2D16D0CBDD3BA /* BoffinCore */,
+			);
+			productName = BOFFINQuickLook;
+			productReference = FCFB5B1992AFA395C1573818 /* BOFFINQuickLook.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		CF09D9BDF8F919D0478F2B9D /* BOFFINTests */ = {
 			isa = PBXNativeTarget;
@@ -441,6 +547,8 @@
 				CF09D9BDF8F919D0478F2B9D /* BOFFINTests */,
 				1E9501C31636001B98C8EFE4 /* BOFFINUITests */,
 				62AAE3EA6B5FE8AC246C07F7 /* BOFFINShare */,
+				B6A13817E407A1F347AFA5C3 /* BOFFINQuickLook */,
+				239B4D174A89FF89785C6ECC /* BOFFINWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -460,6 +568,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		876129DF37C54B6290630FB9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BCC5793D466993997DE45AA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -470,6 +585,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E52B3F6CAB659D81E2C85860 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6BC53BCF8F0B5D4C0AD295B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -497,6 +619,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0B8C9FF45FDFFB689AE19362 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EE9FEC85502DF73DC78DE522 /* PreviewViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C64FEB0877F4F8FA48001CC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -510,6 +640,14 @@
 				60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */,
 				D03A521291746E1B23096591 /* OnboardingUITests.swift in Sources */,
 				40AECFC6DC3030C336E0E52B /* StructureTabUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		412E0BAF83FA6E224B29CF5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B469B23A30CCBB8572B3A92 /* BoffinWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -572,6 +710,18 @@
 			target = AF1F7D39381FF88BD55FD38E /* BOFFIN */;
 			targetProxy = 852503CDBB09F35C0A185CAA /* PBXContainerItemProxy */;
 		};
+		A5A3303A782AD231C3F311AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BOFFINQuickLook;
+			target = B6A13817E407A1F347AFA5C3 /* BOFFINQuickLook */;
+			targetProxy = 2748E6B7A21F68DD7C8F798F /* PBXContainerItemProxy */;
+		};
+		C076ECB8A22BF3ABA3CA39F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BOFFINWidget;
+			target = 239B4D174A89FF89785C6ECC /* BOFFINWidget */;
+			targetProxy = CC71B313407A32EE160D7E63 /* PBXContainerItemProxy */;
+		};
 		C943F33DBB0503DCAEA78276 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BOFFIN;
@@ -613,10 +763,10 @@
 		6C182F2BF34A1F8B1CC082D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SYNV8TWB5Z;
@@ -649,13 +799,32 @@
 			};
 			name = Debug;
 		};
+		7E330EDE0D88097DE68BB7F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extensions/QuickLookExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.quicklook;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		7E76835A37038E624E6890E0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = App/Resources/BOFFIN.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -773,6 +942,26 @@
 			};
 			name = Release;
 		};
+		A0243C73FF578847F6024D79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Extensions/Widget/BOFFINWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extensions/Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		AE00F8ACBFCBB6703C44C3D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -856,6 +1045,39 @@
 			};
 			name = Debug;
 		};
+		DCB5A48CE9177F83E34F569F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Extensions/Widget/BOFFINWidget.entitlements;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extensions/Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F2FC5581ACA6ADAB9837A4A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				DEVELOPMENT_TEAM = SYNV8TWB5Z;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extensions/QuickLookExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mdeller.boffin.quicklook;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -868,11 +1090,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		1EC40547E84CFD702B601C51 /* Build configuration list for PBXNativeTarget "BOFFINWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0243C73FF578847F6024D79 /* Release */,
+				DCB5A48CE9177F83E34F569F /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2D0023BE94449DD9C1E99D40 /* Build configuration list for PBXNativeTarget "BOFFINTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32D1FC2EF27BA75B40151D52 /* Release */,
 				1CD87C3735EDC810A5CC53E6 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3ADB5F387FA4BE36030AD6D6 /* Build configuration list for PBXNativeTarget "BOFFINQuickLook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E330EDE0D88097DE68BB7F0 /* Release */,
+				F2FC5581ACA6ADAB9837A4A8 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -938,12 +1178,12 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C0FFEE0000000000000SHARE /* BoffinCore */ = {
+		52E64E40C0F2CF983CD10559 /* BoffinCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;
 			productName = BoffinCore;
 		};
-		52E64E40C0F2CF983CD10559 /* BoffinCore */ = {
+		6A1743F2E8A2D16D0CBDD3BA /* BoffinCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;
 			productName = BoffinCore;
@@ -972,6 +1212,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9E1CCB28266C60D8B611D3D5 /* XCLocalSwiftPackageReference "BoffinStructure" */;
 			productName = BoffinStructure;
+		};
+		C0FFEE0000000000000SHARE /* BoffinCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;
+			productName = BoffinCore;
+		};
+		E41C1A1886C206A1558C633F /* BoffinCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A22640C5128C88C43A85DAA /* XCLocalSwiftPackageReference "BoffinCore" */;
+			productName = BoffinCore;
 		};
 		E4E1452A61C24872CF80AE64 /* BoffinCharts */ = {
 			isa = XCSwiftPackageProductDependency;

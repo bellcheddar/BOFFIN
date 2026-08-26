@@ -47,3 +47,46 @@ struct SharedInboxTests {
         #expect(SharedInbox.take() == nil)
     }
 }
+
+@Suite("Analysis snapshot")
+struct AnalysisSnapshotTests {
+
+    private var example: AnalysisSnapshot {
+        AnalysisSnapshot(
+            name: "CDK2_HUMAN", residueCount: 298, disorderedFraction: 0.11,
+            helixFraction: 0.34, strandFraction: 0.19,
+            familyName: "PF00069", familyConfidence: 0.98, analysedAt: Date())
+    }
+
+    @Test(
+        "The snapshot survives the round trip the widget reads it through",
+        .enabled(if: SharedInbox.containerURL != nil))
+    func roundTrip() throws {
+        SharedInbox.writeSnapshot(example)
+        let read = try #require(SharedInbox.readSnapshot())
+        #expect(read.name == "CDK2_HUMAN")
+        #expect(read.residueCount == 298)
+        #expect(abs(read.disorderedFraction - 0.11) < 1e-9)
+        #expect(read.familyName == "PF00069")
+    }
+
+    @Test(
+        "Reading does NOT consume, unlike the shared sequence",
+        .enabled(if: SharedInbox.containerURL != nil))
+    func readIsNotDestructive() {
+        SharedInbox.writeSnapshot(example)
+        #expect(SharedInbox.readSnapshot() != nil)
+        // The widget reads this on every refresh. Consuming it, as `take()`
+        // does for a shared sequence, would blank the widget the first time
+        // iOS refreshed it.
+        #expect(SharedInbox.readSnapshot() != nil)
+    }
+
+    @Test("The two shared files do not collide")
+    func distinctFiles() {
+        // Both live in the same container. If they shared a name, analysing a
+        // sequence would look to the app like someone had shared one, and it
+        // would try to parse JSON as FASTA.
+        #expect(SharedInbox.fileName != SharedInbox.snapshotName)
+    }
+}

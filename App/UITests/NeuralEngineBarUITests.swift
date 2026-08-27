@@ -29,7 +29,7 @@ final class NeuralEngineBarUITests: XCTestCase {
             "the bar is on screen before the model has run: \(bar.label)")
     }
 
-    func testTheBarReportsTheWorkItActuallyDid() {
+    func testTheBarReportsTheWorkItActuallyDid() throws {
         let app = XCUIApplication()
         app.launchSkippingOnboarding()
         let bar = app.otherElements["boffin.ane-bar"]
@@ -41,6 +41,17 @@ final class NeuralEngineBarUITests: XCTestCase {
             app.staticTexts["298 residues \u{00B7} UniProt P24941"]
                 .waitForExistence(timeout: 300),
             "the sequence never loaded")
+
+        // The models are gitignored, so a CI checkout has none and no pass can
+        // run. The bar is then correctly ABSENT, and asserting it appears
+        // would be asserting that a build without models behaves as though it
+        // had them. Skipped with the reason stated rather than passed
+        // vacuously.
+        if app.staticTexts["Analysis models are not bundled in this build."]
+            .waitForExistence(timeout: 20)
+        {
+            throw XCTSkip("no analysis models in this build, so no pass can run")
+        }
 
         // Counted passes are the evidence: the bar cannot know this number
         // without the model having run, so its presence is what distinguishes

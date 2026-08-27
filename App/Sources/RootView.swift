@@ -34,6 +34,29 @@ struct RootView: View {
     }
 
     var body: some View {
+        VStack(spacing: 0) {
+            // Across the top of everything, above the tabs. The app's whole
+            // premise is that a protein language model runs in your pocket,
+            // and that is invisible when it works.
+            //
+            // Absent until it has something to say, rather than sitting there
+            // as permanent chrome saying "idle". That is also what keeps it
+            // out of the empty state's way: it takes 24 points from every
+            // screen, and on a fresh launch that compressed the example
+            // buttons in the empty state to 43.7 points, which the
+            // touch-target test caught.
+            if store.neuralEngine.activity.isActive || store.neuralEngine.passes > 0 {
+                NeuralEngineBar(status: store.neuralEngine)
+                Divider()
+            }
+            tabs
+        }
+        .sheet(isPresented: $isShowingOnboarding) {
+            OnboardingView(store: store)
+        }
+    }
+
+    private var tabs: some View {
         TabView {
             Tab("Order", systemImage: "waveform.path.ecg") {
                 OrderTabView(store: store)
@@ -90,9 +113,6 @@ struct RootView: View {
         // Shown once. Not blocking: it is a sheet over a working app rather
         // than a gate in front of one, so a returning user who has cleared
         // their storage loses a swipe rather than their place.
-        .sheet(isPresented: $isShowingOnboarding) {
-            OnboardingView(store: store)
-        }
         .task {
             guard !Self.suppressOnboarding else { return }
             guard !hasSeenOnboarding else { return }

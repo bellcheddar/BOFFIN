@@ -169,6 +169,12 @@ extension View {
             minWidth: Spacing.minimumTouchTarget,
             minHeight: Spacing.minimumTouchTarget
         )
+        // `minHeight` is a request, not a guarantee: a parent short of room
+        // compresses through it. Adding the Neural Engine strip to the top of
+        // the app took 24 points from every screen and the example buttons in
+        // the empty state came out at 43.7, which the touch-target test
+        // caught. fixedSize makes the vertical minimum binding.
+        .fixedSize(horizontal: false, vertical: true)
         .contentShape(Rectangle())
     }
 }

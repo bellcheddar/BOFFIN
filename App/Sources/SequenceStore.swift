@@ -12,6 +12,7 @@ import BoffinCore
 import BoffinData
 import BoffinML
 import BoffinStructure
+import BoffinUI
 import Observation
 import SwiftUI
 import WidgetKit
@@ -20,6 +21,14 @@ import WidgetKit
 @Observable
 final class SequenceStore {
     private(set) var sequence: ProteinSequence?
+
+    /// What the Neural Engine is doing, for the bar across the top.
+    ///
+    /// Driven from the points where the app actually calls Core ML rather
+    /// than inferred from elapsed time or animated on a timer: a progress
+    /// indicator that is not attached to the work it depicts is a decoration,
+    /// and this one exists precisely to show that the work is real.
+    private(set) var neuralEngine = NeuralEngineStatus()
     private(set) var tracks: [AnyResidueTrack] = []
 
     /// Model-derived tracks, kept separate from the analytical ones so the UI
@@ -223,10 +232,19 @@ final class SequenceStore {
         modelState = .running
         do {
             let engine = try embeddingEngine(in: bundle)
+            neuralEngine.activity = .embedding
+            let startedAt = Date()
             let embedding = try await engine.embed(sequence)
+            // Counted per PASS, not per analysis: a tiled sequence runs the
+            // backbone more than once, and reporting one would understate what
+            // the hardware actually did.
+            finishPass(count: embedding.passes, since: startedAt)
 
             let heads = try AnalysisHeads(directory: bundle.appending(path: "heads"))
+            neuralEngine.activity = .heads
+            let headsStartedAt = Date()
             let result = try await heads.predict(for: embedding)
+            finishPass(count: 1, since: headsStartedAt)
 
             // Validate before showing: a track that does not line up with the
             // sequence draws a convincing picture of the wrong thing.
@@ -249,6 +267,15 @@ final class SequenceStore {
             predictions = nil
             modelState = .failed(UserFacingError(error, whileDoing: "analysing the sequence"))
         }
+        // In BOTH paths. An indicator left pulsing after a failure says the
+        // hardware is busy when it is not, which is worse than saying nothing.
+        neuralEngine.activity = .idle
+    }
+
+    /// Record a completed pass and return the indicator to rest.
+    private func finishPass(count: Int, since start: Date) {
+        neuralEngine.passes += count
+        neuralEngine.lastPassSeconds = Date().timeIntervalSince(start) / Double(max(count, 1))
     }
 
     /// Assemble the solver's inputs from three modules that cannot see each
@@ -697,6 +724,7 @@ final class SequenceStore {
         }
         scanTask?.cancel()
         scanState = .running(fraction: 0)
+        neuralEngine.activity = .scanning(fraction: 0)
 
         // Disorder masking narrows the scan to ordered positions. Scoring a
         // disordered region is rarely actionable, and in the slow mode it is
@@ -724,11 +752,14 @@ final class SequenceStore {
                 self.llr = matrix
                 self.llrMode = mode
                 self.scanState = .ready
+                self.neuralEngine.activity = .idle
             } catch is CancellationError {
                 self.scanState = .cancelled
+                self.neuralEngine.activity = .idle
             } catch {
                 self.scanState = .failed(
                     UserFacingError(error, whileDoing: "scanning mutations"))
+                self.neuralEngine.activity = .idle
             }
         }
     }
@@ -738,6 +769,8 @@ final class SequenceStore {
     private func report(_ progress: ScanProgress) {
         if case .running = scanState {
             scanState = .running(fraction: progress.fraction)
+            neuralEngine.activity = .scanning(fraction: progress.fraction)
+            neuralEngine.passes += 1
         }
     }
 

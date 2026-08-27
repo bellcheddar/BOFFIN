@@ -54,6 +54,7 @@
 		F68F37B01EC086FC75DD1E13 /* OpenedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD92A1E5E58AD3413CEF82D5 /* OpenedDocument.swift */; };
 		215361D5CBA4A29754B4B7EF /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC1F6DA918FEB32C3F7A726 /* LibraryView.swift */; };
 		D527007021DCCF07288DD37A /* LibraryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5FA2DAA12DF85FA9E757ED /* LibraryUITests.swift */; };
+		F2ACC71040F2F530492E404D /* NeuralEngineBarUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C985A1261A98B71AAC60533A /* NeuralEngineBarUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -165,6 +166,7 @@
 		FDB080B0BD4D12058F9B8247 /* BOFFINWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BOFFINWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BC1F6DA918FEB32C3F7A726 /* LibraryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LibraryView.swift; path = App/Sources/LibraryView.swift; sourceTree = "<group>"; };
 		AB5FA2DAA12DF85FA9E757ED /* LibraryUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LibraryUITests.swift; path = App/UITests/LibraryUITests.swift; sourceTree = "<group>"; };
+		C985A1261A98B71AAC60533A /* NeuralEngineBarUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NeuralEngineBarUITests.swift; path = App/UITests/NeuralEngineBarUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,6 +291,7 @@
 				CF3222BCE24F65F84CA0580A /* ProbeTests.swift */,
 				95B1444A2B2830C6AE1BA0F5 /* FamilyTabUITests.swift */,
 				1CC9A552FEF7C15866CA7CB6 /* BoundaryTabUITests.swift */,
+				C985A1261A98B71AAC60533A /* NeuralEngineBarUITests.swift */,
 				AB5FA2DAA12DF85FA9E757ED /* LibraryUITests.swift */,
 				028A79FE8164E3D068E50FD3 /* ScreenshotCaptureTests.swift */,
 				D4CA611FFBA9A77D079E6E77 /* TouchTargetUITests.swift */,
@@ -642,6 +645,7 @@
 				86A14BFEBE6C22E5BF84465A /* FitnessTabUITests.swift in Sources */,
 				892EE2A0B15063EFC2524447 /* FamilyTabUITests.swift in Sources */,
 				123748A49624BCB18F737AAF /* BoundaryTabUITests.swift in Sources */,
+				F2ACC71040F2F530492E404D /* NeuralEngineBarUITests.swift in Sources */,
 				D527007021DCCF07288DD37A /* LibraryUITests.swift in Sources */,
 				AA6AF3571C126E7D1975FE1C /* ScreenshotCaptureTests.swift in Sources */,
 				60CC5560AD8FCD8876FAC10D /* TouchTargetUITests.swift in Sources */,

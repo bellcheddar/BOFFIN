@@ -53,6 +53,8 @@ The expensive step is running the model. So BOFFIN runs it **once**, and every f
 
 This is why the app can be fast on a phone rather than merely possible on one. Describing a 300-residue protein takes about **31 ms**, and searching all 72,421 proteins in the PDB for its nearest relatives takes **5.4 ms**. Both figures are measured on the development Mac against phone budgets of 250 ms and 100 ms respectively; measuring them on the device itself is still outstanding, and is on the list below rather than quietly assumed.
 
+
+A slim strip across the top of the app shows it working: what the model is doing right now, how many forward passes it has run since launch, and how long the last one took. **There is no utilisation dial, because iOS does not expose one** — no API reports how busy the Neural Engine is, and a percentage there would be invented. What the strip shows instead is counted or measured: passes it actually ran, and the **746 of 755 operations** Core ML scheduled onto the Neural Engine. Even that last figure is described as *scheduled* rather than used, because it comes from the compute plan, and a plan is not an execution trace.
 ## 🔬 What it does
 
 | Tab | What you get |

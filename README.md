@@ -96,7 +96,12 @@ An app that only advertises what it is good at is a sales brochure. These are on
 
 ## 🔒 Everything stays on the device
 
-There is no inference server, no account, and no telemetry. The privacy manifest declares that BOFFIN collects **nothing**, and not "nothing identifiable": nothing. Structure files can be fetched from the PDB and AlphaFold if you ask for them, and that is the only network traffic the app generates. An unpublished sequence pasted into BOFFIN never leaves the phone, which is the difference between using it on a real project and using it on a demo.
+There is no inference server, no account, and no telemetry. The privacy manifest declares that BOFFIN collects **nothing**, and not "nothing identifiable": nothing. **Analysis is always on the device** — every model runs on the Neural Engine in your pocket, and no sequence is ever sent anywhere to be analysed. That is the difference between using it on a real project and using it on a demo.
+
+Two things reach the network, and both only when you ask:
+
+- **Structure files** from the PDB and AlphaFold, when you type an identifier or tap fetch.
+- **Saved sequences**, if you turn on iCloud sync in the Library. This is **off by default**, and while it is off nothing you paste leaves the device at all. Turned on, saved sequences are copied to *your own* private iCloud database — not to us, and not to anyone else — so they appear on your other devices. The analysis still happens on-device either way; what syncs is the sequence you chose to keep, never the results.
 
 ## ⚖️ Where the data comes from
 

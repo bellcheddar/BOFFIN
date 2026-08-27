@@ -17,6 +17,7 @@ import SwiftUI
 struct OrderTabView: View {
     @Bindable var store: SequenceStore
     @State private var isShowingInput = false
+    @State private var isShowingLibrary = false
 
     var body: some View {
         NavigationStack {
@@ -38,6 +39,17 @@ struct OrderTabView: View {
                     .accessibilityLabel("Acknowledgements")
                     .accessibilityIdentifier("boffin.acknowledgements-link")
                 }
+            }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Library", systemImage: "books.vertical") {
+                        isShowingLibrary = true
+                    }
+                    .accessibilityIdentifier("boffin.library-link")
+                }
+            }
+            .sheet(isPresented: $isShowingLibrary) {
+                LibraryView(store: store)
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

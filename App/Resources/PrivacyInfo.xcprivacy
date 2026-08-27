@@ -2,27 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- BOFFIN collects nothing. Not "nothing identifiable", not "nothing
-	     without consent": nothing. Every analysis runs on device, the model is
-	     bundled, and the only network traffic the app can generate is a
-	     structure fetch the user asks for by typing an identifier.
-
-	     This file says that in the form Apple reads. Declaring a collected data
-	     type here that the app does not collect is as wrong as omitting one it
-	     does. -->
-	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
-
-	<!-- No tracking, and no tracking domains to declare. -->
-	<key>NSPrivacyTracking</key>
-	<false/>
-	<key>NSPrivacyTrackingDomains</key>
-	<array/>
-
-	<!-- Required-reason APIs. Only the file timestamp API is used, and only to
-	     check the size of a file a user handed the app before reading it, which
-	     is reason C617.1: the file is one the user has explicitly granted access
-	     to via a document picker or share sheet. -->
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>
@@ -33,6 +12,20 @@
 				<string>C617.1</string>
 			</array>
 		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
 	</array>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
 </dict>
 </plist>

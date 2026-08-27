@@ -466,6 +466,7 @@ BoffinStructure     → BoffinCore
 BoffinCharts        → BoffinCore
 BoffinUI            → BoffinCore
 BoffinViewer        → BoffinCore, BoffinStructure
+BoffinRenderer      → BoffinCore, BoffinStructure
 App                 → everything (wiring only)
 ```
 

@@ -11,6 +11,7 @@
 #   BoffinCharts    -> BoffinCore
 #   BoffinUI        -> BoffinCore
 #   BoffinViewer    -> BoffinCore, BoffinStructure
+#   BoffinRenderer  -> BoffinCore, BoffinStructure
 #
 # If a feature seems to need an upward dependency, the abstraction is in the
 # wrong module. This script fails the build rather than letting that happen
@@ -24,7 +25,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-MODULES=(BoffinCore BoffinML BoffinData BoffinStructure BoffinViewer BoffinCharts BoffinUI)
+MODULES=(BoffinCore BoffinML BoffinData BoffinStructure BoffinViewer BoffinCharts BoffinUI BoffinRenderer)
 
 allowed_for () {
     case "$1" in
@@ -35,6 +36,7 @@ allowed_for () {
         BoffinCharts)    echo "BoffinCore" ;;
         BoffinUI)        echo "BoffinCore" ;;
         BoffinViewer)    echo "BoffinCore BoffinStructure" ;;
+        BoffinRenderer)  echo "BoffinCore BoffinStructure" ;;
         *)               echo "__UNKNOWN__" ;;
     esac
 }

@@ -11,7 +11,7 @@ Full specification: `Docs/BOFFIN_BUILD_PLAN.md`. That document is authoritative.
 
 ## Current state
 
-- **Phase:** 3 and 5 to 9 substantially complete; **10 in progress** (document types and App Intents done; extensions need new Xcode targets)
+- **Phase:** 3 and 5 to 10 complete; **11 complete bar its own acceptance test** (a TestFlight build is uploaded and signed but not yet installed by a tester); **12 not started**
 - **Last completed:** Phase 10's document opening and App Intents on 2026-08-25 (see `Docs/CHANGELOG.md`)
 - **Blocked on:** nothing. Open questions 1, 2 and 3 are answered. **Release** is blocked on two unverified licences: the DTU head-training datasets, and SIFTS, which states none at all
 
